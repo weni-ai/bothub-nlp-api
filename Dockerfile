@@ -5,7 +5,7 @@ ENV BOTHUB_NLP_API_PORT 2657
 
 WORKDIR $WORKDIR
 
-COPY bothub-nlp-api .
+COPY . .
 
 RUN apk update \
     && apk add --virtual .build-dependencies --no-cache \
