@@ -18,8 +18,8 @@ def train_handler(authorization, repository_version=None):
 
     for language in settings.SUPPORTED_LANGUAGES.keys():
 
-        current_update = backend().request_backend_parse(
-            "train", repository_authorization, language, repository_version
+        current_update = backend().request_backend_train(
+            repository_authorization, language, repository_version
         )
 
         if not current_update.get("ready_for_train"):

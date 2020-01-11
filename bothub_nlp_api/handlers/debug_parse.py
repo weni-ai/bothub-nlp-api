@@ -32,7 +32,7 @@ def _debug_parse(
 
     try:
         update = backend().request_backend_parse(
-            "parse", repository_authorization, language, repository_version
+            repository_authorization, language, repository_version
         )
     except Exception:
         update = {}
@@ -41,7 +41,7 @@ def _debug_parse(
         next_languages = NEXT_LANGS.get(language, [])
         for next_language in next_languages:
             update = backend().request_backend_parse(
-                "parse", repository_authorization, next_language, repository_version
+                repository_authorization, next_language, repository_version
             )
             if update.get("version"):
                 break
