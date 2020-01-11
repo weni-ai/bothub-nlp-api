@@ -84,7 +84,7 @@ async def info_handler(
     Authorization: str = Header(..., description="Bearer your_key"),
 ):
     repository_authorization = get_repository_authorization(Authorization)
-    info = backend().request_backend_parse("info", repository_authorization)
+    info = backend().request_backend_info(repository_authorization)
     if info.get("detail"):
         raise HTTPException(status_code=400, detail=info)
     info["intents"] = info["intents_list"]
