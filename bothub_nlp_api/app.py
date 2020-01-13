@@ -14,7 +14,9 @@ logging.basicConfig(
 
 # Sentry
 if settings.BOTHUB_NLP_SENTRY_CLIENT:
-    init(dsn=settings.BOTHUB_NLP_SENTRY, environment=settings.ENVIRONMENT)
+    init(
+        dsn=settings.BOTHUB_NLP_SENTRY, environment=settings.ENVIRONMENT
+    )  # pragma: no cover
 
 app = FastAPI(title="Bothub NLP", version="3.0", description="", docs_url="/")
 

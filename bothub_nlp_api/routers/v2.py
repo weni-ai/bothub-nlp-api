@@ -41,7 +41,7 @@ async def parsepost_handler(
 
 @router.options(r"/parse/?", status_code=204, include_in_schema=False)
 async def parse_options():
-    return {}
+    return {}  # pragma: no cover
 
 
 @router.post(r"/debug_parse/?", response_model=DebugParseResponse)
@@ -58,7 +58,7 @@ async def debug_parsepost_handler(
 
 @router.options(r"/debug_parse/?", status_code=204, include_in_schema=False)
 async def debug_parse_options():
-    return {}
+    return {}  # pragma: no cover
 
 
 @router.post(r"/train/?", response_model=TrainResponse)
@@ -75,7 +75,7 @@ async def train_handler(
 
 @router.options(r"/train/?", status_code=204, include_in_schema=False)
 async def train_options():
-    return {}
+    return {}  # pragma: no cover
 
 
 # @router.get(r"/info/?", response_model=InfoResponse)
@@ -95,7 +95,7 @@ async def info_handler(
 
 @router.options(r"/info/?", status_code=204, include_in_schema=False)
 async def info_options():
-    return {}
+    return {}  # pragma: no cover
 
 
 @router.post(r"/evaluate/?", response_model=EvaluateResponse)
@@ -114,4 +114,4 @@ async def evaluate_handler(
 
 @router.options(r"/evaluate/?", status_code=204, include_in_schema=False)
 async def evaluate_options():
-    return {}
+    return {}  # pragma: no cover
