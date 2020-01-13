@@ -8,7 +8,6 @@ from bothub_nlp_api.handlers import parse
 from bothub_nlp_api.handlers import debug_parse
 from bothub_nlp_api.handlers import train
 from bothub_nlp_api.models import EvaluateResponse
-from bothub_nlp_api.models import InfoResponse
 from bothub_nlp_api.models import ParseResponse
 from bothub_nlp_api.models import TrainResponse
 from bothub_nlp_api.utils import AuthorizationRequired
@@ -24,7 +23,7 @@ async def parse_handler(
     language: str = Form(default=None),
     rasa_format: Optional[str] = Form(default=False),
     repository_version: Optional[int] = Form(default=None),
-    request: Request = Depends(AuthorizationRequired()),
+    request: Request = Depends(AuthorizationRequired()),  # flake8: noqa
     Authorization: str = Header(..., description="Bearer your_key"),
     user_agent: str = Header(None),
 ):
@@ -63,9 +62,7 @@ async def parse_handler(
     Authorization: str = Header(..., description="Bearer your_key"),
 ):
 
-    return debug_parse._debug_parse(
-        Authorization, text, language, repository_version
-    )
+    return debug_parse._debug_parse(Authorization, text, language, repository_version)
 
 
 @router.options(r"/debug_parse/?", status_code=204, include_in_schema=False)

@@ -8,5 +8,5 @@ class TestDoc(unittest.TestCase):
         self.app = TestClient(api.app)
 
     def test_base(self):
-        response = self.app.get('/')
+        response = self.app.get("/")
         self.assertEqual(response.status_code, 200)

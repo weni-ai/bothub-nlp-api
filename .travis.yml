@@ -1,0 +1,16 @@
+language: python
+python:
+  - "3.6"
+services:
+  - docker
+install:
+  - pip install pipenv
+  - pipenv install --system --dev
+  - pip install coveralls
+env:
+  global:
+    - SUPPORTED_LANGUAGES="en|pt"
+script:
+  - flake8
+after_success:
+  - coveralls

@@ -1,0 +1,9 @@
+[run]
+source =
+    ./bothub_nlp_api
+
+omit =
+    ./bothub_nlp_api/tests/*
+
+[report]
+fail_under = 1

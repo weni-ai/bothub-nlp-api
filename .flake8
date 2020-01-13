@@ -4,3 +4,7 @@ ignore = E501,W503,E203
 exclude =
   ./env
   ./gunicorn.conf.py
+
+per-file-ignores =
+  ./bothub_nlp_api/routers/v1.py: F811
+  ./bothub_nlp_api/routers/v2.py: F811

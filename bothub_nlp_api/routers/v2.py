@@ -5,11 +5,15 @@ from bothub_nlp_api.handlers import evaluate
 from bothub_nlp_api.handlers import parse
 from bothub_nlp_api.handlers import debug_parse
 from bothub_nlp_api.handlers import train
-from bothub_nlp_api.models import ParseRequest, DebugParseRequest, TrainRequest, EvaluateRequest
+from bothub_nlp_api.models import (
+    ParseRequest,
+    DebugParseRequest,
+    TrainRequest,
+    EvaluateRequest,
+)
 from bothub_nlp_api.models import ParseResponse
 from bothub_nlp_api.models import DebugParseResponse
 from bothub_nlp_api.models import TrainResponse
-from bothub_nlp_api.models import InfoResponse
 from bothub_nlp_api.models import EvaluateResponse
 from bothub_nlp_api.utils import backend, AuthorizationRequired
 from bothub_nlp_api.utils import get_repository_authorization
@@ -48,10 +52,7 @@ async def debug_parsepost_handler(
 ):
 
     return debug_parse._debug_parse(
-        Authorization,
-        item.text,
-        item.language,
-        item.repository_version,
+        Authorization, item.text, item.language, item.repository_version
     )
 
 
