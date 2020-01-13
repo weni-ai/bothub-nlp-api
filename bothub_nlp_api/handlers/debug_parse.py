@@ -1,6 +1,3 @@
-import json
-import threading
-
 from bothub_nlp_celery.actions import ACTION_PARSE, queue_name
 from bothub_nlp_celery.app import celery_app
 from bothub_nlp_celery.tasks import TASK_NLU_DEBUG_PARSE_TEXT
@@ -12,12 +9,7 @@ from bothub_nlp_api.utils import backend
 from bothub_nlp_api.utils import get_repository_authorization
 
 
-def _debug_parse(
-    authorization,
-    text,
-    language,
-    repository_version=None,
-):
+def _debug_parse(authorization, text, language, repository_version=None):
     from ..utils import NEXT_LANGS
 
     if language and (
