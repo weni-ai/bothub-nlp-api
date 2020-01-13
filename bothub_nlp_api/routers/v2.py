@@ -5,11 +5,15 @@ from bothub_nlp_api.handlers import evaluate
 from bothub_nlp_api.handlers import parse
 from bothub_nlp_api.handlers import debug_parse
 from bothub_nlp_api.handlers import train
-from bothub_nlp_api.models import ParseRequest, DebugParseRequest, TrainRequest, EvaluateRequest
+from bothub_nlp_api.models import (
+    ParseRequest,
+    DebugParseRequest,
+    TrainRequest,
+    EvaluateRequest,
+)
 from bothub_nlp_api.models import ParseResponse
 from bothub_nlp_api.models import DebugParseResponse
 from bothub_nlp_api.models import TrainResponse
-from bothub_nlp_api.models import InfoResponse
 from bothub_nlp_api.models import EvaluateResponse
 from bothub_nlp_api.utils import backend, AuthorizationRequired
 from bothub_nlp_api.utils import get_repository_authorization
@@ -37,7 +41,7 @@ async def parsepost_handler(
 
 @router.options(r"/parse/?", status_code=204, include_in_schema=False)
 async def parse_options():
-    return {}
+    return {}  # pragma: no cover
 
 
 @router.post(r"/debug_parse/?", response_model=DebugParseResponse)
@@ -48,16 +52,13 @@ async def debug_parsepost_handler(
 ):
 
     return debug_parse._debug_parse(
-        Authorization,
-        item.text,
-        item.language,
-        item.repository_version,
+        Authorization, item.text, item.language, item.repository_version
     )
 
 
 @router.options(r"/debug_parse/?", status_code=204, include_in_schema=False)
 async def debug_parse_options():
-    return {}
+    return {}  # pragma: no cover
 
 
 @router.post(r"/train/?", response_model=TrainResponse)
@@ -74,7 +75,7 @@ async def train_handler(
 
 @router.options(r"/train/?", status_code=204, include_in_schema=False)
 async def train_options():
-    return {}
+    return {}  # pragma: no cover
 
 
 # @router.get(r"/info/?", response_model=InfoResponse)
@@ -84,7 +85,7 @@ async def info_handler(
     Authorization: str = Header(..., description="Bearer your_key"),
 ):
     repository_authorization = get_repository_authorization(Authorization)
-    info = backend().request_backend_parse("info", repository_authorization)
+    info = backend().request_backend_info(repository_authorization)
     if info.get("detail"):
         raise HTTPException(status_code=400, detail=info)
     info["intents"] = info["intents_list"]
@@ -94,7 +95,7 @@ async def info_handler(
 
 @router.options(r"/info/?", status_code=204, include_in_schema=False)
 async def info_options():
-    return {}
+    return {}  # pragma: no cover
 
 
 @router.post(r"/evaluate/?", response_model=EvaluateResponse)
@@ -113,4 +114,4 @@ async def evaluate_handler(
 
 @router.options(r"/evaluate/?", status_code=204, include_in_schema=False)
 async def evaluate_options():
-    return {}
+    return {}  # pragma: no cover

@@ -24,8 +24,8 @@ def evaluate_handler(authorization, language, repository_version=None):
         raise AuthorizationIsRequired()
 
     try:
-        update = backend().request_backend_parse(
-            "evaluate", repository_authorization, language, repository_version
+        update = backend().request_backend_evaluate(
+            repository_authorization, language, repository_version
         )
     except Exception:
         update = {}
