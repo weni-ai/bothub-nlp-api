@@ -12,5 +12,6 @@ env:
     - SUPPORTED_LANGUAGES="en|pt"
 script:
   - flake8
+  - travis_wait coverage run -m unittest discover bothub_nlp_api/tests
 after_success:
   - coveralls
