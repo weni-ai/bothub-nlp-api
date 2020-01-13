@@ -1,0 +1,10 @@
+language: python
+python:
+  - "3.6"
+services:
+  - docker
+install:
+  - pip install coveralls
+script:
+  - echo "test"
+  - echo "test2"
