@@ -3,6 +3,7 @@ from bothub_nlp_celery.actions import ACTION_WORDS_DISTIRBUTION, queue_name
 from bothub_nlp_celery.app import celery_app
 from bothub_nlp_celery.tasks import TASK_NLU_WORDS_DISTRIBUTION
 from bothub_nlp_api.utils import get_repository_authorization
+from bothub_nlp_api.utils import ValidationError
 
 from ..utils import backend
 
@@ -27,7 +28,7 @@ def _words_distribution(authorization, language, repository_version=None):
         args=[
             current_update.get("current_version_id"),
             language,
-            repository_authorization
+            repository_authorization,
         ],
         queue=queue_name(ACTION_WORDS_DISTIRBUTION, language),
     )

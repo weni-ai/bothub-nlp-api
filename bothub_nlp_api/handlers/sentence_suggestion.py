@@ -22,10 +22,5 @@ def _sentence_suggestion(text, language):
     )
     answer_task.wait()
     answer = answer_task.result
-    answer.update(
-        {
-            "text": text,
-            "language": language,
-        }
-    )
+    answer.update({"text": text, "language": language})
     return answer

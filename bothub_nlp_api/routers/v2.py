@@ -19,7 +19,7 @@ from bothub_nlp_api.models import (
     SentenceSuggestionResponse,
     WordsDistributionResponse,
     TrainResponse,
-    EvaluateResponse
+    EvaluateResponse,
 )
 from bothub_nlp_api.utils import backend, AuthorizationRequired
 from bothub_nlp_api.utils import get_repository_authorization
@@ -68,13 +68,9 @@ async def debug_parse_options():
 
 
 @router.post(r"/sentence_suggestion/?", response_model=SentenceSuggestionResponse)
-async def sentence_suggestion_post_handler(
-    item: SentenceSuggestionRequest,
-):
+async def sentence_suggestion_post_handler(item: SentenceSuggestionRequest,):
 
-    return sentence_suggestion._sentence_suggestion(
-        item.text, item.language
-    )
+    return sentence_suggestion._sentence_suggestion(item.text, item.language)
 
 
 @router.post(r"/words_distribution/?", response_model=WordsDistributionResponse)
