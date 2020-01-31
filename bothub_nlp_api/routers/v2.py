@@ -5,19 +5,22 @@ from bothub_nlp_api.handlers import evaluate
 from bothub_nlp_api.handlers import parse
 from bothub_nlp_api.handlers import debug_parse
 from bothub_nlp_api.handlers import sentence_suggestion
+from bothub_nlp_api.handlers import words_distribution
 from bothub_nlp_api.handlers import train
 from bothub_nlp_api.models import (
     ParseRequest,
     DebugParseRequest,
     SentenceSuggestionRequest,
+    WordsDistributionRequest,
     TrainRequest,
     EvaluateRequest,
+    ParseResponse,
+    DebugParseResponse,
+    SentenceSuggestionResponse,
+    WordsDistributionResponse,
+    TrainResponse,
+    EvaluateResponse
 )
-from bothub_nlp_api.models import ParseResponse
-from bothub_nlp_api.models import DebugParseResponse
-from bothub_nlp_api.models import SentenceSuggestionResponse
-from bothub_nlp_api.models import TrainResponse
-from bothub_nlp_api.models import EvaluateResponse
 from bothub_nlp_api.utils import backend, AuthorizationRequired
 from bothub_nlp_api.utils import get_repository_authorization
 
@@ -71,6 +74,17 @@ async def sentence_suggestion_post_handler(
 
     return sentence_suggestion._sentence_suggestion(
         item.text, item.language
+    )
+
+
+@router.post(r"/words_distribution/?", response_model=WordsDistributionResponse)
+async def words_distribution_post_handler(
+    item: WordsDistributionRequest,
+    request: Request = Depends(AuthorizationRequired()),
+    Authorization: str = Header(..., description="Bearer your_key"),
+):
+    return words_distribution._words_distribution(
+        Authorization, item.language, item.repository_version
     )
 
 

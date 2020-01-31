@@ -2,6 +2,8 @@ import bothub_backend
 from fastapi import HTTPException, Header
 from starlette.requests import Request
 
+from decouple import config
+
 import bothub_nlp_api.settings
 
 
