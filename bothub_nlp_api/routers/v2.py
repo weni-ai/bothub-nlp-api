@@ -70,7 +70,7 @@ async def sentence_suggestion_post_handler(
 ):
 
     return sentence_suggestion._sentence_suggestion(
-        item.text, item.language
+        item.text, item.language, item.n, item.percentage_to_replace
     )
 
 
