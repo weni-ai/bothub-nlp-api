@@ -27,7 +27,7 @@ def _sentence_suggestion(text, language, n, percentage_to_replace):
             "text": text,
             "language": language,
             "n": n,
-            "percentage_to_replace": percentage_to_replace
+            "percentage_to_replace": percentage_to_replace,
         }
     )
     return answer
