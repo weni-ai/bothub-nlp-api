@@ -19,7 +19,7 @@ class DebugParseRequest(BaseModel):
 class SentenceSuggestionRequest(BaseModel):
     text: str
     language: str = None
-    n: int = 10
+    n_sentences_to_generate: int = 10
     percentage_to_replace: float = 0.3
 
 

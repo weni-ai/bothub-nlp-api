@@ -68,7 +68,7 @@ async def debug_parse_options():
 async def sentence_suggestion_post_handler(item: SentenceSuggestionRequest,):
 
     return sentence_suggestion._sentence_suggestion(
-        item.text, item.language, item.n, item.percentage_to_replace
+        item.text, item.language, item.n_sentences_to_generate, item.percentage_to_replace
     )
 
 
