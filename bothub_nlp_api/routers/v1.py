@@ -6,9 +6,12 @@ from starlette.requests import Request
 from bothub_nlp_api.handlers import evaluate
 from bothub_nlp_api.handlers import parse
 from bothub_nlp_api.handlers import debug_parse
+from bothub_nlp_api.handlers import sentence_suggestion
 from bothub_nlp_api.handlers import train
 from bothub_nlp_api.models import EvaluateResponse
 from bothub_nlp_api.models import ParseResponse
+from bothub_nlp_api.models import DebugParseResponse
+from bothub_nlp_api.models import SentenceSuggestionResponse
 from bothub_nlp_api.models import TrainResponse
 from bothub_nlp_api.utils import AuthorizationRequired
 from bothub_nlp_api.utils import backend
@@ -53,8 +56,8 @@ async def parse_options():
     return {}  # pragma: no cover
 
 
-@router.post(r"/debug_parse/?", response_model=ParseResponse)
-async def parse_handler(
+@router.post(r"/debug_parse/?", response_model=DebugParseResponse)
+async def debug_parse_handler(
     text: str = Form(...),
     language: str = Form(default=None),
     repository_version: Optional[int] = Form(default=None),
@@ -66,7 +69,25 @@ async def parse_handler(
 
 
 @router.options(r"/debug_parse/?", status_code=204, include_in_schema=False)
-async def parse_options():
+async def debug_parse_options():
+    return {}  # pragma: no cover
+
+
+@router.post(r"/sentence_suggestion/?", response_model=SentenceSuggestionResponse)
+async def sentence_suggestion_handler(
+    text: str = Form(...),
+    language: str = Form(default="pt"),
+    n_sentences_to_generate: int = Form(default=10),
+    percentage_to_replace: float = Form(default=0.3),
+):
+
+    return sentence_suggestion._sentence_suggestion(
+        text, language, n_sentences_to_generate, percentage_to_replace
+    )
+
+
+@router.options(r"/sentence_suggestion/?", status_code=204, include_in_schema=False)
+async def sentence_suggestion_options():
     return {}  # pragma: no cover
 
 
