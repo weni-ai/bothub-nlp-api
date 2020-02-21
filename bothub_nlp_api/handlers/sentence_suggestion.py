@@ -6,7 +6,7 @@ from bothub_nlp_api import settings
 from bothub_nlp_api.utils import ValidationError
 
 
-def _sentence_suggestion(text, language):
+def _sentence_suggestion(text, language, n_sentences_to_generate, percentage_to_replace):
     from ..utils import NEXT_LANGS
 
     if language and (
@@ -17,7 +17,7 @@ def _sentence_suggestion(text, language):
 
     answer_task = celery_app.send_task(
         TASK_NLU_SENTENCE_SUGGESTION_TEXT,
-        args=[text],
+        args=[text, percentage_to_replace, n_sentences_to_generate],
         queue=queue_name(ACTION_SENTENCE_SUGGESTION, language),
     )
     answer_task.wait()
@@ -26,6 +26,8 @@ def _sentence_suggestion(text, language):
         {
             "text": text,
             "language": language,
+            "n_sentences_to_generate": n_sentences_to_generate,
+            "percentage_to_replace": percentage_to_replace,
         }
     )
     return answer

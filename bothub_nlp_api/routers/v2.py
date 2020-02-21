@@ -65,12 +65,10 @@ async def debug_parse_options():
 
 
 @router.post(r"/sentence_suggestion/?", response_model=SentenceSuggestionResponse)
-async def sentence_suggestion_post_handler(
-    item: SentenceSuggestionRequest,
-):
+async def sentence_suggestion_post_handler(item: SentenceSuggestionRequest,):
 
     return sentence_suggestion._sentence_suggestion(
-        item.text, item.language
+        item.text, item.language, item.n_sentences_to_generate, item.percentage_to_replace
     )
 
 

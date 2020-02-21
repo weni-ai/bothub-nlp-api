@@ -76,10 +76,14 @@ async def debug_parse_options():
 @router.post(r"/sentence_suggestion/?", response_model=SentenceSuggestionResponse)
 async def sentence_suggestion_handler(
     text: str = Form(...),
-    language: str = Form(default='pt'),
+    language: str = Form(default="pt"),
+    n_sentences_to_generate: int = Form(default=10),
+    percentage_to_replace: float = Form(default=0.3),
 ):
 
-    return sentence_suggestion._sentence_suggestion(text, language)
+    return sentence_suggestion._sentence_suggestion(
+        text, language, n_sentences_to_generate, percentage_to_replace
+    )
 
 
 @router.options(r"/sentence_suggestion/?", status_code=204, include_in_schema=False)
