@@ -16,6 +16,13 @@ class DebugParseRequest(BaseModel):
     repository_version: int = None
 
 
+class SentenceSuggestionRequest(BaseModel):
+    text: str
+    language: str = None
+    n_sentences_to_generate: int = 10
+    percentage_to_replace: float = 0.3
+
+
 class TrainRequest(BaseModel):
     repository_version: int = None
 
@@ -52,6 +59,11 @@ class DebugParseResponse(BaseModel):
     text: str
     repository_version: int
     language: str
+
+
+class SentenceSuggestionResponse(BaseModel):
+    text: str
+    suggested_sentences: List[str]
 
 
 class TrainResponse(BaseModel):
