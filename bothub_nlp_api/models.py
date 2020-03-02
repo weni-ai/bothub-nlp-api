@@ -23,6 +23,11 @@ class SentenceSuggestionRequest(BaseModel):
     percentage_to_replace: float = 0.3
 
 
+class WordsDistributionRequest(BaseModel):
+    language: str = None
+    repository_version: int = None
+
+
 class TrainRequest(BaseModel):
     repository_version: int = None
 
@@ -64,6 +69,10 @@ class DebugParseResponse(BaseModel):
 class SentenceSuggestionResponse(BaseModel):
     text: str
     suggested_sentences: List[str]
+
+
+class WordsDistributionResponse(BaseModel):
+    words: Dict[str, Dict[str, float]]
 
 
 class TrainResponse(BaseModel):
