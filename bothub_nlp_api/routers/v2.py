@@ -69,8 +69,14 @@ async def debug_parse_options():
 
 @router.post(r"/sentence_suggestion/?", response_model=SentenceSuggestionResponse)
 async def sentence_suggestion_post_handler(item: SentenceSuggestionRequest,):
+    return sentence_suggestion._sentence_suggestion(
+        item.text, item.language, item.n_sentences_to_generate, item.percentage_to_replace
+    )
+  
 
-    return sentence_suggestion._sentence_suggestion(item.text, item.language)
+@router.options(r"/sentence_suggestion/?", status_code=204, include_in_schema=False)
+async def sentence_suggestion_options():
+    return {}  # pragma: no cover
 
 
 @router.post(r"/words_distribution/?", response_model=WordsDistributionResponse)
@@ -81,11 +87,10 @@ async def words_distribution_post_handler(
 ):
     return words_distribution._words_distribution(
         Authorization, item.language, item.repository_version
-    )
+      
 
-
-@router.options(r"/sentence_suggestion/?", status_code=204, include_in_schema=False)
-async def sentence_suggestion_options():
+@router.options(r"/words_distribution/?", status_code=204, include_in_schema=False)
+async def words_distribution_options():
     return {}  # pragma: no cover
 
 
