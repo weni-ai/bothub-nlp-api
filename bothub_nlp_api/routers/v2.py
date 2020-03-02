@@ -10,17 +10,17 @@ from bothub_nlp_api.handlers import train
 from bothub_nlp_api.models import (
     ParseRequest,
     DebugParseRequest,
-    SentenceSuggestionRequest,
     WordsDistributionRequest,
+    SentenceSuggestionRequest,
+    WordsDistributionResponse,
     TrainRequest,
     EvaluateRequest,
-    ParseResponse,
-    DebugParseResponse,
-    SentenceSuggestionResponse,
-    WordsDistributionResponse,
-    TrainResponse,
-    EvaluateResponse,
 )
+from bothub_nlp_api.models import ParseResponse
+from bothub_nlp_api.models import DebugParseResponse
+from bothub_nlp_api.models import SentenceSuggestionResponse
+from bothub_nlp_api.models import TrainResponse
+from bothub_nlp_api.models import EvaluateResponse
 from bothub_nlp_api.utils import backend, AuthorizationRequired
 from bothub_nlp_api.utils import get_repository_authorization
 
@@ -69,10 +69,14 @@ async def debug_parse_options():
 
 @router.post(r"/sentence_suggestion/?", response_model=SentenceSuggestionResponse)
 async def sentence_suggestion_post_handler(item: SentenceSuggestionRequest,):
+
     return sentence_suggestion._sentence_suggestion(
-        item.text, item.language, item.n_sentences_to_generate, item.percentage_to_replace
+        item.text,
+        item.language,
+        item.n_sentences_to_generate,
+        item.percentage_to_replace,
     )
-  
+
 
 @router.options(r"/sentence_suggestion/?", status_code=204, include_in_schema=False)
 async def sentence_suggestion_options():
@@ -87,7 +91,8 @@ async def words_distribution_post_handler(
 ):
     return words_distribution._words_distribution(
         Authorization, item.language, item.repository_version
-      
+    )
+
 
 @router.options(r"/words_distribution/?", status_code=204, include_in_schema=False)
 async def words_distribution_options():
