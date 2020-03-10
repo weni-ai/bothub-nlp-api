@@ -42,6 +42,7 @@ async def parsepost_handler(
         item.rasa_format,
         item.repository_version,
         user_agent=user_agent,
+        from_backend=item.from_backend,
     )
 
 
