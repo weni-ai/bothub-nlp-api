@@ -19,6 +19,7 @@ def _parse(
     rasa_format=False,
     repository_version=None,
     user_agent=None,
+    from_backend=False,
 ):
     from ..utils import NEXT_LANGS
 
@@ -72,6 +73,7 @@ def _parse(
         kwargs={
             "data": {
                 "text": text,
+                "from_backend": from_backend,
                 "user_agent": user_agent,
                 "user": str(get_repository_authorization(authorization)),
                 "repository_version_language": int(update.get("repository_version")),

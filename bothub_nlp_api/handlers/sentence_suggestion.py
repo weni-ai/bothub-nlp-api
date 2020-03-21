@@ -6,7 +6,9 @@ from bothub_nlp_api import settings
 from bothub_nlp_api.utils import ValidationError
 
 
-def _sentence_suggestion(text, language, n_sentences_to_generate, percentage_to_replace):
+def _sentence_suggestion(
+    text, language, n_sentences_to_generate, percentage_to_replace
+):
     from ..utils import NEXT_LANGS
 
     if language and (
