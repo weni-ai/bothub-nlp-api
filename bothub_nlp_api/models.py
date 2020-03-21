@@ -8,6 +8,7 @@ class ParseRequest(BaseModel):
     language: str = None
     rasa_format: bool = False
     repository_version: int = None
+    from_backend: bool = False
 
 
 class DebugParseRequest(BaseModel):
@@ -21,6 +22,11 @@ class SentenceSuggestionRequest(BaseModel):
     language: str = None
     n_sentences_to_generate: int = 10
     percentage_to_replace: float = 0.3
+
+
+class WordsDistributionRequest(BaseModel):
+    language: str = None
+    repository_version: int = None
 
 
 class TrainRequest(BaseModel):
@@ -64,6 +70,10 @@ class DebugParseResponse(BaseModel):
 class SentenceSuggestionResponse(BaseModel):
     text: str
     suggested_sentences: List[str]
+
+
+class WordsDistributionResponse(BaseModel):
+    words: Dict[str, Dict[str, float]]
 
 
 class TrainResponse(BaseModel):

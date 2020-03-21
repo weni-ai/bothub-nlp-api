@@ -26,13 +26,20 @@ async def parse_handler(
     language: str = Form(default=None),
     rasa_format: Optional[str] = Form(default=False),
     repository_version: Optional[int] = Form(default=None),
+    from_backend: Optional[bool] = Form(default=False),
     request: Request = Depends(AuthorizationRequired()),  # flake8: noqa
     Authorization: str = Header(..., description="Bearer your_key"),
     user_agent: str = Header(None),
 ):
 
     return parse._parse(
-        Authorization, text, language, rasa_format, repository_version, user_agent
+        Authorization,
+        text,
+        language,
+        rasa_format,
+        repository_version,
+        user_agent,
+        from_backend,
     )
 
 
@@ -41,13 +48,19 @@ async def parse_handler(
     text: str,
     language: str = None,
     rasa_format: Optional[str] = False,
+    from_backend: Optional[bool] = Form(default=False),
     request: Request = Depends(AuthorizationRequired()),
     Authorization: str = Header(..., description="Bearer your_key"),
     user_agent: str = Header(None),
 ):
 
     return parse._parse(
-        Authorization, text, language, rasa_format, user_agent=user_agent
+        Authorization,
+        text,
+        language,
+        rasa_format,
+        user_agent=user_agent,
+        from_backend=from_backend,
     )
 
 
