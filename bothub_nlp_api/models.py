@@ -51,7 +51,6 @@ class IntentRankingResponse(BaseModel):
 class ParseResponse(BaseModel):
     intent: IntentResponse
     intent_ranking: List[IntentRankingResponse]
-    labels_list: List[str]
     entities_list: List[str]
     entities: Dict[str, List[Dict[str, Any]]]
     text: str
