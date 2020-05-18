@@ -61,6 +61,7 @@ class ParseResponse(BaseModel):
 class DebugParseResponse(BaseModel):
     intent: IntentResponse
     words: Dict[str, Any]
+    entities: List[Dict[str, Any]]
     text: str
     repository_version: int
     language: str
