@@ -52,7 +52,7 @@ class ParseResponse(BaseModel):
     intent: IntentResponse
     intent_ranking: List[IntentRankingResponse]
     entities_list: List[str]
-    entities: Dict[str, List[Dict[str, Any]]]
+    entities: List[Dict[str, Any]]
     text: str
     repository_version: int
     language: str
