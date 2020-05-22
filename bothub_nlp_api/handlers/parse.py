@@ -70,7 +70,6 @@ def _parse(
             }
         }
     )
-    print(json.dumps(answer, indent=2))
 
     log = threading.Thread(
         target=backend().send_log_nlp_parse,
