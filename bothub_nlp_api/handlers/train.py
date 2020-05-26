@@ -15,6 +15,7 @@ def train_handler(authorization, repository_version=None):
     repository_authorization = get_repository_authorization(authorization)
 
     languages_report = {}
+    train_tasks = []
 
     for language in settings.SUPPORTED_LANGUAGES.keys():
 
@@ -26,24 +27,28 @@ def train_handler(authorization, repository_version=None):
             languages_report[language] = {"status": TRAIN_STATUS_NOT_READY_FOR_TRAIN}
             continue
 
-        try:
-            train_task = celery_app.send_task(
-                TASK_NLU_TRAIN_UPDATE,
-                args=[
-                    current_update.get("current_version_id"),
-                    current_update.get("repository_authorization_user_id"),
-                    repository_authorization,
-                ],
-                queue=queue_name(ACTION_TRAIN, current_update.get("language")),
-            )
-            train_task.wait()
+        train_task = celery_app.send_task(
+            TASK_NLU_TRAIN_UPDATE,
+            args=[
+                current_update.get("current_version_id"),
+                current_update.get("repository_authorization_user_id"),
+                repository_authorization,
+            ],
+            queue=queue_name(ACTION_TRAIN, current_update.get("language")),
+        )
+        train_tasks.append({"task": train_task, "language": language})
+
+    for train_task in train_tasks:
+        language = train_task.get("language")
+        train_task["task"].wait(propagate=False)
+        if train_task["task"].successful():
             languages_report[language] = {"status": TRAIN_STATUS_TRAINED}
-        except Exception as e:
+        elif train_task["task"].failed():
             languages_report[language] = {
                 "status": TRAIN_STATUS_FAILED,
-                "error": str(e),
+                "error": str(train_task["task"].result),
             }
-            raise e
+
 
     resp = {
         "SUPPORTED_LANGUAGES": list(settings.SUPPORTED_LANGUAGES.keys()),
