@@ -49,7 +49,6 @@ def train_handler(authorization, repository_version=None):
                 "error": str(train_task["task"].result),
             }
 
-
     resp = {
         "SUPPORTED_LANGUAGES": list(settings.SUPPORTED_LANGUAGES.keys()),
         "languages_report": languages_report,
