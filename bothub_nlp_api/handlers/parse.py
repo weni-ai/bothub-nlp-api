@@ -65,6 +65,10 @@ def _parse(
             "text": text,
             "repository_version": update.get("repository_version"),
             "language": update.get("language"),
+            "labels_list": ["other"],
+            "entities": {
+                "other": answer.get("entities", [])
+            }
         }
     )
 
