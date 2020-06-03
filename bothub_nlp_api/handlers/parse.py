@@ -1,5 +1,6 @@
 import json
 import threading
+from babel import Locale
 
 from bothub_nlp_celery.actions import ACTION_PARSE, queue_name
 from bothub_nlp_celery.app import celery_app
@@ -22,6 +23,11 @@ def _parse(
     from_backend=False,
 ):
     from ..utils import NEXT_LANGS
+
+    try:
+        language = str(Locale.parse(language).language).lower()
+    except ValueError:
+        raise ValidationError("Expected only letters, got '{}'".format(language))
 
     if language and (
         language not in settings.SUPPORTED_LANGUAGES.keys()
@@ -66,9 +72,7 @@ def _parse(
             "repository_version": update.get("repository_version"),
             "language": update.get("language"),
             "labels_list": ["other"],
-            "entities": {
-                "other": answer.get("entities", [])
-            }
+            "entities": {"other": answer.get("entities", [])},
         }
     )
 
