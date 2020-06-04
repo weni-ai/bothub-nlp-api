@@ -13,6 +13,25 @@ from bothub_nlp_api.utils import backend
 from bothub_nlp_api.utils import get_repository_authorization
 
 
+def order_by_confidence(entities):
+    return sorted(
+        entities,
+        key=lambda x: (x.get("confidence") is not None, x.get("confidence")),
+        reverse=True,
+    )
+
+
+def get_entities_dict(answer):
+    entities_dict = {}
+    entities = answer.get("entities")
+    for entity in reversed(order_by_confidence(entities)):
+        group_value = entity.get("role") if entity.get("role") else "other"
+        if not entities_dict.get(group_value):
+            entities_dict[group_value] = []
+        entities_dict[group_value].append(entity)
+    return entities_dict
+
+
 def _parse(
     authorization,
     text,
@@ -66,13 +85,14 @@ def _parse(
     )
     answer_task.wait()
     answer = answer_task.result
+    entities_dict = get_entities_dict(answer)
     answer.update(
         {
             "text": text,
             "repository_version": update.get("repository_version"),
             "language": update.get("language"),
-            "labels_list": ["other"],
-            "entities": {"other": answer.get("entities", [])},
+            "group_list": list(entities_dict.keys()),
+            "entities": entities_dict,
         }
     )
 
