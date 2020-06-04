@@ -23,6 +23,7 @@ python-multipart = "*"
 email-validator = "*"
 dataclasses = "==0.6"
 sentry-sdk = "==0.13.2"
+babel = "==2.8.0"
 
 [dev-packages]
 "psycopg2-binary" = "*"
