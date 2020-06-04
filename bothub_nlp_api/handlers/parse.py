@@ -43,10 +43,11 @@ def _parse(
 ):
     from ..utils import NEXT_LANGS
 
-    try:
-        language = str(Locale.parse(language).language).lower()
-    except ValueError:
-        raise ValidationError("Expected only letters, got '{}'".format(language))
+    if not str(language).lower() == "pt_br":
+        try:
+            language = str(Locale.parse(language).language).lower()
+        except ValueError:
+            raise ValidationError("Expected only letters, got '{}'".format(language))
 
     if language and (
         language not in settings.SUPPORTED_LANGUAGES.keys()
