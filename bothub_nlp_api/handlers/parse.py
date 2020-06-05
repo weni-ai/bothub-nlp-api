@@ -1,6 +1,7 @@
 import json
 import threading
-from babel import Locale, UnknownLocaleError
+
+import babel
 
 from bothub_nlp_celery.actions import ACTION_PARSE, queue_name
 from bothub_nlp_celery.app import celery_app
@@ -45,10 +46,10 @@ def _parse(
 
     if not str(language).lower() == "pt_br":
         try:
-            language = str(Locale.parse(language).language).lower()
+            language = str(babel.Locale.parse(language).language).lower()
         except ValueError:
             raise ValidationError("Expected only letters, got '{}'".format(language))
-        except UnknownLocaleError:
+        except babel.core.UnknownLocaleError:
             raise ValidationError("Language '{}' not supported by now.".format(language))
 
     if language and (
