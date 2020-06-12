@@ -127,8 +127,6 @@ async def info_handler(
     info = backend().request_backend_info(repository_authorization)
     if info.get("detail"):
         raise HTTPException(status_code=400, detail=info)
-    info["intents"] = info["intents_list"]
-    info.pop("intents_list")
     return info
 
 
