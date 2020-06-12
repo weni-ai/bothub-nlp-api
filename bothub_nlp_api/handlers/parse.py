@@ -1,6 +1,8 @@
 import json
 import threading
 
+import babel
+
 from bothub_nlp_celery.actions import ACTION_PARSE, queue_name
 from bothub_nlp_celery.app import celery_app
 from bothub_nlp_celery.tasks import TASK_NLU_PARSE_TEXT
@@ -10,6 +12,25 @@ from bothub_nlp_api.utils import AuthorizationIsRequired
 from bothub_nlp_api.utils import ValidationError
 from bothub_nlp_api.utils import backend
 from bothub_nlp_api.utils import get_repository_authorization
+
+
+def order_by_confidence(entities):
+    return sorted(
+        entities,
+        key=lambda x: (x.get("confidence") is not None, x.get("confidence")),
+        reverse=True,
+    )
+
+
+def get_entities_dict(answer):
+    entities_dict = {}
+    entities = answer.get("entities")
+    for entity in reversed(order_by_confidence(entities)):
+        group_value = entity.get("role") if entity.get("role") else "other"
+        if not entities_dict.get(group_value):
+            entities_dict[group_value] = []
+        entities_dict[group_value].append(entity)
+    return entities_dict
 
 
 def _parse(
@@ -22,6 +43,15 @@ def _parse(
     from_backend=False,
 ):
     from ..utils import NEXT_LANGS
+
+    if language is not None:
+        if not str(language).lower() == "pt_br":
+            try:
+                language = str(babel.Locale.parse(language).language).lower()
+            except ValueError:
+                raise ValidationError("Expected only letters, got '{}'".format(language))
+            except babel.core.UnknownLocaleError:
+                raise ValidationError("Language '{}' not supported by now.".format(language))
 
     if language and (
         language not in settings.SUPPORTED_LANGUAGES.keys()
@@ -60,11 +90,14 @@ def _parse(
     )
     answer_task.wait()
     answer = answer_task.result
+    entities_dict = get_entities_dict(answer)
     answer.update(
         {
             "text": text,
             "repository_version": update.get("repository_version"),
             "language": update.get("language"),
+            "group_list": list(entities_dict.keys()),
+            "entities": entities_dict,
         }
     )
 

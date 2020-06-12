@@ -9,7 +9,7 @@ lint = "flake8"
 [packages]
 raven = "*"
 requests = "==2.20.1"
-bothub_backend = {ref = "1.0.8",git = "https://github.com/Ilhasoft/bothub-backend"}
+bothub_backend = {ref = "1.0.9",git = "https://github.com/Ilhasoft/bothub-backend"}
 celery = "==4.3.0"
 gunicorn = "==19.9.0"
 gevent = "==1.4.0"
@@ -23,6 +23,9 @@ python-multipart = "*"
 email-validator = "*"
 dataclasses = "==0.6"
 sentry-sdk = "==0.13.2"
+babel = "==2.8.0"
+python-decouple = "==3.3"
+numpy = "==1.18.1"
 
 [dev-packages]
 "psycopg2-binary" = "*"
