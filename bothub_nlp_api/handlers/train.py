@@ -9,6 +9,7 @@ from ..utils import get_repository_authorization
 TRAIN_STATUS_TRAINED = "trained"
 TRAIN_STATUS_FAILED = "failed"
 TRAIN_STATUS_NOT_READY_FOR_TRAIN = "not_ready_for_train"
+AI_PLATFORM_TRAIN_JOB_SUCCEEDED = "SUCCEEDED"
 
 
 def train_handler(authorization, repository_version=None):
@@ -78,6 +79,7 @@ def get_train_job_status(project_name, job_name):
     
     return response['state']
 
+
 def get_train_job_ml_units(project_name, job_name):
     project_name = project_name
     projectId = 'projects/{}'.format(project_name)
@@ -96,6 +98,9 @@ def get_train_job_ml_units(project_name, job_name):
         raise e
 
     if response == None:
-        raise Exception("Got None as response.")
+        raise Exception("Got response as None.")
+    
+    if response['state'] != AI_PLATFORM_TRAIN_JOB_SUCCEEDED:
+        raise Exception("The job status isn't succeeded")
     
     return response['trainingOutput']['consumedMLUnits']
