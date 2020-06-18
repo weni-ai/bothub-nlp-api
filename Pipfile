@@ -24,8 +24,8 @@ email-validator = "*"
 dataclasses = "==0.6"
 sentry-sdk = "==0.13.2"
 babel = "==2.8.0"
-python-decouple = "==3.3"
 numpy = "==1.18.1"
+google-api-python-client = "*"
 
 [dev-packages]
 "psycopg2-binary" = "*"
