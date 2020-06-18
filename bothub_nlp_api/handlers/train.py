@@ -36,11 +36,13 @@ def train_handler(authorization, repository_version=None):
             ],
             queue=queue_name(ACTION_TRAIN, current_update.get("language")),
         )
+        print(train_task.task_id)
         train_tasks.append({"task": train_task, "language": language})
 
     for train_task in train_tasks:
         language = train_task.get("language")
         train_task["task"].wait(propagate=False)
+        print(train_task["task"])
         if train_task["task"].successful():
             languages_report[language] = {"status": TRAIN_STATUS_TRAINED}
         elif train_task["task"].failed():

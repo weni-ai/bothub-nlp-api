@@ -53,3 +53,26 @@ class AuthorizationRequired:
         if not repository_authorization:
             raise HTTPException(status_code=401, detail="Authorization is required")
         return True
+
+
+def get_train_job_status(project_name, job_name):
+    project_name = project_name
+    projectId = 'projects/{}'.format(project_name)
+    job_name = job_name
+    jobId = '{}/jobs/{}'.format(projectId, job_name)
+
+    cloudml = discovery.build('ml', 'v1')
+
+    request = cloudml.projects().jobs().get(name=jobId)
+
+    response = None
+
+    try:
+        response = request.execute()
+    except errors.HttpError as e:
+        raise e
+
+    if response == None:
+        raise Exception("Got None as response.")
+
+    return response['state']
