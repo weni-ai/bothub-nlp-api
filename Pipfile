@@ -25,7 +25,7 @@ dataclasses = "==0.6"
 sentry-sdk = "==0.13.2"
 babel = "==2.8.0"
 numpy = "==1.18.1"
-google-api-python-client = "*"
+google-api-python-client = "==1.9.1"
 
 [dev-packages]
 "psycopg2-binary" = "*"
