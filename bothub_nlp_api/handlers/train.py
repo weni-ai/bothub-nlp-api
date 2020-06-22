@@ -1,8 +1,9 @@
+import time
 from bothub_nlp_celery.actions import ACTION_TRAIN, queue_name
 from bothub_nlp_celery.app import celery_app
 from bothub_nlp_celery.tasks import TASK_NLU_TRAIN_UPDATE
 
-from .. import settings
+from .. import settings, utils
 from ..utils import backend
 from ..utils import get_repository_authorization
 
@@ -26,33 +27,34 @@ def train_handler(authorization, repository_version=None):
         if not current_update.get("ready_for_train"):
             languages_report[language] = {"status": TRAIN_STATUS_NOT_READY_FOR_TRAIN}
             continue
-
-        train_task = celery_app.send_task(
-            TASK_NLU_TRAIN_UPDATE,
-            args=[
-                current_update.get("current_version_id"),
-                current_update.get("repository_authorization_user_id"),
-                repository_authorization,
-            ],
-            queue=queue_name(ACTION_TRAIN, current_update.get("language")),
-        )
-        print(train_task.task_id)
-        train_tasks.append({"task": train_task, "language": language})
-
-    for train_task in train_tasks:
-        language = train_task.get("language")
-        train_task["task"].wait(propagate=False)
-        print(train_task["task"])
-        if train_task["task"].successful():
-            languages_report[language] = {"status": TRAIN_STATUS_TRAINED}
-        elif train_task["task"].failed():
-            languages_report[language] = {
-                "status": TRAIN_STATUS_FAILED,
-                "error": str(train_task["task"].result),
-            }
+        if settings.BOTHUB_SERVICE_TRAIN == "celery":
+            train_task = celery_app.send_task(
+                TASK_NLU_TRAIN_UPDATE,
+                args=[
+                    current_update.get("current_version_id"),
+                    current_update.get("repository_authorization_user_id"),
+                    repository_authorization,
+                ],
+                queue=queue_name(ACTION_TRAIN, current_update.get("language")),
+            )
+            train_tasks.append({"task": train_task, "language": language})
+        elif settings.BOTHUB_SERVICE_TRAIN == "ai-platform":
+            job_id = f'bothub_{settings.ENVIRONMENT}_train_{str(current_update.get("current_version_id"))}_{str(int(time.time()))}'
+            utils.send_job_train_ai_platform(
+                jobId=job_id,
+                repository_version=str(current_update.get("current_version_id")),
+                by_id=str(current_update.get("repository_authorization_user_id")),
+                repository_authorization=str(repository_authorization),
+            )
+            backend().request_backend_save_queue_id(
+                repository_version=str(current_update.get("current_version_id")),
+                repository_authorization=str(repository_authorization),
+                task_id=job_id,
+                from_queue=0
+            )
 
     resp = {
         "SUPPORTED_LANGUAGES": list(settings.SUPPORTED_LANGUAGES.keys()),
-        "languages_report": languages_report,
+        "languages_report": {},
     }
     return resp

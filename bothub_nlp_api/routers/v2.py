@@ -14,7 +14,8 @@ from bothub_nlp_api.models import (
     SentenceSuggestionRequest,
     WordsDistributionResponse,
     TrainRequest,
-    EvaluateRequest, TaskQueueResponse,
+    EvaluateRequest,
+    TaskQueueResponse,
 )
 from bothub_nlp_api.models import ParseResponse
 from bothub_nlp_api.models import DebugParseResponse
@@ -155,11 +156,6 @@ async def evaluate_options():
 
 
 @router.get(r"/task-queue/?", response_model=TaskQueueResponse)
-async def task_queue_handler(
-    id_task: str,
-    from_queue: str,
-    request: Request = Depends(AuthorizationRequired()),
-    Authorization: str = Header(..., description="Bearer your_key"),
-):
+async def task_queue_handler(id_task: str, from_queue: str):
 
-    return task_queue.task_queue_handler(Authorization, id_task, from_queue)
+    return task_queue.task_queue_handler(id_task, from_queue)
