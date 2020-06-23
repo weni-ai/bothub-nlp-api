@@ -137,12 +137,8 @@ def send_job_train_ai_platform(
 
     try:
         request.execute()
-        return True
-
     except errors.HttpError as err:
-        # Do whatever error response is appropriate for your application.
-        # For this example, just send some text to the logs.
-        # You need to import logging for this to work.
-        print("There was an error creating the training job. Check the details:")
-        print(err)
-    return False
+        raise HTTPException(
+            status_code=401,
+            detail=f"There was an error creating the training job. Check the details: {err}",
+        )
