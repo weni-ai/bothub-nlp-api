@@ -39,18 +39,19 @@ def train_handler(authorization, repository_version=None):
             )
             train_tasks.append({"task": train_task, "language": language})
         elif settings.BOTHUB_SERVICE_TRAIN == "ai-platform":
-            job_id = f'bothub_{settings.ENVIRONMENT}_train_{str(current_update.get("current_version_id"))}_{str(int(time.time()))}'
+            job_id = f'bothub_{settings.ENVIRONMENT}_train_{str(current_update.get("current_version_id"))}_{language}_{str(int(time.time()))}'
             utils.send_job_train_ai_platform(
                 jobId=job_id,
                 repository_version=str(current_update.get("current_version_id")),
                 by_id=str(current_update.get("repository_authorization_user_id")),
                 repository_authorization=str(repository_authorization),
+                language=language,
             )
             backend().request_backend_save_queue_id(
                 update_id=str(current_update.get("current_version_id")),
                 repository_authorization=str(repository_authorization),
                 task_id=job_id,
-                from_queue=0
+                from_queue=0,
             )
 
     resp = {

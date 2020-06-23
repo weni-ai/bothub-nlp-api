@@ -1,18 +1,11 @@
-import json
-from urllib.parse import urlencode
-from urllib.request import urlopen
-
 import bothub_backend
-import requests
-
-import bothub_nlp_api.settings
+import google.oauth2.credentials
 from fastapi import HTTPException, Header
-from starlette.requests import Request
-from google.oauth2 import service_account
 from googleapiclient import discovery
 from googleapiclient import errors
-import google.oauth2.credentials
+from starlette.requests import Request
 
+import bothub_nlp_api.settings
 from bothub_nlp_api import settings
 
 
@@ -90,24 +83,23 @@ def get_train_job_status(job_name):
     except errors.HttpError as e:
         raise e
 
-    if response == None:
-        raise Exception("Got None as response.")
+    if response is None:
+        raise HTTPException(status_code=401, detail="Got None as response.")
 
     return response
 
 
 def send_job_train_ai_platform(
-    jobId, repository_version, by_id, repository_authorization
+    jobId, repository_version, by_id, repository_authorization, language
 ):
     training_inputs = {
         "scaleTier": "CUSTOM",
         "masterType": "standard_p100",
         "masterConfig": {
-            "imageUri": "us.gcr.io/bothub-273521/bothub-nlp-ai-platform:1.0.37"
+            "imageUri": f"{settings.BOTHUB_GOOGLE_AI_PLATFORM_REGISTRY}:"
+            f"{settings.BOTHUB_GOOGLE_AI_PLATFORM_IMAGE_VERSION}-{language}"
         },
-        "packageUris": [
-            "gs://poc-training-ai-platform/bothub-nlp-ai-platform/bothub-nlp-ai-platform-0.1.tar.gz"
-        ],
+        "packageUris": settings.BOTHUB_GOOGLE_AI_PLATFORM_PACKAGE_URI,
         "pythonModule": "trainer.train",
         "args": [
             "--repository-version",
@@ -117,7 +109,7 @@ def send_job_train_ai_platform(
             "--repository-authorization",
             repository_authorization,
             "--base_url",
-            bothub_nlp_api.settings.BOTHUB_ENGINE_URL
+            bothub_nlp_api.settings.BOTHUB_ENGINE_URL,
         ],
         "region": "us-east1",
         "jobDir": "gs://poc-training-ai-platform/job-dir",

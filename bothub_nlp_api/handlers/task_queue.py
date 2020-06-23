@@ -22,7 +22,7 @@ def task_queue_handler(id_task, from_queue):
             "SUCCEEDED": 2,
             "FAILED": 3,
             "CANCELLING": 3,
-            "CANCELLED": 3
+            "CANCELLED": 3,
         }
         return {
             "status": int(status.get(res.get("state"))),
