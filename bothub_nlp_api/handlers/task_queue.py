@@ -14,8 +14,18 @@ def task_queue_handler(id_task, from_queue):
         return {"status": int(status.get(res.status)), "ml_units": 0}
     if from_queue == "ai-platform":
         res = utils.get_train_job_status(id_task)
+        status = {
+            "STATE_UNSPECIFIED": 3,
+            "QUEUED": 0,
+            "PREPARING": 0,
+            "RUNNING": 1,
+            "SUCCEEDED": 2,
+            "FAILED": 3,
+            "CANCELLING": 3,
+            "CANCELLED": 3
+        }
         return {
-            "status": res.get("state"),
+            "status": int(status.get(res.get("state"))),
             "ml_units": res.get("trainingOutput", {}).get("consumedMLUnits", 0),
         }
     return {"status": "", "ml_units": 0}

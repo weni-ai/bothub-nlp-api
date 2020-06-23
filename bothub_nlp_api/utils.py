@@ -103,7 +103,7 @@ def send_job_train_ai_platform(
         "scaleTier": "CUSTOM",
         "masterType": "standard_p100",
         "masterConfig": {
-            "imageUri": "us.gcr.io/bothub-273521/bothub-nlp-ai-platform:1.0.35"
+            "imageUri": "us.gcr.io/bothub-273521/bothub-nlp-ai-platform:1.0.37"
         },
         "packageUris": [
             "gs://poc-training-ai-platform/bothub-nlp-ai-platform/bothub-nlp-ai-platform-0.1.tar.gz"

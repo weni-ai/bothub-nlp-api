@@ -47,7 +47,7 @@ def train_handler(authorization, repository_version=None):
                 repository_authorization=str(repository_authorization),
             )
             backend().request_backend_save_queue_id(
-                repository_version=str(current_update.get("current_version_id")),
+                update_id=str(current_update.get("current_version_id")),
                 repository_authorization=str(repository_authorization),
                 task_id=job_id,
                 from_queue=0
