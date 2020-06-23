@@ -56,3 +56,6 @@ Use ```make``` commands to ```lint```, ```init_env```, ```start_development```.
 | BOTHUB_GOOGLE_CREDENTIALS_TOKEN_URI | `str` | `None` |  |
 | BOTHUB_GOOGLE_CREDENTIALS_CLIENT_ID | `str` | `None` |  |
 | BOTHUB_GOOGLE_CREDENTIALS_CLIENT_SECRET | `str` | `None` |  |
+| BOTHUB_GOOGLE_AI_PLATFORM_IMAGE_VERSION | `str` | `1.0.0` |  |
+| BOTHUB_GOOGLE_AI_PLATFORM_REGISTRY | `str` | `us.gcr.io/bothub/bothub-nlp-ai-platform` |  |
+| BOTHUB_GOOGLE_AI_PLATFORM_PACKAGE_URI | `list` | `["gs://poc-training-ai-platform/bothub-nlp-ai-platform/bothub-nlp-ai-platform-0.1.tar.gz"]` |  |
