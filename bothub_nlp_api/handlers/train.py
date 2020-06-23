@@ -8,6 +8,7 @@ from ..utils import backend
 from ..utils import get_repository_authorization
 
 TRAIN_STATUS_TRAINED = "trained"
+TRAIN_STATUS_PROCESSING = "processing"
 TRAIN_STATUS_FAILED = "failed"
 TRAIN_STATUS_NOT_READY_FOR_TRAIN = "not_ready_for_train"
 
@@ -27,6 +28,7 @@ def train_handler(authorization, repository_version=None):
         if not current_update.get("ready_for_train"):
             languages_report[language] = {"status": TRAIN_STATUS_NOT_READY_FOR_TRAIN}
             continue
+
         if settings.BOTHUB_SERVICE_TRAIN == "celery":
             train_task = celery_app.send_task(
                 TASK_NLU_TRAIN_UPDATE,
@@ -53,9 +55,10 @@ def train_handler(authorization, repository_version=None):
                 task_id=job_id,
                 from_queue=0,
             )
+        languages_report[language] = {"status": TRAIN_STATUS_PROCESSING}
 
     resp = {
         "SUPPORTED_LANGUAGES": list(settings.SUPPORTED_LANGUAGES.keys()),
-        "languages_report": {},
+        "languages_report": languages_report,
     }
     return resp
