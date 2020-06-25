@@ -1,6 +1,7 @@
 from bothub_nlp_celery.actions import ACTION_TRAIN, queue_name
 from bothub_nlp_celery.app import celery_app
 from bothub_nlp_celery.tasks import TASK_NLU_TRAIN_UPDATE
+from bothub_nlp_celery.utils import ALGORITHM_TO_LANGUAGE_MODEL
 
 from .. import settings
 from ..utils import backend
@@ -35,7 +36,7 @@ def train_handler(authorization, repository_version=None):
                 current_update.get("repository_authorization_user_id"),
                 repository_authorization,
             ],
-            queue=queue_name(ACTION_TRAIN, current_update.get("language")),
+            queue=queue_name(ACTION_TRAIN, current_update.get("language"), ALGORITHM_TO_LANGUAGE_MODEL[current_update.get("language")]),
         )
         train_tasks.append({"task": train_task, "language": language})
 

@@ -86,7 +86,7 @@ def _parse(
         TASK_NLU_PARSE_TEXT,
         args=[update.get("repository_version"), repository_authorization, text],
         kwargs={"rasa_format": rasa_format},
-        queue=queue_name(ACTION_PARSE, update.get("language")),
+        queue=queue_name(ACTION_PARSE, update.get("language"), ALGORITHM_TO_LANGUAGE_MODEL[current_update.get("language")]),
     )
     answer_task.wait()
     answer = answer_task.result
