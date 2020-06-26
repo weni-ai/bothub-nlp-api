@@ -141,3 +141,8 @@ class EvaluateResponse(BaseModel):
     repository_version: int
     evaluate_id: int
     evaluate_version: int
+
+
+class TaskQueueResponse(BaseModel):
+    status: str
+    ml_units: float = None
