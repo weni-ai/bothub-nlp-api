@@ -110,6 +110,8 @@ def send_job_train_ai_platform(
             repository_authorization,
             "--base_url",
             bothub_nlp_api.settings.BOTHUB_ENGINE_URL,
+            "--AIPLATFORM_LANGUAGE_QUEUE",
+            language
         ],
         "region": "us-east1",
         "jobDir": "gs://poc-training-ai-platform/job-dir",
