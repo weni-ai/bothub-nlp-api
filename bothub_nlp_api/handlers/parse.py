@@ -123,7 +123,7 @@ def _parse(
                         else False,
                         "confidence": result["confidence"],
                     }
-                    for result in answer["intent_ranking"]
+                    for result in answer.get("intent_ranking", [])
                 ],
             }
         },
