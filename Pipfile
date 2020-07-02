@@ -13,7 +13,6 @@ bothub_backend = {ref = "1.0.9",git = "https://github.com/Ilhasoft/bothub-backen
 celery = "==4.3.0"
 gunicorn = "==19.9.0"
 gevent = "==1.4.0"
-bothub_nlp_celery = {ref = "0.1.15",git = "https://github.com/Ilhasoft/bothub-nlp-celery"}
 django-environ = "*"
 redis = "*"
 kombu = "==4.5.0"
@@ -26,6 +25,7 @@ sentry-sdk = "==0.13.2"
 babel = "==2.8.0"
 python-decouple = "==3.3"
 numpy = "==1.18.1"
+bothub-nlp-celery = {editable = true,path = "./../bothub-nlp-celery"}
 
 [dev-packages]
 "psycopg2-binary" = "*"

@@ -20,7 +20,9 @@ def train_handler(authorization, repository_version=None):
     train_tasks = []
 
     for language in settings.SUPPORTED_LANGUAGES.keys():
-
+        print(language)
+        print(repository_authorization)
+        print(repository_version)
         current_update = backend().request_backend_train(
             repository_authorization, language, repository_version
         )
@@ -28,7 +30,8 @@ def train_handler(authorization, repository_version=None):
         if not current_update.get("ready_for_train"):
             languages_report[language] = {"status": TRAIN_STATUS_NOT_READY_FOR_TRAIN}
             continue
-
+        import json
+        print(json.dumps(current_update, indent=2))
         train_task = celery_app.send_task(
             TASK_NLU_TRAIN_UPDATE,
             args=[
@@ -36,7 +39,7 @@ def train_handler(authorization, repository_version=None):
                 current_update.get("repository_authorization_user_id"),
                 repository_authorization,
             ],
-            queue=queue_name(ACTION_TRAIN, current_update.get("language"), ALGORITHM_TO_LANGUAGE_MODEL[current_update.get("language")]),
+            queue=queue_name(current_update.get("language"), ACTION_TRAIN, None),
         )
         train_tasks.append({"task": train_task, "language": language})
 
@@ -77,7 +80,7 @@ def get_train_job_status(project_name, job_name):
 
     if response == None:
         raise Exception("Got None as response.")
-    
+
     return response['state']
 
 
@@ -100,8 +103,8 @@ def get_train_job_ml_units(project_name, job_name):
 
     if response == None:
         raise Exception("Got response as None.")
-    
+
     if response['state'] != AI_PLATFORM_TRAIN_JOB_SUCCEEDED:
         raise Exception("The job status isn't succeeded")
-    
+
     return response['trainingOutput']['consumedMLUnits']
