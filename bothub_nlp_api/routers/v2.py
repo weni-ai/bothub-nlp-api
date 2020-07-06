@@ -1,7 +1,7 @@
 from fastapi import Depends, APIRouter, Header, HTTPException
 from starlette.requests import Request
 
-from bothub_nlp_api.handlers import evaluate
+from bothub_nlp_api.handlers import evaluate, task_queue
 from bothub_nlp_api.handlers import parse
 from bothub_nlp_api.handlers import debug_parse
 from bothub_nlp_api.handlers import sentence_suggestion
@@ -15,6 +15,7 @@ from bothub_nlp_api.models import (
     WordsDistributionResponse,
     TrainRequest,
     EvaluateRequest,
+    TaskQueueResponse,
 )
 from bothub_nlp_api.models import ParseResponse
 from bothub_nlp_api.models import DebugParseResponse
@@ -152,3 +153,9 @@ async def evaluate_handler(
 @router.options(r"/evaluate/?", status_code=204, include_in_schema=False)
 async def evaluate_options():
     return {}  # pragma: no cover
+
+
+@router.get(r"/task-queue/?", response_model=TaskQueueResponse)
+async def task_queue_handler(id_task: str, from_queue: str):
+
+    return task_queue.task_queue_handler(id_task, from_queue)
