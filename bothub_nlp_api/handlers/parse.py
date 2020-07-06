@@ -49,9 +49,13 @@ def _parse(
             try:
                 language = str(babel.Locale.parse(language).language).lower()
             except ValueError:
-                raise ValidationError("Expected only letters, got '{}'".format(language))
+                raise ValidationError(
+                    "Expected only letters, got '{}'".format(language)
+                )
             except babel.core.UnknownLocaleError:
-                raise ValidationError("Language '{}' not supported by now.".format(language))
+                raise ValidationError(
+                    "Language '{}' not supported by now.".format(language)
+                )
 
     if language and (
         language not in settings.SUPPORTED_LANGUAGES.keys()
