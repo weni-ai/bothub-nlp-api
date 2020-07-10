@@ -44,7 +44,7 @@ def _debug_parse(authorization, text, language, repository_version=None):
     answer_task = celery_app.send_task(
         TASK_NLU_DEBUG_PARSE_TEXT,
         args=[update.get("repository_version"), repository_authorization, text],
-        queue=queue_name(ACTION_DEBUG_PARSE, update.get("language")),
+        queue=queue_name(ACTION_DEBUG_PARSE, update.get("language"), ALGORITHM_TO_LANGUAGE_MODEL[current_update.get("language")]),
     )
     answer_task.wait()
     answer = answer_task.result
