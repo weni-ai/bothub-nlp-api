@@ -86,8 +86,6 @@ def _parse(
 
     if not update.get("version"):
         raise ValidationError("This repository has never been trained")
-    print(update.get("algorithm"))
-    print(queue_name(update.get("language"), ACTION_PARSE, ALGORITHM_TO_LANGUAGE_MODEL[update.get("language")]))
     answer_task = celery_app.send_task(
         TASK_NLU_PARSE_TEXT,
         args=[update.get("repository_version"), repository_authorization, text],

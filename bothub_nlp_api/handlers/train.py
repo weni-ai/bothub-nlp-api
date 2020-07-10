@@ -28,8 +28,6 @@ def train_handler(authorization, repository_version=None):
             continue
 
         if settings.BOTHUB_SERVICE_TRAIN == "celery":
-            print(update.get("algorithm"))
-            print(queue_name(update.get("language"), ACTION_PARSE, ALGORITHM_TO_LANGUAGE_MODEL[update.get("language")]))
             train_task = celery_app.send_task(
                 TASK_NLU_TRAIN_UPDATE,
                 args=[
