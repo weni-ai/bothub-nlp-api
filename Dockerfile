@@ -14,7 +14,7 @@ RUN apk update \
         python3-dev \
     && pip install --upgrade pip \
     && pip install -U pip setuptools \
-    && pip install pipenv redis \
+    && pip install pipenv==2018.11.26 redis \
     && pipenv install --system --deploy \
     && apk del .build-dependencies \
     && rm -rf /var/cache/apk/*
