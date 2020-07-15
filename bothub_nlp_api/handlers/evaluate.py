@@ -42,7 +42,7 @@ def evaluate_handler(authorization, language, repository_version=None):
                 update.get("user_id"),
                 repository_authorization,
             ],
-            queue=queue_name(update.get("language"), ACTION_EVALUATE, ALGORITHM_TO_LANGUAGE_MODEL[current_update.get("algorithm")]),
+            queue=queue_name(update.get("language"), ACTION_EVALUATE, ALGORITHM_TO_LANGUAGE_MODEL[update.get("algorithm")]),
         )
         evaluate_task.wait()
         evaluate = evaluate_task.result
