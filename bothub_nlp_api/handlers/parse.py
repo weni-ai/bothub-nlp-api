@@ -6,7 +6,7 @@ import babel
 from bothub_nlp_celery.actions import ACTION_PARSE, queue_name
 from bothub_nlp_celery.app import celery_app
 from bothub_nlp_celery.tasks import TASK_NLU_PARSE_TEXT
-from bothub_nlp_celery.utils import ALGORITHM_TO_LANGUAGE_MODEL
+from bothub_nlp_celery.utils import ALGORITHM_TO_LANGUAGE_MODEL, choose_best_algorithm
 
 from bothub_nlp_api import settings
 from bothub_nlp_api.utils import AuthorizationIsRequired
@@ -90,7 +90,10 @@ def _parse(
         TASK_NLU_PARSE_TEXT,
         args=[update.get("repository_version"), repository_authorization, text],
         kwargs={"rasa_format": rasa_format},
-        queue=queue_name(update.get("language"), ACTION_PARSE, ALGORITHM_TO_LANGUAGE_MODEL[update.get("algorithm")]),
+        queue=queue_name(
+            update.get("language"),
+            ACTION_PARSE,
+            ALGORITHM_TO_LANGUAGE_MODEL[choose_best_algorithm(update.get("language"))]),
     )
     answer_task.wait()
     answer = answer_task.result

@@ -2,7 +2,7 @@ import time
 from bothub_nlp_celery.actions import ACTION_TRAIN, queue_name
 from bothub_nlp_celery.app import celery_app
 from bothub_nlp_celery.tasks import TASK_NLU_TRAIN_UPDATE
-from bothub_nlp_celery.utils import ALGORITHM_TO_LANGUAGE_MODEL
+from bothub_nlp_celery.utils import ALGORITHM_TO_LANGUAGE_MODEL, choose_best_algorithm
 
 from .. import settings, utils
 from ..utils import backend
@@ -28,6 +28,8 @@ def train_handler(authorization, repository_version=None):
         if not current_update.get("ready_for_train"):
             continue
 
+        algorithm = choose_best_algorithm(current_update.get("language"))
+
         if settings.BOTHUB_SERVICE_TRAIN == "celery":
             train_task = celery_app.send_task(
                 TASK_NLU_TRAIN_UPDATE,
@@ -36,7 +38,10 @@ def train_handler(authorization, repository_version=None):
                     current_update.get("repository_authorization_user_id"),
                     repository_authorization,
                 ],
-                queue=queue_name(current_update.get("language"), ACTION_TRAIN, ALGORITHM_TO_LANGUAGE_MODEL[current_update.get("algorithm")]),
+                queue=queue_name(
+                    current_update.get("language"),
+                    ACTION_TRAIN,
+                    ALGORITHM_TO_LANGUAGE_MODEL[algorithm]),
             )
             train_tasks.append({"task": train_task, "language": language})
         elif settings.BOTHUB_SERVICE_TRAIN == "ai-platform":
@@ -47,7 +52,7 @@ def train_handler(authorization, repository_version=None):
                 by_id=str(current_update.get("repository_authorization_user_id")),
                 repository_authorization=str(repository_authorization),
                 language=language,
-                type_model=ALGORITHM_TO_LANGUAGE_MODEL[current_update.get("algorithm")]
+                type_model=ALGORITHM_TO_LANGUAGE_MODEL[algorithm]
             )
             backend().request_backend_save_queue_id(
                 update_id=str(current_update.get("current_version_id")),
