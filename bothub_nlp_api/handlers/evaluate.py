@@ -1,7 +1,7 @@
 from bothub_nlp_celery.actions import ACTION_EVALUATE, queue_name
 from bothub_nlp_celery.app import celery_app
 from bothub_nlp_celery.tasks import TASK_NLU_EVALUATE_UPDATE
-from bothub_nlp_celery.utils import ALGORITHM_TO_LANGUAGE_MODEL
+from bothub_nlp_celery.utils import ALGORITHM_TO_LANGUAGE_MODEL, choose_best_algorithm
 
 from .. import settings
 from ..utils import AuthorizationIsRequired
@@ -42,7 +42,7 @@ def evaluate_handler(authorization, language, repository_version=None):
                 update.get("user_id"),
                 repository_authorization,
             ],
-            queue=queue_name(update.get("language"), ACTION_EVALUATE, ALGORITHM_TO_LANGUAGE_MODEL[current_update.get("algorithm")]),
+            queue=queue_name(update.get("language"), ACTION_EVALUATE, ALGORITHM_TO_LANGUAGE_MODEL[choose_best_algorithm(update.get("language"))]),
         )
         evaluate_task.wait()
         evaluate = evaluate_task.result
