@@ -28,10 +28,10 @@ def train_handler(authorization, repository_version=None):
         if not current_update.get("ready_for_train"):
             continue
 
-        algorithm = current_update.get('algorithm')
+        chosen_algorithm = current_update.get('algorithm')
         # to enable auto-select algorithm des-comment this
-        # algorithm = choose_best_algorithm(current_update.get("language"))
-        
+        # chosen_algorithm = choose_best_algorithm(current_update.get("language"))
+
         if settings.BOTHUB_SERVICE_TRAIN == "celery":
             train_task = celery_app.send_task(
                 TASK_NLU_TRAIN_UPDATE,
@@ -43,7 +43,7 @@ def train_handler(authorization, repository_version=None):
                 queue=queue_name(
                     current_update.get("language"),
                     ACTION_TRAIN,
-                    ALGORITHM_TO_LANGUAGE_MODEL[algorithm]),
+                    ALGORITHM_TO_LANGUAGE_MODEL[chosen_algorithm]),
             )
             train_tasks.append({"task": train_task, "language": language})
         elif settings.BOTHUB_SERVICE_TRAIN == "ai-platform":

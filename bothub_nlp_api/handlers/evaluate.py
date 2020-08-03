@@ -33,7 +33,10 @@ def evaluate_handler(authorization, language, repository_version=None):
 
     if not update.get("update"):
         raise ValidationError("This repository has never been trained")
-
+    
+    # chosen_algorithm = choose_best_algorithm(update.get("language"))
+    chosen_algorithm = update.get('algorithm')
+    
     try:
         evaluate_task = celery_app.send_task(
             TASK_NLU_EVALUATE_UPDATE,
@@ -42,7 +45,7 @@ def evaluate_handler(authorization, language, repository_version=None):
                 update.get("user_id"),
                 repository_authorization,
             ],
-            queue=queue_name(update.get("language"), ACTION_EVALUATE, ALGORITHM_TO_LANGUAGE_MODEL[choose_best_algorithm(update.get("language"))]),
+            queue=queue_name(update.get("language"), ACTION_EVALUATE, ALGORITHM_TO_LANGUAGE_MODEL[chosen_algorithm]),
         )
         evaluate_task.wait()
         evaluate = evaluate_task.result

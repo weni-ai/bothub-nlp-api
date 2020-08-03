@@ -84,6 +84,9 @@ def _parse(
             if update.get("version"):
                 break
 
+    # chosen_algorithm = choose_best_algorithm(update.get("language"))
+    chosen_algorithm = update.get('algorithm')
+
     if not update.get("version"):
         raise ValidationError("This repository has never been trained")
     answer_task = celery_app.send_task(
@@ -93,7 +96,7 @@ def _parse(
         queue=queue_name(
             update.get("language"),
             ACTION_PARSE,
-            ALGORITHM_TO_LANGUAGE_MODEL[choose_best_algorithm(update.get("language"))]),
+            ALGORITHM_TO_LANGUAGE_MODEL[chosen_algorithm]),
     )
     answer_task.wait()
     answer = answer_task.result
