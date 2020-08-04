@@ -92,12 +92,13 @@ def get_train_job_status(job_name):
 def send_job_train_ai_platform(
     jobId, repository_version, by_id, repository_authorization, language, type_model
 ):
+    image_sufix = f"-{language}-{type_model}" if type_model is not None else f"-{language}"
     training_inputs = {
         "scaleTier": "CUSTOM",
         "masterType": "standard_p100",
         "masterConfig": {
             "imageUri": f"{settings.BOTHUB_GOOGLE_AI_PLATFORM_REGISTRY}:"
-            f"{settings.BOTHUB_GOOGLE_AI_PLATFORM_IMAGE_VERSION}-{language}-{type_model}"
+            f"{settings.BOTHUB_GOOGLE_AI_PLATFORM_IMAGE_VERSION}{image_sufix}"
         },
         "packageUris": settings.BOTHUB_GOOGLE_AI_PLATFORM_PACKAGE_URI,
         "pythonModule": "trainer.train",
