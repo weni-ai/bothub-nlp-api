@@ -46,7 +46,7 @@ def _parse(
     from ..utils import NEXT_LANGS
 
     if language is not None:
-        if not str(language).lower() == "pt_br":
+        if not str(language).lower() == "pt_br" and not str(language).lower() in settings.BABEL_NOT_SUPPORT:
             try:
                 language = str(babel.Locale.parse(language).language).lower()
             except ValueError:
