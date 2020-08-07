@@ -2,6 +2,7 @@ from bothub_nlp_celery.actions import ACTION_EVALUATE, queue_name
 from bothub_nlp_celery.app import celery_app
 from bothub_nlp_celery.tasks import TASK_NLU_EVALUATE_UPDATE
 from bothub_nlp_celery.utils import ALGORITHM_TO_LANGUAGE_MODEL, choose_best_algorithm
+from bothub_nlp_celery import settings as celery_settings
 
 from .. import settings
 from ..utils import AuthorizationIsRequired
@@ -33,10 +34,14 @@ def evaluate_handler(authorization, language, repository_version=None):
 
     if not update.get("update"):
         raise ValidationError("This repository has never been trained")
-    
-    # chosen_algorithm = choose_best_algorithm(update.get("language"))
+
     chosen_algorithm = update.get('algorithm')
-    
+    # chosen_algorithm = choose_best_algorithm(update.get("language"))
+    model = ALGORITHM_TO_LANGUAGE_MODEL[chosen_algorithm]
+    if (model == 'SPACY' and language not in celery_settings.SPACY_LANGUAGES) or (
+        model == 'BERT' and language not in celery_settings.BERT_LANGUAGES):
+        model = None
+
     try:
         evaluate_task = celery_app.send_task(
             TASK_NLU_EVALUATE_UPDATE,
@@ -45,7 +50,7 @@ def evaluate_handler(authorization, language, repository_version=None):
                 update.get("user_id"),
                 repository_authorization,
             ],
-            queue=queue_name(update.get("language"), ACTION_EVALUATE, ALGORITHM_TO_LANGUAGE_MODEL[chosen_algorithm]),
+            queue=queue_name(update.get("language"), ACTION_EVALUATE, model),
         )
         evaluate_task.wait()
         evaluate = evaluate_task.result
