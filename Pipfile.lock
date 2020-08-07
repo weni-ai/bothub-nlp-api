@@ -1,7 +1,7 @@
 {
     "_meta": {
         "hash": {
-            "sha256": "b030ecdfcc4c56c1a7e33358d94a706da08519fb7ac1f3f46cf5d6de09a4f125"
+            "sha256": "07e19bea125da162ac49022080301f06640a84511a86688b2412fa0253a2c2f0"
         },
         "pipfile-spec": 6,
         "requires": {
@@ -63,7 +63,7 @@
         },
         "bothub-nlp-celery": {
             "git": "https://github.com/Ilhasoft/bothub-nlp-celery",
-            "ref": "bc02dd8d9a82dff0dc7d70a6e4348fa256607e81"
+            "ref": "eb0c7606267ea0f0b75b9b32156cf03be8bb329f"
         },
         "cachetools": {
             "hashes": [
@@ -207,11 +207,11 @@
         },
         "google-auth": {
             "hashes": [
-                "sha256:25c97cec5d4f6821f3ab67eb25b264fb00fda8fb9e2f05869bfa93dfcb8b50ee",
-                "sha256:c6e9735a2ee829a75b546702e460489db5cc35567a27fabd70b7c459f11efd58"
+                "sha256:2f34dd810090d0d4c9d5787c4ad7b4413d1fbfb941e13682c7a2298d3b6cdcc8",
+                "sha256:ce1fb80b5c6d3dd038babcc43e221edeafefc72d983b3dc28b67b996f76f00b9"
             ],
             "markers": "python_version >= '2.7' and python_version not in '3.0, 3.1, 3.2, 3.3'",
-            "version": "==1.20.0"
+            "version": "==1.20.1"
         },
         "google-auth-httplib2": {
             "hashes": [
