@@ -25,7 +25,9 @@ def train_handler(authorization, repository_version=None):
         current_update = backend().request_backend_train(
             repository_authorization, language, repository_version
         )
-
+        print(language)
+        print(current_update)
+        print('######')
         if not current_update.get("ready_for_train"):
             continue
 
