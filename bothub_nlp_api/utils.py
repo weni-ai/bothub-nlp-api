@@ -90,18 +90,10 @@ def get_train_job_status(job_name):
 
 
 def send_job_train_ai_platform(
-    jobId, repository_version, by_id, repository_authorization, language
+    jobId, repository_version, by_id, repository_authorization, language, type_model
 ):
-    training_inputs = {
-        "scaleTier": "CUSTOM",
-        "masterType": "standard_p100",
-        "masterConfig": {
-            "imageUri": f"{settings.BOTHUB_GOOGLE_AI_PLATFORM_REGISTRY}:"
-            f"{settings.BOTHUB_GOOGLE_AI_PLATFORM_IMAGE_VERSION}-{language}"
-        },
-        "packageUris": settings.BOTHUB_GOOGLE_AI_PLATFORM_PACKAGE_URI,
-        "pythonModule": "trainer.train",
-        "args": [
+    image_sufix = f"-{language}-{type_model}" if type_model is not None else "-xx-SPACY"
+    args = [
             "--repository-version",
             repository_version,
             "--by-id",
@@ -111,8 +103,20 @@ def send_job_train_ai_platform(
             "--base_url",
             bothub_nlp_api.settings.BOTHUB_ENGINE_URL,
             "--AIPLATFORM_LANGUAGE_QUEUE",
-            language
-        ],
+            language,
+        ]
+    if type_model is not None:
+        args.extend(["--AIPLATFORM_LANGUAGE_MODEL", type_model])
+    training_inputs = {
+        "scaleTier": "CUSTOM",
+        "masterType": "standard_gpu",
+        "masterConfig": {
+            "imageUri": f"{settings.BOTHUB_GOOGLE_AI_PLATFORM_REGISTRY}:"
+            f"{settings.BOTHUB_GOOGLE_AI_PLATFORM_IMAGE_VERSION}{image_sufix}"
+        },
+        "packageUris": settings.BOTHUB_GOOGLE_AI_PLATFORM_PACKAGE_URI,
+        "pythonModule": "trainer.train",
+        "args": args,
         "region": "us-east1",
         "jobDir": "gs://poc-training-ai-platform/job-dir",
     }
