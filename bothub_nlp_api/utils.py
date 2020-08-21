@@ -1,11 +1,12 @@
 import bothub_backend
 import google.oauth2.credentials
+import bothub_nlp_api.settings
 from fastapi import HTTPException, Header
 from googleapiclient import discovery
 from googleapiclient import errors
 from starlette.requests import Request
-
-import bothub_nlp_api.settings
+from bothub_nlp_celery.utils import ALGORITHM_TO_LANGUAGE_MODEL, choose_best_algorithm
+from bothub_nlp_celery import settings as celery_settings
 from bothub_nlp_api import settings
 
 

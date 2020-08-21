@@ -1,7 +1,7 @@
 from bothub_nlp_celery.actions import ACTION_DEBUG_PARSE, queue_name
 from bothub_nlp_celery.app import celery_app
 from bothub_nlp_celery.tasks import TASK_NLU_DEBUG_PARSE_TEXT
-from bothub_nlp_celery.utils import ALGORITHM_TO_LANGUAGE_MODEL, choose_best_algorithm
+from bothub_nlp_celery.utils import ALGORITHM_TO_LANGUAGE_MODEL, choose_best_algorithm, get_language_model
 from bothub_nlp_celery import settings as celery_settings
 
 from bothub_nlp_api import settings
@@ -40,13 +40,8 @@ def _debug_parse(authorization, text, language, repository_version=None):
             if update.get("version"):
                 break
     
-    chosen_algorithm = update.get('algorithm')
-    # chosen_algorithm = choose_best_algorithm(update.get("language"))
-    model = ALGORITHM_TO_LANGUAGE_MODEL[chosen_algorithm]
-
-    if (model == 'SPACY' and language not in celery_settings.SPACY_LANGUAGES) or (
-        model == 'BERT' and language not in celery_settings.BERT_LANGUAGES):
-        model = None
+    model = get_language_model(update, language)
+    
     if not update.get("version"):
         raise ValidationError("This repository has never been trained")
 
