@@ -22,6 +22,7 @@ from bothub_nlp_api.models import DebugParseResponse
 from bothub_nlp_api.models import SentenceSuggestionResponse
 from bothub_nlp_api.models import TrainResponse
 from bothub_nlp_api.models import EvaluateResponse
+from bothub_nlp_api.models import ScoreResponse
 from bothub_nlp_api.utils import backend, AuthorizationRequired
 from bothub_nlp_api.utils import get_repository_authorization
 
@@ -161,14 +162,14 @@ async def task_queue_handler(id_task: str, from_queue: str):
     return task_queue.task_queue_handler(id_task, from_queue)
 
 
-@router.get(r"/score/?")
+@router.get(r"/score/?", response_model=ScoreResponse)
 async def score_handler(
     repository_version: str,
-    language: str = None,
+    language: str,
     request: Request = Depends(AuthorizationRequired()),
-    Authorization: str = Header(..., description="Bearer your_key"),
+    authorization: str = Header(..., description="Bearer your_key"),
 ):
-    result = score_calculation.get_scores(Authorization, repository_version, language)
+    result = score_calculation.get_scores(authorization, repository_version, language)
 
     return result
 
