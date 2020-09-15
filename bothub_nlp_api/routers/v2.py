@@ -1,7 +1,7 @@
 from fastapi import Depends, APIRouter, Header, HTTPException
 from starlette.requests import Request
 
-from bothub_nlp_api.handlers import evaluate, task_queue
+from bothub_nlp_api.handlers import evaluate, task_queue, score_calculation
 from bothub_nlp_api.handlers import parse
 from bothub_nlp_api.handlers import debug_parse
 from bothub_nlp_api.handlers import sentence_suggestion
@@ -159,3 +159,20 @@ async def evaluate_options():
 async def task_queue_handler(id_task: str, from_queue: str):
 
     return task_queue.task_queue_handler(id_task, from_queue)
+
+
+@router.get(r"/score/?")
+async def score_handler(
+    repository_version: str,
+    language: str = None,
+    request: Request = Depends(AuthorizationRequired()),
+    Authorization: str = Header(..., description="Bearer your_key"),
+):
+    result = score_calculation.get_scores(Authorization, repository_version, language)
+
+    return result
+
+
+@router.options(r"/score/?")
+async def score_options():
+    return {}  # pragma: no cover

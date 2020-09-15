@@ -2,23 +2,7 @@ import math
 import matplotlib.pyplot as plt
 import numpy as np
 
-mocked_repository_obj = {
-    "intentions": ["a", "b", "c", "d", "e"],
-    "sentences": {
-        "a": ["intenção A", "outra frase da A", "outra frase da A", "outra frase da A", "outra frase da A", "outra frase da A", "outra frase da A", "outra frase da A", "outra frase da A", "outra frase da A", "outra frase da A", "outra frase da A", "outra frase da A", "outra frase da A", "outra frase da A", "outra frase da A", "outra frase da A", "outra frase da A", "outra frase da A", "outra frase da A", "outra frase da A", "outra frase da A", "outra frase da A", "outra frase da A", "outra frase da A", "outra frase da A", "outra frase da A", "outra frase da A", "outra frase da A", "outra frase da A", "outra frase da A", "outra frase da A", "outra frase da A", "outra frase da A", "outra frase da A", "outra frase da A", "outra frase da A", "outra frase da A", "outra frase da A", "outra frase da A", "outra frase da A", "outra frase da A"],
-        "b": ["intenção B", "outra frase da B", "frase 3", "frase 4", "frase 5"],
-        "c": ["intenção C", "outra frase da C", "outra frase da C", "outra frase da C", "outra frase da C", "outra frase da C", "outra frase da C", "outra frase da C", "outra frase da C", "outra frase da C", "outra frase da C", "outra frase da C", "outra frase da C", "outra frase da C", "outra frase da C", "outra frase da C", "outra frase da C", "outra frase da C", "outra frase da C", "outra frase da C", "outra frase da C", "outra frase da C", "outra frase da C"],
-        "d": ["intenção D", "outra frase da D", "outra frase da D", "outra frase da D", "outra frase da D", "outra frase da D", "outra frase da D", "outra frase da D", "outra frase da D", "outra frase da D", "outra frase da D", "outra frase da D", "outra frase da D", "outra frase da D"],
-        "e": ["intenção E", "outra frase da E", "outra frase da E", "outra frase da E", "outra frase da E", "outra frase da E", "outra frase da E", "outra frase da E", "outra frase da E", "outra frase da E", "outra frase da E", "outra frase da E", "outra frase da E", "outra frase da E", "outra frase da E", "outra frase da E", "outra frase da E", "outra frase da E", "outra frase da E"],
-    },
-    "evaluate": {
-        "a": ["teste A", "outra frase teste da A", "outra frase teste da A", "outra frase teste da A", "outra frase teste da A"],
-        "b": ["teste B", "outra frase teste da B", "frase teste3", "frase teste4", "frase teste5"],
-        "c": ["teste C", "outra frase teste da C", "outra frase teste da C", "outra frase teste da C", "outra frase teste da C"],
-        "d": ["teste D", "outra frase teste da D", "outra frase teste da D", "outra frase teste da D", "outra frase teste da D", "outra frase teste da D", "outra frase teste da D"],
-        "e": ["teste E", "outra frase teste da E", "outra frase teste da E", "outra frase teste da E", "outra frase teste da E", "outra frase teste da E", "outra frase teste da E"],
-    }
-}
+from ..utils import backend, get_repository_authorization
 
 
 def score_normal(x,  optimal):
@@ -26,7 +10,7 @@ def score_normal(x,  optimal):
         Based on normal distribution,
         score will decay if current value is below or above target
     """
-    slim_const = 2.3
+    slim_const = 2
     result = math.exp(-((x - optimal) ** 2) / (2 * (optimal/slim_const) ** 2))
     return result * 100
 
@@ -53,44 +37,44 @@ def plot_func(func, optimal):
     plt.show()
 
 
-def intentions_balance_score(intentions, sentences):
+def intentions_balance_score(dataset):
+    intentions = dataset["intentions"]
+    sentences = dataset["train"]
 
-    intentions_size = len(intentions)
-    if intentions_size < 2:
+    intentions_count = len(intentions)
+    if intentions_count < 2:
         return 0
 
-    sentences_size = 0
-    for intention in sentences.keys():
-        sentences_size += len(sentences[intention])
+    train_count = dataset["train_count"]
 
     scores = []
     for intention in sentences.keys():
         this_size = len(sentences[intention])
-        excl_size = sentences_size - this_size
+        excl_size = train_count - this_size
 
         # Mean of sentences/intention excluding this intention
         # It is the optimal target
-        excl_mean = excl_size/(intentions_size-1)
-        print(this_size, excl_mean)
+        excl_mean = excl_size/(intentions_count-1)
+        # print(this_size, excl_mean)
         scores.append(score_normal(this_size, excl_mean))
-
-    # for score in scores:
-    #     print(score)
 
     score = sum(scores)/len(scores)
 
     return {
         "score": score,
-        "recommended": int(sentences_size/intentions_size)
+        "recommended": f"The avarage sentences per intention is {int(train_count/intentions_count)}"
     }
 
 
-def intentions_size_score(intentions, sentences):
-    intentions_size = len(intentions)
-    if intentions_size < 2:
+def intentions_size_score(dataset):
+    intentions = dataset["intentions"]
+    sentences = dataset["train"]
+
+    intentions_count = len(intentions)
+    if intentions_count < 2:
         return 0
 
-    optimal = int(106.6556 + (19.75708 - 106.6556)/(1 + (intentions_size/8.791823)**1.898546))
+    optimal = int(106.6556 + (19.75708 - 106.6556)/(1 + (intentions_count/8.791823)**1.898546))
 
     scores = []
     for intention in sentences.keys():
@@ -104,47 +88,152 @@ def intentions_size_score(intentions, sentences):
 
     return {
         "score": score,
-        "recommended": optimal
+        "recommended": f"{optimal} sentences per intention"
     }
 
 
-def evaluate_size_score(intentions, sentences, evaluate_data):
+def evaluate_size_score(dataset):
+    intentions = dataset["intentions"]
+
     intentions_size = len(intentions)
     if intentions_size < 2:
         return 0
 
-    sentences_size = 0
-    for intention in sentences.keys():
-        sentences_size += len(sentences[intention])
+    train_count = dataset["train_count"]
+    evaluate_count = dataset["evaluate_count"]
 
-    evaluate_size = 0
-    for intention in evaluate_data.keys():
-        evaluate_size += len(evaluate_data[intention])
+    optimal = int(692.4702 + (-1.396326 - 692.4702) / (1 + (train_count / 5646.078) ** 0.7374176))
 
-    optimal = int(906866.6 + (-3.677954 - 906866.6)/(1 + (sentences_size/71299080000)**0.501674))
-
-    if evaluate_size >= optimal:
+    if evaluate_count >= optimal:
         score = 1.0
     else:
-        score = score_cumulated(evaluate_size, optimal)
+        score = score_cumulated(evaluate_count, optimal)
 
     return {
         "score": score,
-        "recommended": optimal
+        "recommended": f"{optimal} evaluation sentences"
     }
 
 
 # TODO: word distribution score
 
+def arrange_data(train_data, eval_data):
+    dataset = {
+        "intentions": [],
+        "train_count": len(train_data),
+        "train": {},
+        "evaluate_count": len(eval_data),
+        "evaluate": {}
+    }
+
+    for data in train_data:
+        if data["intent"] not in dataset["intentions"]:
+            dataset["intentions"].append(data["intent"])
+            dataset["train"][data["intent"]] = []
+
+        dataset["train"][data["intent"]].append(data["text"])
+
+    for data in eval_data:
+        if data["intent"] not in dataset["intentions"]:
+            continue
+        if data["intent"] not in dataset["evaluate"]:
+            dataset["evaluate"][data["intent"]] = []
+
+        dataset["evaluate"][data["intent"]].append(data["text"])
+
+    return dataset
+
+
+def get_scores(authorization, repository_version, default_language):
+    repository_authorization = get_repository_authorization(authorization)
+
+    intents = backend().request_backend_info(
+        repository_authorization,
+        repository_version=repository_version
+    )
+    # print(intents)
+
+    update = backend().request_backend_train(
+        repository_authorization, default_language, repository_version
+    )
+    # print(update)
+
+    train_data = backend().request_backend_get_examples(
+        update.get("current_version_id"), False, None, repository_authorization
+    ).get("results")
+    # print(train_data)
+
+    eval_data = backend().request_backend_start_evaluation(
+        update.get("current_version_id"),
+        repository_authorization
+    )
+    # print(eval_data)
+
+    dataset = arrange_data(train_data, eval_data)
+
+    scores = {
+        "intentions_balance": intentions_balance_score(dataset),
+        "intentions_size": intentions_size_score(dataset),
+        "evaluate_size": evaluate_size_score(dataset)
+    }
+
+    sum = 0
+    for n in scores.keys():
+        sum += scores[n]["score"]
+    average = sum/len(scores)
+
+    scores["average"] = average
+
+    return scores
+
+
 if __name__ == "__main__":
+    mocked_repository_example = {
+        "intentions": ["a", "b", "c", "d", "e"],
+        "train_count": 103,
+        "train": {
+            "a": ["intenção A", "outra frase da A", "outra frase da A", "outra frase da A", "outra frase da A",
+                  "outra frase da A", "outra frase da A", "outra frase da A", "outra frase da A", "outra frase da A",
+                  "outra frase da A", "outra frase da A", "outra frase da A", "outra frase da A", "outra frase da A",
+                  "outra frase da A", "outra frase da A", "outra frase da A", "outra frase da A", "outra frase da A",
+                  "outra frase da A", "outra frase da A", "outra frase da A", "outra frase da A", "outra frase da A",
+                  "outra frase da A", "outra frase da A", "outra frase da A", "outra frase da A", "outra frase da A",
+                  "outra frase da A", "outra frase da A", "outra frase da A", "outra frase da A", "outra frase da A",
+                  "outra frase da A", "outra frase da A", "outra frase da A", "outra frase da A", "outra frase da A",
+                  "outra frase da A", "outra frase da A"],
+            "b": ["intenção B", "outra frase da B", "frase 3", "frase 4", "frase 5"],
+            "c": ["intenção C", "outra frase da C", "outra frase da C", "outra frase da C", "outra frase da C",
+                  "outra frase da C", "outra frase da C", "outra frase da C", "outra frase da C", "outra frase da C",
+                  "outra frase da C", "outra frase da C", "outra frase da C", "outra frase da C", "outra frase da C",
+                  "outra frase da C", "outra frase da C", "outra frase da C", "outra frase da C", "outra frase da C",
+                  "outra frase da C", "outra frase da C", "outra frase da C"],
+            "d": ["intenção D", "outra frase da D", "outra frase da D", "outra frase da D", "outra frase da D",
+                  "outra frase da D", "outra frase da D", "outra frase da D", "outra frase da D", "outra frase da D",
+                  "outra frase da D", "outra frase da D", "outra frase da D", "outra frase da D"],
+            "e": ["intenção E", "outra frase da E", "outra frase da E", "outra frase da E", "outra frase da E",
+                  "outra frase da E", "outra frase da E", "outra frase da E", "outra frase da E", "outra frase da E",
+                  "outra frase da E", "outra frase da E", "outra frase da E", "outra frase da E", "outra frase da E",
+                  "outra frase da E", "outra frase da E", "outra frase da E", "outra frase da E"],
+        },
+        "evaluate_count": 29,
+        "evaluate": {
+            "a": ["teste A", "outra frase teste da A", "outra frase teste da A", "outra frase teste da A",
+                  "outra frase teste da A"],
+            "b": ["teste B", "outra frase teste da B", "frase teste3", "frase teste4", "frase teste5"],
+            "c": ["teste C", "outra frase teste da C", "outra frase teste da C", "outra frase teste da C",
+                  "outra frase teste da C"],
+            "d": ["teste D", "outra frase teste da D", "outra frase teste da D", "outra frase teste da D",
+                  "outra frase teste da D", "outra frase teste da D", "outra frase teste da D"],
+            "e": ["teste E", "outra frase teste da E", "outra frase teste da E", "outra frase teste da E",
+                  "outra frase teste da E", "outra frase teste da E", "outra frase teste da E"],
+        }
+    }
 
-    # plot_func(score_cumulated, 100)
-    # plot_func(score_normal, 100)
+    plot_func(score_cumulated, 50)
+    plot_func(score_normal, 50)
 
-    sc = evaluate_size_score(
-        mocked_repository_obj.get("intentions"),
-        mocked_repository_obj.get("sentences"),
-        mocked_repository_obj.get("evaluate")
+    sc = intentions_balance_score(
+        mocked_repository_example
     )
 
     print(sc["score"], sc["recommended"])
