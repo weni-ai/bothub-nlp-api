@@ -169,7 +169,7 @@ async def score_handler(
     request: Request = Depends(AuthorizationRequired()),
     authorization: str = Header(..., description="Bearer your_key"),
 ):
-    result = score_calculation.get_scores(authorization, repository_version, language)
+    result = score_calculation.score_handler(authorization, repository_version, language)
 
     return result
 
