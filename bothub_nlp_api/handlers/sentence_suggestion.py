@@ -1,6 +1,7 @@
 from bothub_nlp_celery.actions import ACTION_SENTENCE_SUGGESTION, queue_name
 from bothub_nlp_celery.app import celery_app
 from bothub_nlp_celery.tasks import TASK_NLU_SENTENCE_SUGGESTION_TEXT
+from bothub_nlp_celery.utils import ALGORITHM_TO_LANGUAGE_MODEL
 
 from bothub_nlp_api import settings
 from bothub_nlp_api.utils import ValidationError
@@ -20,7 +21,7 @@ def _sentence_suggestion(
     answer_task = celery_app.send_task(
         TASK_NLU_SENTENCE_SUGGESTION_TEXT,
         args=[text, percentage_to_replace, n_sentences_to_generate],
-        queue=queue_name(ACTION_SENTENCE_SUGGESTION, language, ALGORITHM_TO_LANGUAGE_MODEL[current_update.get("language")]),
+        queue=queue_name(language, ACTION_SENTENCE_SUGGESTION, ALGORITHM_TO_LANGUAGE_MODEL.get(language)),
     )
     answer_task.wait()
     answer = answer_task.result
