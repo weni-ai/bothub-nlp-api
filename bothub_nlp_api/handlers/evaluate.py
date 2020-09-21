@@ -14,7 +14,7 @@ EVALUATE_STATUS_EVALUATED = "evaluated"
 EVALUATE_STATUS_FAILED = "failed"
 
 
-def evaluate_handler(authorization, language, repository_version=None):
+def evaluate_handler(authorization, language, repository_version=None, cross_validation=False):
     if language and (
         language not in settings.SUPPORTED_LANGUAGES.keys()
         and language not in NEXT_LANGS.keys()
@@ -44,6 +44,7 @@ def evaluate_handler(authorization, language, repository_version=None):
                 update.get("repository_version"),
                 update.get("user_id"),
                 repository_authorization,
+                cross_validation,
             ],
             queue=queue_name(update.get("language"), ACTION_EVALUATE, model),
         )
@@ -55,6 +56,7 @@ def evaluate_handler(authorization, language, repository_version=None):
             "repository_version": update.get("repository_version"),
             "evaluate_id": evaluate.get("id"),
             "evaluate_version": evaluate.get("version"),
+            "cross_validation": cross_validation,
         }
     except Exception as e:
         evaluate_report = {"status": EVALUATE_STATUS_FAILED, "error": str(e)}

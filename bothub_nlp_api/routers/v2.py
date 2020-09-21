@@ -77,11 +77,27 @@ async def sentence_suggestion_post_handler(item: SentenceSuggestionRequest,):
         item.language,
         item.n_sentences_to_generate,
         item.percentage_to_replace,
+        item.intent,
     )
 
 
 @router.options(r"/sentence_suggestion/?", status_code=204, include_in_schema=False)
 async def sentence_suggestion_options():
+    return {}  # pragma: no cover
+
+
+@router.post(r"/word_suggestion/?", response_model=WordSuggestionResponse)
+async def word_suggestion_post_handler(item: WordSuggestionRequest,):
+
+    return word_suggestion._word_suggestion(
+        item.text,
+        item.language,
+        item.n_words_to_generate,
+    )
+
+
+@router.options(r"/word_suggestion/?", status_code=204, include_in_schema=False)
+async def word_suggestion_options():
     return {}  # pragma: no cover
 
 
@@ -143,7 +159,7 @@ async def evaluate_handler(
     Authorization: str = Header(..., description="Bearer your_key"),
 ):
     result = evaluate.evaluate_handler(
-        Authorization, item.language, item.repository_version
+        Authorization, item.language, item.repository_version, item.cross_validation
     )
     if result.get("status") and result.get("error"):
         raise HTTPException(status_code=400, detail=result)

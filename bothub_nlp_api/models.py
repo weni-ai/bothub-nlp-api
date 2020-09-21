@@ -22,6 +22,12 @@ class SentenceSuggestionRequest(BaseModel):
     language: str = None
     n_sentences_to_generate: int = 10
     percentage_to_replace: float = 0.3
+    intent: str = None
+
+class WordSuggestionRequest(BaseModel):
+    text: str
+    language: str = None
+    n_words_to_generate: int = 10
 
 
 class WordsDistributionRequest(BaseModel):
@@ -36,6 +42,7 @@ class TrainRequest(BaseModel):
 class EvaluateRequest(BaseModel):
     language: str = None
     repository_version: int = None
+    cross_validation: bool = False
 
 
 class IntentResponse(BaseModel):
