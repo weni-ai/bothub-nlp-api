@@ -106,6 +106,13 @@ class OtherLabel(BaseModel):
     value: str
 
 
+class ScoreResponse(BaseModel):
+    intentions_balance: Dict[str, Any]
+    intentions_size: Dict[str, Any]
+    evaluate_size: Dict[str, Any]
+    average: float
+
+
 class InfoResponse(BaseModel):
     absolute_url: str
     algorithm: str

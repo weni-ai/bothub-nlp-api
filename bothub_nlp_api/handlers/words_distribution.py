@@ -30,8 +30,9 @@ def _words_distribution(authorization, language, repository_version=None):
             language,
             repository_authorization,
         ],
-        queue=queue_name(ACTION_WORDS_DISTIRBUTION, language),
+        queue=queue_name(language, ACTION_WORDS_DISTIRBUTION),
     )
+
     answer_task.wait()
     answer = answer_task.result
     return answer
