@@ -1,5 +1,6 @@
 import json
 import threading
+import logging
 
 import babel
 
@@ -66,6 +67,7 @@ def _parse(
         raise ValidationError("Language '{}' not supported by now.".format(language))
 
     repository_authorization = get_repository_authorization(authorization)
+
     if not repository_authorization:
         raise AuthorizationIsRequired()
 
@@ -85,6 +87,9 @@ def _parse(
             if update.get("version"):
                 break
 
+    if not update.get("version"):
+        raise ValidationError("This repository has never been trained")
+
     chosen_algorithm = update.get('algorithm')
     # chosen_algorithm = choose_best_algorithm(update.get("language"))
     model = ALGORITHM_TO_LANGUAGE_MODEL[chosen_algorithm]
@@ -92,8 +97,6 @@ def _parse(
         model == 'BERT' and language not in celery_settings.BERT_LANGUAGES):
         model = None
 
-    if not update.get("version"):
-        raise ValidationError("This repository has never been trained")
     answer_task = celery_app.send_task(
         TASK_NLU_PARSE_TEXT,
         args=[update.get("repository_version"), repository_authorization, text],
@@ -116,6 +119,20 @@ def _parse(
         }
     )
 
+    try:
+        log_intent = []
+        for result in answer.get("intent_ranking", []):
+            log_intent.append(
+                {
+                    "intent": result["name"],
+                    "is_default": result["name"] == answer["intent"]["name"],
+                    "confidence": result["confidence"],
+                }
+            )
+    except Exception as err:
+        logging.error(f"Unknown error log_intent {err}")
+        log_intent = []
+
     log = threading.Thread(
         target=backend().send_log_nlp_parse,
         kwargs={
@@ -126,18 +143,10 @@ def _parse(
                 "user": str(get_repository_authorization(authorization)),
                 "repository_version_language": int(update.get("repository_version")),
                 "nlp_log": json.dumps(answer),
-                "log_intent": [
-                    {
-                        "intent": result["name"],
-                        "is_default": True
-                        if result["name"] == answer["intent"]["name"]
-                        else False,
-                        "confidence": result["confidence"],
-                    }
-                    for result in answer.get("intent_ranking", [])
-                ],
+                "log_intent": log_intent,
             }
         },
     )
     log.start()
+
     return answer
