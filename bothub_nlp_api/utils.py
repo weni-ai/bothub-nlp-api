@@ -1,11 +1,10 @@
 import bothub_backend
 import google.oauth2.credentials
+import bothub_nlp_api.settings
 from fastapi import HTTPException, Header
 from googleapiclient import discovery
 from googleapiclient import errors
 from starlette.requests import Request
-
-import bothub_nlp_api.settings
 from bothub_nlp_api import settings
 
 
@@ -21,6 +20,16 @@ NEXT_LANGS = {
     "pt": ["pt_br"],
     "pt-br": ["pt_br"],
     "br": ["pt_br"],
+}
+
+DEFAULT_LANGS_PRIORITY = {
+    "english": ["en"],
+    "portuguese": ["pt_br", "pt"],
+    "pt": ["pt_br", "pt"],
+}
+
+REGIONS = {
+    "br", "us"
 }
 
 
