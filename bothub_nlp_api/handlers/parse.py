@@ -1,7 +1,6 @@
 import json
 import threading
 
-import babel
 import re
 
 from bothub_nlp_celery.actions import ACTION_PARSE, queue_name
@@ -42,24 +41,12 @@ def validate_language(language, repository_authorization, repository_version):
     if language is None:
         raise ValidationError("A language is required")
 
-    language = language.lower()
+    language = str(language.lower())
     try:
         language, region = re.split(r'[-_]', language)
     except ValueError:
         language = re.split(r'[-_]', language)[0]
         region = None
-
-    if not str(language).lower() in settings.BABEL_NOT_SUPPORT:
-        try:
-            language = str(babel.Locale.parse(language).language).lower()
-        except ValueError:
-            raise ValidationError(
-                "Expected only letters, got '{}'".format(language)
-            )
-        except babel.core.UnknownLocaleError:
-            raise ValidationError(
-                "Language '{}' not supported by now.".format(language)
-            )
 
     if language not in settings.SUPPORTED_LANGUAGES.keys() and language not in NEXT_LANGS.keys():
         raise ValidationError("Language '{}' not supported by now.".format(language))
