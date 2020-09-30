@@ -2,6 +2,7 @@ import json
 import threading
 
 import babel
+import re
 
 from bothub_nlp_celery.actions import ACTION_PARSE, queue_name
 from bothub_nlp_celery.app import celery_app
@@ -35,6 +36,72 @@ def get_entities_dict(answer):
     return entities_dict
 
 
+def validate_language(language, repository_authorization, repository_version):
+    from ..utils import NEXT_LANGS, DEFAULT_LANGS_PRIORITY, REGIONS
+
+    if language is None:
+        raise ValidationError("A language is required")
+
+    language = language.lower()
+    try:
+        language, region = re.split(r'[-_]', language)
+    except ValueError:
+        language = re.split(r'[-_]', language)[0]
+        region = None
+
+    if not str(language).lower() in settings.BABEL_NOT_SUPPORT:
+        try:
+            language = str(babel.Locale.parse(language).language).lower()
+        except ValueError:
+            raise ValidationError(
+                "Expected only letters, got '{}'".format(language)
+            )
+        except babel.core.UnknownLocaleError:
+            raise ValidationError(
+                "Language '{}' not supported by now.".format(language)
+            )
+
+    if language not in settings.SUPPORTED_LANGUAGES.keys() and language not in NEXT_LANGS.keys():
+        raise ValidationError("Language '{}' not supported by now.".format(language))
+
+    # Tries to get repository language with specified region 'LANG_REGION'
+    if region is not None and region in REGIONS:
+        try:
+            update = backend().request_backend_parse(
+                repository_authorization, f"{language}_{region}", repository_version
+            )
+        except Exception:
+            update = {}
+
+        if update.get("version"):
+            return update
+
+    # Tries to get repository by DEFAULT_LANGS (hard-coded exceptions)
+    if language in DEFAULT_LANGS_PRIORITY.keys():
+        priority_ordered_langs = DEFAULT_LANGS_PRIORITY.get(language)
+        for lang in priority_ordered_langs:
+            try:
+                update = backend().request_backend_parse(
+                    repository_authorization, lang, repository_version
+                )
+            except Exception:
+                update = {}
+
+            if update.get("version"):
+                break
+
+    # Tries to get most generic repository 'LANG' (without region)
+    else:
+        try:
+            update = backend().request_backend_parse(
+                repository_authorization, language, repository_version
+            )
+        except Exception:
+            update = {}
+
+    return update
+
+
 def _parse(
     authorization,
     text,
@@ -44,51 +111,19 @@ def _parse(
     user_agent=None,
     from_backend=False,
 ):
-    from ..utils import NEXT_LANGS
-
-    if language is not None:
-        if not str(language).lower() == "pt_br" and not str(language).lower() in settings.BABEL_NOT_SUPPORT:
-            try:
-                language = str(babel.Locale.parse(language).language).lower()
-            except ValueError:
-                raise ValidationError(
-                    "Expected only letters, got '{}'".format(language)
-                )
-            except babel.core.UnknownLocaleError:
-                raise ValidationError(
-                    "Language '{}' not supported by now.".format(language)
-                )
-
-    if language and (
-        language not in settings.SUPPORTED_LANGUAGES.keys()
-        and language not in NEXT_LANGS.keys()
-    ):
-        raise ValidationError("Language '{}' not supported by now.".format(language))
 
     repository_authorization = get_repository_authorization(authorization)
+
     if not repository_authorization:
         raise AuthorizationIsRequired()
 
-    try:
-        update = backend().request_backend_parse(
-            repository_authorization, language, repository_version
-        )
-    except Exception:
-        update = {}
-
-    if not update.get("version"):
-        next_languages = NEXT_LANGS.get(language, [])
-        for next_language in next_languages:
-            update = backend().request_backend_parse(
-                repository_authorization, next_language, repository_version
-            )
-            if update.get("version"):
-                break
-
-    model = get_language_model(update, language)
+    update = validate_language(language, repository_authorization, repository_version)
 
     if not update.get("version"):
         raise ValidationError("This repository has never been trained")
+
+    model = get_language_model(update, language)
+
     answer_task = celery_app.send_task(
         TASK_NLU_PARSE_TEXT,
         args=[update.get("repository_version"), repository_authorization, text],
@@ -135,4 +170,5 @@ def _parse(
         },
     )
     log.start()
+
     return answer

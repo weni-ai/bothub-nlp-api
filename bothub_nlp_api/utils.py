@@ -24,6 +24,16 @@ NEXT_LANGS = {
     "br": ["pt_br"],
 }
 
+DEFAULT_LANGS_PRIORITY = {
+    "english": ["en"],
+    "portuguese": ["pt_br", "pt"],
+    "pt": ["pt_br", "pt"],
+}
+
+REGIONS = {
+    "br", "us"
+}
+
 
 class AuthorizationIsRequired(HTTPException):
     def __init__(self):
