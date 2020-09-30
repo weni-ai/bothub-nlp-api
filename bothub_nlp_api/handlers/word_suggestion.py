@@ -17,10 +17,11 @@ def _word_suggestion(
     ):
         raise ValidationError("Language '{}' not supported by now.".format(language))
 
+    print(queue_name(language, ACTION_WORD_SUGGESTION, 'SPACY'))
     answer_task = celery_app.send_task(
         TASK_NLU_WORD_SUGGESTION_TEXT,
-        args=[text, percentage_to_replace, n_sentences_to_generate, intent],
-        queue=queue_name(ACTION_WORD_SUGGESTION, language, ALGORITHM_TO_LANGUAGE_MODEL[current_update.get("language")]),
+        args=[text, n_words_to_generate],
+        queue=queue_name(language, ACTION_WORD_SUGGESTION, 'SPACY'),
     )
     answer_task.wait()
     answer = answer_task.result

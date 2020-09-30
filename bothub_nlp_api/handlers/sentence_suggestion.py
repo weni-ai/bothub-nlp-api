@@ -8,7 +8,7 @@ from bothub_nlp_api.utils import ValidationError
 
 
 def _sentence_suggestion(
-    text, language, n_sentences_to_generate, percentage_to_replace, intent=None
+    text, language, n_sentences_to_generate, percentage_to_replace
 ):
     from ..utils import NEXT_LANGS
 
@@ -20,7 +20,7 @@ def _sentence_suggestion(
 
     answer_task = celery_app.send_task(
         TASK_NLU_SENTENCE_SUGGESTION_TEXT,
-        args=[text, percentage_to_replace, n_sentences_to_generate, intent],
+        args=[text, percentage_to_replace, n_sentences_to_generate],
         queue=queue_name(language, ACTION_SENTENCE_SUGGESTION, ALGORITHM_TO_LANGUAGE_MODEL.get(language)),
     )
     answer_task.wait()
@@ -31,7 +31,6 @@ def _sentence_suggestion(
             "language": language,
             "n_sentences_to_generate": n_sentences_to_generate,
             "percentage_to_replace": percentage_to_replace,
-            "intent": intent,
         }
     )
     return answer

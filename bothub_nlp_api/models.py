@@ -1,4 +1,4 @@
-from typing import List, Dict, Any
+from typing import List, Dict, Any, Tuple
 
 from pydantic import BaseModel
 
@@ -22,7 +22,15 @@ class SentenceSuggestionRequest(BaseModel):
     language: str = None
     n_sentences_to_generate: int = 10
     percentage_to_replace: float = 0.3
+
+
+class IntentSentenceSuggestionRequest(BaseModel):
+    language: str = None
     intent: str = None
+    n_sentences_to_generate: int = 10
+    percentage_to_replace: float = 0.3
+    repository_version: int = None
+
 
 class WordSuggestionRequest(BaseModel):
     text: str
@@ -78,6 +86,16 @@ class DebugParseResponse(BaseModel):
 class SentenceSuggestionResponse(BaseModel):
     text: str
     suggested_sentences: List[str]
+
+
+class IntentSentenceSuggestionResponse(BaseModel):
+    intent: str
+    suggested_sentences: List[str]
+
+
+class WordSuggestionResponse(BaseModel):
+    text: str
+    similar_words: List[Tuple[str, str]]
 
 
 class WordsDistributionResponse(BaseModel):
@@ -155,6 +173,7 @@ class EvaluateResponse(BaseModel):
     repository_version: int
     evaluate_id: int
     evaluate_version: int
+    cross_validation: bool
 
 
 class TaskQueueResponse(BaseModel):

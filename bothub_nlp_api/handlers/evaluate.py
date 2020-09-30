@@ -9,8 +9,10 @@ from ..utils import AuthorizationIsRequired
 from ..utils import NEXT_LANGS
 from ..utils import ValidationError, get_repository_authorization
 from ..utils import backend
+from ..utils import send_job_train_ai_platform
 
 EVALUATE_STATUS_EVALUATED = "evaluated"
+EVALUATE_STATUS_PROCESSING = "processing"
 EVALUATE_STATUS_FAILED = "failed"
 
 
@@ -38,24 +40,43 @@ def evaluate_handler(authorization, language, repository_version=None, cross_val
     model = get_language_model(update, language)
 
     try:
-        evaluate_task = celery_app.send_task(
-            TASK_NLU_EVALUATE_UPDATE,
-            args=[
-                update.get("repository_version"),
-                update.get("user_id"),
-                repository_authorization,
-                cross_validation,
-            ],
-            queue=queue_name(update.get("language"), ACTION_EVALUATE, model),
-        )
-        evaluate_task.wait()
-        evaluate = evaluate_task.result
+        evaluate = None
+        if cross_validation is False:
+            evaluate_task = celery_app.send_task(
+                TASK_NLU_EVALUATE_UPDATE,
+                args=[
+                    update.get("repository_version"),
+                    update.get("user_id"),
+                    repository_authorization,
+                    cross_validation,
+                ],
+                queue=queue_name(update.get("language"), ACTION_EVALUATE, model),
+            )
+            evaluate_task.wait()
+            evaluate = evaluate_task.result
+        else:
+            job_id = f'bothub_{settings.ENVIRONMENT}_evaluate_{str(update.get("current_version_id"))}_{language}_{str(int(time.time()))}'
+            send_job_train_ai_platform(
+                jobId=job_id,
+                repository_version=str(update.get("current_version_id")),
+                by_id=str(update.get("repository_authorization_user_id")),
+                repository_authorization=str(repository_authorization),
+                language=language,
+                type_model=model
+            )
+            backend().request_backend_save_queue_id(
+                update_id=str(update.get("current_version_id")),
+                repository_authorization=str(repository_authorization),
+                task_id=job_id,
+                from_queue=0,
+            )
+
         evaluate_report = {
             "language": language,
-            "status": EVALUATE_STATUS_EVALUATED,
+            "status": EVALUATE_STATUS_PROCESSING,
             "repository_version": update.get("repository_version"),
-            "evaluate_id": evaluate.get("id"),
-            "evaluate_version": evaluate.get("version"),
+            "evaluate_id": evaluate.get("id") if evaluate is not None else None,
+            "evaluate_version": evaluate.get("version") if evaluate is not None else None,
             "cross_validation": cross_validation,
         }
     except Exception as e:

@@ -55,7 +55,8 @@ def train_handler(authorization, repository_version=None):
                 by_id=str(update.get("repository_authorization_user_id")),
                 repository_authorization=str(repository_authorization),
                 language=language,
-                type_model=model
+                type_model=model,
+                operation='evaluate'
             )
             backend().request_backend_save_queue_id(
                 update_id=str(update.get("current_version_id")),

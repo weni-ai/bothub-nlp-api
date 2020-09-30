@@ -75,7 +75,6 @@ def _parse(
         )
     except Exception:
         update = {}
-
     if not update.get("version"):
         next_languages = NEXT_LANGS.get(language, [])
         for next_language in next_languages:
