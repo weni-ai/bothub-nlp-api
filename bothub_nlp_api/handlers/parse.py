@@ -68,7 +68,7 @@ def validate_language(language, repository_authorization, repository_version):
     if region is not None and region in REGIONS:
         try:
             update = backend().request_backend_parse(
-                repository_authorization, f"{language}_{region}", repository_version
+                repository_authorization, "{}_{}".format(language, region), repository_version
             )
         except Exception:
             update = {}
@@ -90,7 +90,7 @@ def validate_language(language, repository_authorization, repository_version):
             if update.get("version"):
                 break
 
-    # Tries to get most generic repository 'LANG' (without region)
+    # Else tries to get most generic repository 'LANG' (without region)
     else:
         try:
             update = backend().request_backend_parse(
