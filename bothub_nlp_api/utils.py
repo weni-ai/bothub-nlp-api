@@ -22,6 +22,7 @@ DEFAULT_LANGS_PRIORITY = {
     "br": ["pt_br"],
 }
 
+
 class AuthorizationIsRequired(HTTPException):
     def __init__(self):
         self.status_code = 401
@@ -92,17 +93,17 @@ def send_job_train_ai_platform(
 ):
     image_sufix = f"-{language}-{type_model}" if type_model is not None else "-xx-SPACY"
     args = [
-            "--repository-version",
-            repository_version,
-            "--by-id",
-            by_id,
-            "--repository-authorization",
-            repository_authorization,
-            "--base_url",
-            bothub_nlp_api.settings.BOTHUB_ENGINE_URL,
-            "--AIPLATFORM_LANGUAGE_QUEUE",
-            language,
-        ]
+        "--repository-version",
+        repository_version,
+        "--by-id",
+        by_id,
+        "--repository-authorization",
+        repository_authorization,
+        "--base_url",
+        bothub_nlp_api.settings.BOTHUB_ENGINE_URL,
+        "--AIPLATFORM_LANGUAGE_QUEUE",
+        language,
+    ]
     if type_model is not None:
         args.extend(["--AIPLATFORM_LANGUAGE_MODEL", type_model])
     training_inputs = {

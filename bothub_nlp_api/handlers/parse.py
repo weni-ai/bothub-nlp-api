@@ -6,7 +6,7 @@ import re
 from bothub_nlp_celery.actions import ACTION_PARSE, queue_name
 from bothub_nlp_celery.app import celery_app
 from bothub_nlp_celery.tasks import TASK_NLU_PARSE_TEXT
-from bothub_nlp_celery.utils import ALGORITHM_TO_LANGUAGE_MODEL, choose_best_algorithm
+from bothub_nlp_celery.utils import ALGORITHM_TO_LANGUAGE_MODEL
 from bothub_nlp_celery import settings as celery_settings
 
 from bothub_nlp_api import settings
@@ -38,11 +38,13 @@ def get_entities_dict(answer):
 
 
 def validate_language(language, repository_authorization, repository_version):
-
     language = str(language.lower())
-    language = re.split(r'[-_]', language)[0]
+    language = re.split(r"[-_]", language)[0]
 
-    if language not in settings.SUPPORTED_LANGUAGES.keys() and language not in DEFAULT_LANGS_PRIORITY.keys():
+    if (
+        language not in settings.SUPPORTED_LANGUAGES.keys()
+        and language not in DEFAULT_LANGS_PRIORITY.keys()
+    ):
         raise ValidationError("Language '{}' not supported by now.".format(language))
 
     # Tries to get repository by DEFAULT_LANGS (hard-coded exceptions)
@@ -80,7 +82,6 @@ def _parse(
     user_agent=None,
     from_backend=False,
 ):
-
     repository_authorization = get_repository_authorization(authorization)
     if not repository_authorization:
         raise AuthorizationIsRequired()
@@ -90,23 +91,21 @@ def _parse(
     if not update.get("version"):
         raise ValidationError("This repository has never been trained")
 
-    chosen_algorithm = update.get('algorithm')
+    chosen_algorithm = update.get("algorithm")
     # chosen_algorithm = choose_best_algorithm(update.get("language"))
     model = ALGORITHM_TO_LANGUAGE_MODEL[chosen_algorithm]
 
-    language = update.get('language')
-    if (model == 'SPACY' and language not in celery_settings.SPACY_LANGUAGES) or (
-        model == 'BERT' and language not in celery_settings.BERT_LANGUAGES):
+    language = update.get("language")
+    if (model == "SPACY" and language not in celery_settings.SPACY_LANGUAGES) or (
+        model == "BERT" and language not in celery_settings.BERT_LANGUAGES
+    ):
         model = None
 
     answer_task = celery_app.send_task(
         TASK_NLU_PARSE_TEXT,
         args=[update.get("repository_version"), repository_authorization, text],
         kwargs={"rasa_format": rasa_format},
-        queue=queue_name(
-            update.get("language"),
-            ACTION_PARSE,
-            model),
+        queue=queue_name(update.get("language"), ACTION_PARSE, model),
     )
     answer_task.wait()
     answer = answer_task.result

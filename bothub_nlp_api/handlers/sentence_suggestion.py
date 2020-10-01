@@ -20,7 +20,7 @@ def _sentence_suggestion(
     answer_task = celery_app.send_task(
         TASK_NLU_SENTENCE_SUGGESTION_TEXT,
         args=[text, percentage_to_replace, n_sentences_to_generate],
-        queue=queue_name(ACTION_SENTENCE_SUGGESTION, language, ALGORITHM_TO_LANGUAGE_MODEL[current_update.get("language")]),
+        queue=queue_name(language, ACTION_SENTENCE_SUGGESTION, "SPACY"),
     )
     answer_task.wait()
     answer = answer_task.result
