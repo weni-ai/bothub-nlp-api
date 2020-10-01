@@ -40,6 +40,9 @@ def _debug_parse(authorization, text, language, repository_version=None):
             if update.get("version"):
                 break
 
+    if not update.get("version"):
+        raise ValidationError("This repository has never been trained")
+
     chosen_algorithm = update.get("algorithm")
     # chosen_algorithm = choose_best_algorithm(update.get("language"))
     model = ALGORITHM_TO_LANGUAGE_MODEL[chosen_algorithm]
@@ -48,8 +51,6 @@ def _debug_parse(authorization, text, language, repository_version=None):
         model == "BERT" and language not in celery_settings.BERT_LANGUAGES
     ):
         model = None
-    if not update.get("version"):
-        raise ValidationError("This repository has never been trained")
 
     answer_task = celery_app.send_task(
         TASK_NLU_DEBUG_PARSE_TEXT,
