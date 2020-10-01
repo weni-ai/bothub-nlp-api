@@ -1,11 +1,10 @@
 import bothub_backend
 import google.oauth2.credentials
+import bothub_nlp_api.settings
 from fastapi import HTTPException, Header
 from googleapiclient import discovery
 from googleapiclient import errors
 from starlette.requests import Request
-
-import bothub_nlp_api.settings
 from bothub_nlp_api import settings
 
 
@@ -15,10 +14,10 @@ def backend():
     )
 
 
-NEXT_LANGS = {
+DEFAULT_LANGS_PRIORITY = {
     "english": ["en"],
-    "portuguese": ["pt", "pt_br"],
-    "pt": ["pt_br"],
+    "portuguese": ["pt_br", "pt"],
+    "pt": ["pt_br", "pt"],
     "pt-br": ["pt_br"],
     "br": ["pt_br"],
 }
@@ -94,17 +93,17 @@ def send_job_train_ai_platform(
 ):
     image_sufix = f"-{language}-{type_model}" if type_model is not None else "-xx-SPACY"
     args = [
-            "--repository-version",
-            repository_version,
-            "--by-id",
-            by_id,
-            "--repository-authorization",
-            repository_authorization,
-            "--base_url",
-            bothub_nlp_api.settings.BOTHUB_ENGINE_URL,
-            "--AIPLATFORM_LANGUAGE_QUEUE",
-            language,
-        ]
+        "--repository-version",
+        repository_version,
+        "--by-id",
+        by_id,
+        "--repository-authorization",
+        repository_authorization,
+        "--base_url",
+        bothub_nlp_api.settings.BOTHUB_ENGINE_URL,
+        "--AIPLATFORM_LANGUAGE_QUEUE",
+        language,
+    ]
     if type_model is not None:
         args.extend(["--AIPLATFORM_LANGUAGE_MODEL", type_model])
     training_inputs = {
