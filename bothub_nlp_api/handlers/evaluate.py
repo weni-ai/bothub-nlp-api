@@ -6,7 +6,7 @@ from bothub_nlp_celery import settings as celery_settings
 
 from .. import settings
 from ..utils import AuthorizationIsRequired
-from ..utils import NEXT_LANGS
+from ..utils import DEFAULT_LANGS_PRIORITY
 from ..utils import ValidationError, get_repository_authorization
 from ..utils import backend
 
@@ -17,7 +17,7 @@ EVALUATE_STATUS_FAILED = "failed"
 def evaluate_handler(authorization, language, repository_version=None):
     if language and (
         language not in settings.SUPPORTED_LANGUAGES.keys()
-        and language not in NEXT_LANGS.keys()
+        and language not in DEFAULT_LANGS_PRIORITY.keys()
     ):
         raise ValidationError("Language '{}' not supported by now.".format(language))
 

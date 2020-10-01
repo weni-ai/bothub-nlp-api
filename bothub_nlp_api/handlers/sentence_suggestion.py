@@ -9,11 +9,11 @@ from bothub_nlp_api.utils import ValidationError
 def _sentence_suggestion(
     text, language, n_sentences_to_generate, percentage_to_replace
 ):
-    from ..utils import NEXT_LANGS
+    from ..utils import DEFAULT_LANGS_PRIORITY
 
     if language and (
         language not in settings.SUPPORTED_LANGUAGES.keys()
-        and language not in NEXT_LANGS.keys()
+        and language not in DEFAULT_LANGS_PRIORITY.keys()
     ):
         raise ValidationError("Language '{}' not supported by now.".format(language))
 

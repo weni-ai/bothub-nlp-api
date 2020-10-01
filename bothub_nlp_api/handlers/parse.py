@@ -6,7 +6,7 @@ import re
 from bothub_nlp_celery.actions import ACTION_PARSE, queue_name
 from bothub_nlp_celery.app import celery_app
 from bothub_nlp_celery.tasks import TASK_NLU_PARSE_TEXT
-from bothub_nlp_celery.utils import ALGORITHM_TO_LANGUAGE_MODEL, choose_best_algorithm, get_language_model
+from bothub_nlp_celery.utils import ALGORITHM_TO_LANGUAGE_MODEL, choose_best_algorithm
 from bothub_nlp_celery import settings as celery_settings
 
 from bothub_nlp_api import settings
@@ -14,6 +14,8 @@ from bothub_nlp_api.utils import AuthorizationIsRequired
 from bothub_nlp_api.utils import ValidationError
 from bothub_nlp_api.utils import backend
 from bothub_nlp_api.utils import get_repository_authorization
+
+from ..utils import DEFAULT_LANGS_PRIORITY
 
 
 def order_by_confidence(entities):
@@ -36,32 +38,12 @@ def get_entities_dict(answer):
 
 
 def validate_language(language, repository_authorization, repository_version):
-    from ..utils import NEXT_LANGS, DEFAULT_LANGS_PRIORITY, REGIONS
-
-    if language is None:
-        raise ValidationError("A language is required")
 
     language = str(language.lower())
-    try:
-        language, region = re.split(r'[-_]', language)
-    except ValueError:
-        language = re.split(r'[-_]', language)[0]
-        region = None
+    language = re.split(r'[-_]', language)[0]
 
-    if language not in settings.SUPPORTED_LANGUAGES.keys() and language not in NEXT_LANGS.keys():
+    if language not in settings.SUPPORTED_LANGUAGES.keys() and language not in DEFAULT_LANGS_PRIORITY.keys():
         raise ValidationError("Language '{}' not supported by now.".format(language))
-
-    # Tries to get repository language with specified region 'LANG_REGION'
-    if region is not None and region in REGIONS:
-        try:
-            update = backend().request_backend_parse(
-                repository_authorization, "{}_{}".format(language, region), repository_version
-            )
-        except Exception:
-            update = {}
-
-        if update.get("version"):
-            return update
 
     # Tries to get repository by DEFAULT_LANGS (hard-coded exceptions)
     if language in DEFAULT_LANGS_PRIORITY.keys():
@@ -77,7 +59,7 @@ def validate_language(language, repository_authorization, repository_version):
             if update.get("version"):
                 break
 
-    # Else tries to get most generic repository 'LANG' (without region)
+    # Else tries to get most generic repository ('LANG' only)
     else:
         try:
             update = backend().request_backend_parse(
@@ -100,7 +82,6 @@ def _parse(
 ):
 
     repository_authorization = get_repository_authorization(authorization)
-
     if not repository_authorization:
         raise AuthorizationIsRequired()
 
@@ -109,7 +90,14 @@ def _parse(
     if not update.get("version"):
         raise ValidationError("This repository has never been trained")
 
-    model = get_language_model(update, language)
+    chosen_algorithm = update.get('algorithm')
+    # chosen_algorithm = choose_best_algorithm(update.get("language"))
+    model = ALGORITHM_TO_LANGUAGE_MODEL[chosen_algorithm]
+
+    language = update.get('language')
+    if (model == 'SPACY' and language not in celery_settings.SPACY_LANGUAGES) or (
+        model == 'BERT' and language not in celery_settings.BERT_LANGUAGES):
+        model = None
 
     answer_task = celery_app.send_task(
         TASK_NLU_PARSE_TEXT,

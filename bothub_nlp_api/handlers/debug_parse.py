@@ -12,11 +12,11 @@ from bothub_nlp_api.utils import get_repository_authorization
 
 
 def _debug_parse(authorization, text, language, repository_version=None):
-    from ..utils import NEXT_LANGS
+    from ..utils import DEFAULT_LANGS_PRIORITY
 
     if language and (
         language not in settings.SUPPORTED_LANGUAGES.keys()
-        and language not in NEXT_LANGS.keys()
+        and language not in DEFAULT_LANGS_PRIORITY.keys()
     ):
         raise ValidationError("Language '{}' not supported by now.".format(language))
 
@@ -32,14 +32,14 @@ def _debug_parse(authorization, text, language, repository_version=None):
         update = {}
 
     if not update.get("version"):
-        next_languages = NEXT_LANGS.get(language, [])
+        next_languages = DEFAULT_LANGS_PRIORITY.get(language, [])
         for next_language in next_languages:
             update = backend().request_backend_parse(
                 repository_authorization, next_language, repository_version
             )
             if update.get("version"):
                 break
-    
+
     chosen_algorithm = update.get('algorithm')
     # chosen_algorithm = choose_best_algorithm(update.get("language"))
     model = ALGORITHM_TO_LANGUAGE_MODEL[chosen_algorithm]
