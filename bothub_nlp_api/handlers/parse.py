@@ -104,6 +104,14 @@ def _parse(
     ):
         model = None
 
+    # Send parse to SPACY worker to use name_entities (only if BERT not in use)
+    if (
+        (update.get("use_name_entities"))
+        and (model is None)
+        and (language in celery_settings.SPACY_LANGUAGES)
+    ):
+        model = "SPACY"
+
     answer_task = celery_app.send_task(
         TASK_NLU_PARSE_TEXT,
         args=[update.get("repository_version"), repository_authorization, text],
