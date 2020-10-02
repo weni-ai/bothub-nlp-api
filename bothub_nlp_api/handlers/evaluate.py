@@ -6,7 +6,7 @@ from bothub_nlp_celery import settings as celery_settings
 
 from .. import settings
 from ..utils import AuthorizationIsRequired
-from ..utils import NEXT_LANGS
+from ..utils import DEFAULT_LANGS_PRIORITY
 from ..utils import ValidationError, get_repository_authorization
 from ..utils import backend
 from ..utils import send_job_train_ai_platform
@@ -19,7 +19,7 @@ EVALUATE_STATUS_FAILED = "failed"
 def evaluate_handler(authorization, language, repository_version=None, cross_validation=False):
     if language and (
         language not in settings.SUPPORTED_LANGUAGES.keys()
-        and language not in NEXT_LANGS.keys()
+        and language not in DEFAULT_LANGS_PRIORITY.keys()
     ):
         raise ValidationError("Language '{}' not supported by now.".format(language))
 
@@ -37,8 +37,14 @@ def evaluate_handler(authorization, language, repository_version=None, cross_val
     if not update.get("update"):
         raise ValidationError("This repository has never been trained")
 
+    chosen_algorithm = update.get("algorithm")
+    # chosen_algorithm = choose_best_algorithm(update.get("language"))
     model = get_language_model(update, language)
-
+    if (model == "SPACY" and language not in celery_settings.SPACY_LANGUAGES) or (
+        model == "BERT" and language not in celery_settings.BERT_LANGUAGES
+    ):
+        model = None
+    
     try:
         evaluate = None
         if cross_validation is False:

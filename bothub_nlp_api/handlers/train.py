@@ -2,7 +2,7 @@ import time
 from bothub_nlp_celery.actions import ACTION_TRAIN, queue_name
 from bothub_nlp_celery.app import celery_app
 from bothub_nlp_celery.tasks import TASK_NLU_TRAIN_UPDATE
-from bothub_nlp_celery.utils import ALGORITHM_TO_LANGUAGE_MODEL, choose_best_algorithm, get_language_model
+from bothub_nlp_celery.utils import ALGORITHM_TO_LANGUAGE_MODEL, get_language_model
 from bothub_nlp_celery import settings as celery_settings
 
 from .. import settings, utils
@@ -27,12 +27,9 @@ def train_handler(authorization, repository_version=None):
 
         if not update.get("ready_for_train"):
             continue
-
+            
         model = get_language_model(update, language)
-        print(queue_name(
-                    update.get("language"),
-                    ACTION_TRAIN,
-                    model))
+
         if settings.BOTHUB_SERVICE_TRAIN == "celery":
             train_task = celery_app.send_task(
                 TASK_NLU_TRAIN_UPDATE,
@@ -41,10 +38,7 @@ def train_handler(authorization, repository_version=None):
                     update.get("repository_authorization_user_id"),
                     repository_authorization,
                 ],
-                queue=queue_name(
-                    update.get("language"),
-                    ACTION_TRAIN,
-                    model),
+                queue=queue_name(update.get("language"), ACTION_TRAIN, model),
             )
             train_tasks.append({"task": train_task, "language": language})
         elif settings.BOTHUB_SERVICE_TRAIN == "ai-platform":

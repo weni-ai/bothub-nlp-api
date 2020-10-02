@@ -12,11 +12,11 @@ from bothub_nlp_api.utils import get_repository_authorization
 
 
 def _debug_parse(authorization, text, language, repository_version=None):
-    from ..utils import NEXT_LANGS
+    from ..utils import DEFAULT_LANGS_PRIORITY
 
     if language and (
         language not in settings.SUPPORTED_LANGUAGES.keys()
-        and language not in NEXT_LANGS.keys()
+        and language not in DEFAULT_LANGS_PRIORITY.keys()
     ):
         raise ValidationError("Language '{}' not supported by now.".format(language))
 
@@ -32,7 +32,7 @@ def _debug_parse(authorization, text, language, repository_version=None):
         update = {}
 
     if not update.get("version"):
-        next_languages = NEXT_LANGS.get(language, [])
+        next_languages = DEFAULT_LANGS_PRIORITY.get(language, [])
         for next_language in next_languages:
             update = backend().request_backend_parse(
                 repository_authorization, next_language, repository_version
@@ -44,14 +44,16 @@ def _debug_parse(authorization, text, language, repository_version=None):
     
     if not update.get("version"):
         raise ValidationError("This repository has never been trained")
+    
+    if (model == "SPACY" and language not in celery_settings.SPACY_LANGUAGES) or (
+        model == "BERT" and language not in celery_settings.BERT_LANGUAGES
+    ):
+        model = None
 
     answer_task = celery_app.send_task(
         TASK_NLU_DEBUG_PARSE_TEXT,
         args=[update.get("repository_version"), repository_authorization, text],
-        queue=queue_name(
-            update.get("language"),
-            ACTION_DEBUG_PARSE,
-            model),
+        queue=queue_name(update.get("language"), ACTION_DEBUG_PARSE, model),
     )
     answer_task.wait()
     answer = answer_task.result

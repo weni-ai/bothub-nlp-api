@@ -1,7 +1,7 @@
 import json
 import threading
-
-import babel
+import logging
+import re
 
 from bothub_nlp_celery.actions import ACTION_PARSE, queue_name
 from bothub_nlp_celery.app import celery_app
@@ -14,6 +14,8 @@ from bothub_nlp_api.utils import AuthorizationIsRequired
 from bothub_nlp_api.utils import ValidationError
 from bothub_nlp_api.utils import backend
 from bothub_nlp_api.utils import get_repository_authorization
+
+from ..utils import DEFAULT_LANGS_PRIORITY
 
 
 def order_by_confidence(entities):
@@ -35,6 +37,42 @@ def get_entities_dict(answer):
     return entities_dict
 
 
+def validate_language(language, repository_authorization, repository_version):
+    language = str(language.lower())
+    language = re.split(r"[-_]", language)[0]
+
+    if (
+        language not in settings.SUPPORTED_LANGUAGES.keys()
+        and language not in DEFAULT_LANGS_PRIORITY.keys()
+    ):
+        raise ValidationError("Language '{}' not supported by now.".format(language))
+
+    # Tries to get repository by DEFAULT_LANGS (hard-coded exceptions)
+    if language in DEFAULT_LANGS_PRIORITY.keys():
+        priority_ordered_langs = DEFAULT_LANGS_PRIORITY.get(language)
+        for lang in priority_ordered_langs:
+            try:
+                update = backend().request_backend_parse(
+                    repository_authorization, lang, repository_version
+                )
+            except Exception:
+                update = {}
+
+            if update.get("version"):
+                break
+
+    # Else tries to get most generic repository ('LANG' only)
+    else:
+        try:
+            update = backend().request_backend_parse(
+                repository_authorization, language, repository_version
+            )
+        except Exception:
+            update = {}
+
+    return update
+
+
 def _parse(
     authorization,
     text,
@@ -44,58 +82,22 @@ def _parse(
     user_agent=None,
     from_backend=False,
 ):
-    from ..utils import NEXT_LANGS
-
-    if language is not None:
-        if not str(language).lower() == "pt_br" and not str(language).lower() in settings.BABEL_NOT_SUPPORT:
-            try:
-                language = str(babel.Locale.parse(language).language).lower()
-            except ValueError:
-                raise ValidationError(
-                    "Expected only letters, got '{}'".format(language)
-                )
-            except babel.core.UnknownLocaleError:
-                raise ValidationError(
-                    "Language '{}' not supported by now.".format(language)
-                )
-
-    if language and (
-        language not in settings.SUPPORTED_LANGUAGES.keys()
-        and language not in NEXT_LANGS.keys()
-    ):
-        raise ValidationError("Language '{}' not supported by now.".format(language))
-
     repository_authorization = get_repository_authorization(authorization)
     if not repository_authorization:
         raise AuthorizationIsRequired()
 
-    try:
-        update = backend().request_backend_parse(
-            repository_authorization, language, repository_version
-        )
-    except Exception:
-        update = {}
-    if not update.get("version"):
-        next_languages = NEXT_LANGS.get(language, [])
-        for next_language in next_languages:
-            update = backend().request_backend_parse(
-                repository_authorization, next_language, repository_version
-            )
-            if update.get("version"):
-                break
-
-    model = get_language_model(update, language)
+    update = validate_language(language, repository_authorization, repository_version)
 
     if not update.get("version"):
         raise ValidationError("This repository has never been trained")
+
+    model = get_language_model(update, language)
+
     answer_task = celery_app.send_task(
         TASK_NLU_PARSE_TEXT,
         args=[update.get("repository_version"), repository_authorization, text],
         kwargs={"rasa_format": rasa_format},
-        queue=queue_name(
-            update.get("language"),
-            ACTION_PARSE,
-            model),
+        queue=queue_name(update.get("language"), ACTION_PARSE, model),
     )
     answer_task.wait()
     answer = answer_task.result
@@ -110,6 +112,20 @@ def _parse(
         }
     )
 
+    try:
+        log_intent = []
+        for result in answer.get("intent_ranking", []):
+            log_intent.append(
+                {
+                    "intent": result["name"],
+                    "is_default": result["name"] == answer["intent"]["name"],
+                    "confidence": result["confidence"],
+                }
+            )
+    except Exception as err:
+        logging.error(f"Unknown error log_intent {err}")
+        log_intent = []
+
     log = threading.Thread(
         target=backend().send_log_nlp_parse,
         kwargs={
@@ -120,18 +136,10 @@ def _parse(
                 "user": str(get_repository_authorization(authorization)),
                 "repository_version_language": int(update.get("repository_version")),
                 "nlp_log": json.dumps(answer),
-                "log_intent": [
-                    {
-                        "intent": result["name"],
-                        "is_default": True
-                        if result["name"] == answer["intent"]["name"]
-                        else False,
-                        "confidence": result["confidence"],
-                    }
-                    for result in answer.get("intent_ranking", [])
-                ],
+                "log_intent": log_intent,
             }
         },
     )
     log.start()
+
     return answer
