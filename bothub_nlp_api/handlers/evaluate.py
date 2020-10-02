@@ -43,6 +43,14 @@ def evaluate_handler(authorization, language, repository_version=None):
     ):
         model = None
 
+    # Send evaluate to SPACY worker to use name_entities (only if BERT not in use)
+    if (
+        (update.get("use_name_entities"))
+        and (model is None)
+        and (language in celery_settings.SPACY_LANGUAGES)
+    ):
+        model = "SPACY"
+
     try:
         evaluate_task = celery_app.send_task(
             TASK_NLU_EVALUATE_UPDATE,
