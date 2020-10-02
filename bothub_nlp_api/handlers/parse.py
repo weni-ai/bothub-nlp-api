@@ -38,8 +38,11 @@ def get_entities_dict(answer):
 
 
 def validate_language(language, repository_authorization, repository_version):
-    language = str(language.lower())
-    language = re.split(r"[-_]", language)[0]
+    try:
+        language = str(language.lower())
+        language = re.split(r"[-_]", language)[0]
+    except Exception:
+        language = None
 
     if (
         language not in settings.SUPPORTED_LANGUAGES.keys()
