@@ -13,11 +13,11 @@ def _intent_sentence_suggestion(
     authorization, language, intent, n_sentences_to_generate, percentage_to_replace, repository_version=None,
 ):
     print(authorization)
-    from ..utils import NEXT_LANGS
+    from ..utils import DEFAULT_LANGS_PRIORITY
 
     if language and (
         language not in settings.SUPPORTED_LANGUAGES.keys()
-        and language not in NEXT_LANGS.keys()
+        and language not in DEFAULT_LANGS_PRIORITY.keys()
     ):
         raise ValidationError("Language '{}' not supported by now.".format(language))
 
