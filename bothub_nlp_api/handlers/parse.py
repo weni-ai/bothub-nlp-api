@@ -45,8 +45,8 @@ def validate_language(language, repository_authorization, repository_version):
         language = None
 
     if (
-        language and
-        language not in settings.SUPPORTED_LANGUAGES.keys()
+        language
+        and language not in settings.SUPPORTED_LANGUAGES.keys()
         and language not in DEFAULT_LANGS_PRIORITY.keys()
     ):
         raise ValidationError("Language '{}' not supported by now.".format(language))
