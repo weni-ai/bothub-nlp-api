@@ -2,7 +2,7 @@ import time
 from bothub_nlp_celery.actions import ACTION_TRAIN, queue_name
 from bothub_nlp_celery.app import celery_app
 from bothub_nlp_celery.tasks import TASK_NLU_TRAIN_UPDATE
-from bothub_nlp_celery.utils import ALGORITHM_TO_LANGUAGE_MODEL, choose_best_algorithm
+from bothub_nlp_celery.utils import ALGORITHM_TO_LANGUAGE_MODEL
 from bothub_nlp_celery import settings as celery_settings
 
 from .. import settings, utils
@@ -25,20 +25,26 @@ def train_handler(authorization, repository_version=None):
         current_update = backend().request_backend_train(
             repository_authorization, language, repository_version
         )
-        print(language)
-        print(current_update)
-        print('######')
+
         if not current_update.get("ready_for_train"):
             continue
 
-        chosen_algorithm = current_update.get('algorithm')
+        chosen_algorithm = current_update.get("algorithm")
         model = ALGORITHM_TO_LANGUAGE_MODEL[chosen_algorithm]
 
-        if (model == 'SPACY' and language not in celery_settings.SPACY_LANGUAGES) or (
-            model == 'BERT' and language not in celery_settings.BERT_LANGUAGES):
+        if (model == "SPACY" and language not in celery_settings.SPACY_LANGUAGES) or (
+            model == "BERT" and language not in celery_settings.BERT_LANGUAGES
+        ):
             model = None
 
-        print(queue_name(current_update.get("language"), ACTION_TRAIN, model))
+        # Send train to SPACY worker to use name_entities (only if BERT not in use)
+        if (
+            (current_update.get("use_name_entities"))
+            and (model is None)
+            and (language in celery_settings.SPACY_LANGUAGES)
+        ):
+            model = "SPACY"
+
         if settings.BOTHUB_SERVICE_TRAIN == "celery":
             train_task = celery_app.send_task(
                 TASK_NLU_TRAIN_UPDATE,
@@ -47,10 +53,7 @@ def train_handler(authorization, repository_version=None):
                     current_update.get("repository_authorization_user_id"),
                     repository_authorization,
                 ],
-                queue=queue_name(
-                    current_update.get("language"),
-                    ACTION_TRAIN,
-                    model),
+                queue=queue_name(current_update.get("language"), ACTION_TRAIN, model),
             )
             train_tasks.append({"task": train_task, "language": language})
         elif settings.BOTHUB_SERVICE_TRAIN == "ai-platform":
@@ -61,7 +64,7 @@ def train_handler(authorization, repository_version=None):
                 by_id=str(current_update.get("repository_authorization_user_id")),
                 repository_authorization=str(repository_authorization),
                 language=language,
-                type_model=model
+                type_model=model,
             )
             backend().request_backend_save_queue_id(
                 update_id=str(current_update.get("current_version_id")),

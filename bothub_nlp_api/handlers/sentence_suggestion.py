@@ -9,18 +9,18 @@ from bothub_nlp_api.utils import ValidationError
 def _sentence_suggestion(
     text, language, n_sentences_to_generate, percentage_to_replace
 ):
-    from ..utils import NEXT_LANGS
+    from ..utils import DEFAULT_LANGS_PRIORITY
 
     if language and (
         language not in settings.SUPPORTED_LANGUAGES.keys()
-        and language not in NEXT_LANGS.keys()
+        and language not in DEFAULT_LANGS_PRIORITY.keys()
     ):
         raise ValidationError("Language '{}' not supported by now.".format(language))
 
     answer_task = celery_app.send_task(
         TASK_NLU_SENTENCE_SUGGESTION_TEXT,
         args=[text, percentage_to_replace, n_sentences_to_generate],
-        queue=queue_name(ACTION_SENTENCE_SUGGESTION, language, ALGORITHM_TO_LANGUAGE_MODEL[current_update.get("language")]),
+        queue=queue_name(language, ACTION_SENTENCE_SUGGESTION, "SPACY"),
     )
     answer_task.wait()
     answer = answer_task.result
