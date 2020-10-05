@@ -38,11 +38,15 @@ def get_entities_dict(answer):
 
 
 def validate_language(language, repository_authorization, repository_version):
-    language = str(language.lower())
-    language = re.split(r"[-_]", language)[0]
+    try:
+        language = str(language.lower())
+        language = re.split(r"[-_]", language)[0]
+    except Exception:
+        language = None
 
     if (
-        language not in settings.SUPPORTED_LANGUAGES.keys()
+        language
+        and language not in settings.SUPPORTED_LANGUAGES.keys()
         and language not in DEFAULT_LANGS_PRIORITY.keys()
     ):
         raise ValidationError("Language '{}' not supported by now.".format(language))
@@ -92,6 +96,14 @@ def _parse(
         raise ValidationError("This repository has never been trained")
 
     model = get_language_model(update, language)
+
+    # Send parse to SPACY worker to use name_entities (only if BERT not in use)
+    if (
+        (update.get("use_name_entities"))
+        and (model is None)
+        and (language in celery_settings.SPACY_LANGUAGES)
+    ):
+        model = "SPACY"
 
     answer_task = celery_app.send_task(
         TASK_NLU_PARSE_TEXT,

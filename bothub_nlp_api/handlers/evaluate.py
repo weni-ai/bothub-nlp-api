@@ -37,14 +37,16 @@ def evaluate_handler(authorization, language, repository_version=None, cross_val
     if not update.get("update"):
         raise ValidationError("This repository has never been trained")
 
-    chosen_algorithm = update.get("algorithm")
-    # chosen_algorithm = choose_best_algorithm(update.get("language"))
     model = get_language_model(update, language)
-    if (model == "SPACY" and language not in celery_settings.SPACY_LANGUAGES) or (
-        model == "BERT" and language not in celery_settings.BERT_LANGUAGES
-    ):
-        model = None
     
+    # Send evaluate to SPACY worker to use name_entities (only if BERT not in use)
+    if (
+        (update.get("use_name_entities"))
+        and (model is None)
+        and (language in celery_settings.SPACY_LANGUAGES)
+    ):
+        model = "SPACY"
+
     try:
         evaluate = None
         if cross_validation is False:

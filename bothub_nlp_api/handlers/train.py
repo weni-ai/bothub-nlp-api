@@ -30,6 +30,14 @@ def train_handler(authorization, repository_version=None):
             
         model = get_language_model(update, language)
 
+        # Send train to SPACY worker to use name_entities (only if BERT not in use)
+        if (
+            (current_update.get("use_name_entities"))
+            and (model is None)
+            and (language in celery_settings.SPACY_LANGUAGES)
+        ):
+            model = "SPACY"
+
         if settings.BOTHUB_SERVICE_TRAIN == "celery":
             train_task = celery_app.send_task(
                 TASK_NLU_TRAIN_UPDATE,
