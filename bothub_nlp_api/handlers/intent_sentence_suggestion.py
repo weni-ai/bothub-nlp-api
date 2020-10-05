@@ -5,12 +5,16 @@ from bothub_nlp_api.utils import get_repository_authorization
 from bothub_nlp_api.utils import backend
 from bothub_nlp_api import settings
 from bothub_nlp_api.utils import ValidationError
-
-import json
+from bothub_nlp_api.utils import AuthorizationIsRequired
 
 
 def _intent_sentence_suggestion(
-    authorization, language, intent, n_sentences_to_generate, percentage_to_replace, repository_version=None,
+    authorization,
+    language,
+    intent,
+    n_sentences_to_generate,
+    percentage_to_replace,
+    repository_version=None,
 ):
     print(authorization)
     from ..utils import DEFAULT_LANGS_PRIORITY
@@ -33,8 +37,14 @@ def _intent_sentence_suggestion(
         update = {}
     answer_task = celery_app.send_task(
         TASK_NLU_INTENT_SENTENCE_SUGGESTION_TEXT,
-        args=[update.get("repository_version"), repository_authorization, intent, percentage_to_replace, n_sentences_to_generate],
-        queue=queue_name(language, ACTION_INTENT_SENTENCE_SUGGESTION, 'SPACY'),
+        args=[
+            update.get("repository_version"),
+            repository_authorization,
+            intent,
+            percentage_to_replace,
+            n_sentences_to_generate,
+        ],
+        queue=queue_name(language, ACTION_INTENT_SENTENCE_SUGGESTION, "SPACY"),
     )
     answer_task.wait()
     answer = answer_task.result

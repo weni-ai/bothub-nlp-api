@@ -5,8 +5,6 @@ from fastapi import HTTPException, Header
 from googleapiclient import discovery
 from googleapiclient import errors
 from starlette.requests import Request
-from bothub_nlp_celery.utils import ALGORITHM_TO_LANGUAGE_MODEL, choose_best_algorithm
-from bothub_nlp_celery import settings as celery_settings
 from bothub_nlp_api import settings
 
 
@@ -91,7 +89,13 @@ def get_train_job_status(job_name):
 
 
 def send_job_train_ai_platform(
-    jobId, repository_version, by_id, repository_authorization, language, type_model, operation='train'
+    jobId,
+    repository_version,
+    by_id,
+    repository_authorization,
+    language,
+    type_model,
+    operation="train",
 ):
     image_sufix = f"-{language}-{type_model}" if type_model is not None else "-xx-SPACY"
     args = [
@@ -107,8 +111,8 @@ def send_job_train_ai_platform(
         bothub_nlp_api.settings.BOTHUB_ENGINE_URL,
         "--AIPLATFORM_LANGUAGE_QUEUE",
         language,
-        ]
-        
+    ]
+
     if type_model is not None:
         args.extend(["--AIPLATFORM_LANGUAGE_MODEL", type_model])
     training_inputs = {

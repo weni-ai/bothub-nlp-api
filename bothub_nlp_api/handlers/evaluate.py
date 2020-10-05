@@ -1,8 +1,7 @@
 from bothub_nlp_celery.actions import ACTION_EVALUATE, queue_name
 from bothub_nlp_celery.app import celery_app
 from bothub_nlp_celery.tasks import TASK_NLU_EVALUATE_UPDATE
-from bothub_nlp_celery.utils import ALGORITHM_TO_LANGUAGE_MODEL, choose_best_algorithm, get_language_model
-from bothub_nlp_celery import settings as celery_settings
+from bothub_nlp_celery.utils import get_language_model
 
 from .. import settings
 from ..utils import AuthorizationIsRequired
@@ -10,13 +9,16 @@ from ..utils import DEFAULT_LANGS_PRIORITY
 from ..utils import ValidationError, get_repository_authorization
 from ..utils import backend
 from ..utils import send_job_train_ai_platform
+import time
 
 EVALUATE_STATUS_EVALUATED = "evaluated"
 EVALUATE_STATUS_PROCESSING = "processing"
 EVALUATE_STATUS_FAILED = "failed"
 
 
-def evaluate_handler(authorization, language, repository_version=None, cross_validation=False):
+def evaluate_handler(
+    authorization, language, repository_version=None, cross_validation=False
+):
     if language and (
         language not in settings.SUPPORTED_LANGUAGES.keys()
         and language not in DEFAULT_LANGS_PRIORITY.keys()
@@ -37,15 +39,7 @@ def evaluate_handler(authorization, language, repository_version=None, cross_val
     if not update.get("update"):
         raise ValidationError("This repository has never been trained")
 
-    model = get_language_model(update, language)
-    
-    # Send evaluate to SPACY worker to use name_entities (only if BERT not in use)
-    if (
-        (update.get("use_name_entities"))
-        and (model is None)
-        and (language in celery_settings.SPACY_LANGUAGES)
-    ):
-        model = "SPACY"
+    model = get_language_model(update)
 
     try:
         evaluate = None
@@ -70,7 +64,7 @@ def evaluate_handler(authorization, language, repository_version=None, cross_val
                 by_id=str(update.get("repository_authorization_user_id")),
                 repository_authorization=str(repository_authorization),
                 language=language,
-                type_model=model
+                type_model=model,
             )
             backend().request_backend_save_queue_id(
                 update_id=str(update.get("current_version_id")),
@@ -84,7 +78,9 @@ def evaluate_handler(authorization, language, repository_version=None, cross_val
             "status": EVALUATE_STATUS_PROCESSING,
             "repository_version": update.get("repository_version"),
             "evaluate_id": evaluate.get("id") if evaluate is not None else None,
-            "evaluate_version": evaluate.get("version") if evaluate is not None else None,
+            "evaluate_version": evaluate.get("version")
+            if evaluate is not None
+            else None,
             "cross_validation": cross_validation,
         }
     except Exception as e:

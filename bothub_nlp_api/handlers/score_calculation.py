@@ -25,12 +25,8 @@ def score_handler(authorization, repository_version, language):
     answer_task = celery_app.send_task(
         TASK_NLU_SCORE_CALCULATION,
         args=[update.get("current_version_id"), repository_authorization],
-        queue=queue_name(language, ACTION_SCORE_CALCULATION)
+        queue=queue_name(language, ACTION_SCORE_CALCULATION),
     )
     answer_task.wait()
 
     return answer_task.result
-
-
-
-
