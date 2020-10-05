@@ -7,7 +7,6 @@ from bothub_nlp_celery.actions import ACTION_PARSE, queue_name
 from bothub_nlp_celery.app import celery_app
 from bothub_nlp_celery.tasks import TASK_NLU_PARSE_TEXT
 from bothub_nlp_celery.utils import ALGORITHM_TO_LANGUAGE_MODEL, choose_best_algorithm, get_language_model
-from bothub_nlp_celery import settings as celery_settings
 
 from bothub_nlp_api import settings
 from bothub_nlp_api.utils import AuthorizationIsRequired
@@ -95,15 +94,7 @@ def _parse(
     if not update.get("version"):
         raise ValidationError("This repository has never been trained")
 
-    model = get_language_model(update, language)
-
-    # Send parse to SPACY worker to use name_entities (only if BERT not in use)
-    if (
-        (update.get("use_name_entities"))
-        and (model is None)
-        and (language in celery_settings.SPACY_LANGUAGES)
-    ):
-        model = "SPACY"
+    model = get_language_model(update)
 
     answer_task = celery_app.send_task(
         TASK_NLU_PARSE_TEXT,

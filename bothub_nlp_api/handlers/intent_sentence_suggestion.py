@@ -5,8 +5,7 @@ from bothub_nlp_api.utils import get_repository_authorization
 from bothub_nlp_api.utils import backend
 from bothub_nlp_api import settings
 from bothub_nlp_api.utils import ValidationError
-
-import json
+from bothub_nlp_api.utils import AuthorizationIsRequired
 
 
 def _intent_sentence_suggestion(
