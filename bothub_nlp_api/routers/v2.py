@@ -93,11 +93,14 @@ async def sentence_suggestion_options():
     return {}  # pragma: no cover
 
 
-@router.post(r"/intent_sentence_suggestion/?", response_model=IntentSentenceSuggestionResponse)
+@router.post(
+    r"/intent_sentence_suggestion/?", response_model=IntentSentenceSuggestionResponse
+)
 async def intent_sentence_suggestion_post_handler(
     item: IntentSentenceSuggestionRequest,
     request: Request = Depends(AuthorizationRequired()),
-    Authorization: str = Header(..., description="Bearer your_key"),):
+    Authorization: str = Header(..., description="Bearer your_key"),
+):
 
     return intent_sentence_suggestion._intent_sentence_suggestion(
         Authorization,
@@ -109,7 +112,9 @@ async def intent_sentence_suggestion_post_handler(
     )
 
 
-@router.options(r"/intent_sentence_suggestion/?", status_code=204, include_in_schema=False)
+@router.options(
+    r"/intent_sentence_suggestion/?", status_code=204, include_in_schema=False
+)
 async def intent_sentence_suggestion_options():
     return {}  # pragma: no cover
 
@@ -118,9 +123,7 @@ async def intent_sentence_suggestion_options():
 async def word_suggestion_post_handler(item: WordSuggestionRequest,):
 
     return word_suggestion._word_suggestion(
-        item.text,
-        item.language,
-        item.n_words_to_generate,
+        item.text, item.language, item.n_words_to_generate
     )
 
 
@@ -212,7 +215,9 @@ async def score_handler(
     request: Request = Depends(AuthorizationRequired()),
     authorization: str = Header(..., description="Bearer your_key"),
 ):
-    result = score_calculation.score_handler(authorization, repository_version, language)
+    result = score_calculation.score_handler(
+        authorization, repository_version, language
+    )
 
     return result
 

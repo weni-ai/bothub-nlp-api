@@ -2,7 +2,7 @@ import time
 from bothub_nlp_celery.actions import ACTION_TRAIN, queue_name
 from bothub_nlp_celery.app import celery_app
 from bothub_nlp_celery.tasks import TASK_NLU_TRAIN_UPDATE
-from bothub_nlp_celery.utils import ALGORITHM_TO_LANGUAGE_MODEL, get_language_model
+from bothub_nlp_celery.utils import get_language_model
 
 from .. import settings, utils
 from ..utils import backend, get_repository_authorization
@@ -49,7 +49,7 @@ def train_handler(authorization, repository_version=None):
                 repository_authorization=str(repository_authorization),
                 language=language,
                 type_model=model,
-                operation='evaluate'
+                operation="evaluate",
             )
             backend().request_backend_save_queue_id(
                 update_id=str(update.get("current_version_id")),
