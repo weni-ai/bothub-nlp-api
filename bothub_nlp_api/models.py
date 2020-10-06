@@ -171,8 +171,8 @@ class EvaluateResponse(BaseModel):
     language: str
     status: str
     repository_version: int
-    evaluate_id: int
-    evaluate_version: int
+    evaluate_id: Any
+    evaluate_version: Any
     cross_validation: bool
 
 

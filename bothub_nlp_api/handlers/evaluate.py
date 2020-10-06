@@ -57,17 +57,18 @@ def evaluate_handler(
             evaluate_task.wait()
             evaluate = evaluate_task.result
         else:
-            job_id = f'bothub_{settings.ENVIRONMENT}_evaluate_{str(update.get("current_version_id"))}_{language}_{str(int(time.time()))}'
+            job_id = f'bothub_{settings.ENVIRONMENT}_evaluate_{str(update.get("repository_version"))}_{language}_{str(int(time.time()))}'
             send_job_train_ai_platform(
                 jobId=job_id,
-                repository_version=str(update.get("current_version_id")),
-                by_id=str(update.get("repository_authorization_user_id")),
+                repository_version=str(update.get("repository_version")),
+                by_id=str(update.get("user_id")),
                 repository_authorization=str(repository_authorization),
                 language=language,
                 type_model=model,
+                operation="evaluate",
             )
             backend().request_backend_save_queue_id(
-                update_id=str(update.get("current_version_id")),
+                update_id=str(update.get("repository_version")),
                 repository_authorization=str(repository_authorization),
                 task_id=job_id,
                 from_queue=0,
