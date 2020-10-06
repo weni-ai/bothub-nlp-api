@@ -61,10 +61,11 @@ def evaluate_handler(
             send_job_train_ai_platform(
                 jobId=job_id,
                 repository_version=str(update.get("repository_version")),
-                by_id=str(update.get("repository_authorization_user_id")),
+                by_id=str(update.get("user_id")),
                 repository_authorization=str(repository_authorization),
                 language=language,
                 type_model=model,
+                operation="evaluate",
             )
             backend().request_backend_save_queue_id(
                 update_id=str(update.get("repository_version")),
