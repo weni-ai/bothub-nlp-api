@@ -49,7 +49,7 @@ def train_handler(authorization, repository_version=None):
                 repository_authorization=str(repository_authorization),
                 language=language,
                 type_model=model,
-                operation="evaluate",
+                operation="train",
             )
             backend().request_backend_save_queue_id(
                 update_id=str(update.get("current_version_id")),
