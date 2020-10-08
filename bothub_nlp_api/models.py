@@ -1,4 +1,4 @@
-from typing import List, Dict, Any
+from typing import List, Dict, Any, Tuple
 
 from pydantic import BaseModel
 
@@ -24,6 +24,20 @@ class SentenceSuggestionRequest(BaseModel):
     percentage_to_replace: float = 0.3
 
 
+class IntentSentenceSuggestionRequest(BaseModel):
+    language: str = None
+    intent: str = None
+    n_sentences_to_generate: int = 10
+    percentage_to_replace: float = 0.3
+    repository_version: int = None
+
+
+class WordSuggestionRequest(BaseModel):
+    text: str
+    language: str = None
+    n_words_to_generate: int = 10
+
+
 class WordsDistributionRequest(BaseModel):
     language: str = None
     repository_version: int = None
@@ -36,6 +50,7 @@ class TrainRequest(BaseModel):
 class EvaluateRequest(BaseModel):
     language: str = None
     repository_version: int = None
+    cross_validation: bool = False
 
 
 class IntentResponse(BaseModel):
@@ -73,6 +88,16 @@ class SentenceSuggestionResponse(BaseModel):
     suggested_sentences: List[str]
 
 
+class IntentSentenceSuggestionResponse(BaseModel):
+    intent: str
+    suggested_sentences: List[str]
+
+
+class WordSuggestionResponse(BaseModel):
+    text: str
+    similar_words: List[Tuple[str, str]]
+
+
 class WordsDistributionResponse(BaseModel):
     words: Dict[str, Dict[str, float]]
 
@@ -97,6 +122,13 @@ class OtherLabel(BaseModel):
     examples__count: int
     repository: str
     value: str
+
+
+class ScoreResponse(BaseModel):
+    intentions_balance: Dict[str, Any]
+    intentions_size: Dict[str, Any]
+    evaluate_size: Dict[str, Any]
+    average: float
 
 
 class InfoResponse(BaseModel):
@@ -139,8 +171,9 @@ class EvaluateResponse(BaseModel):
     language: str
     status: str
     repository_version: int
-    evaluate_id: int
-    evaluate_version: int
+    evaluate_id: Any
+    evaluate_version: Any
+    cross_validation: bool
 
 
 class TaskQueueResponse(BaseModel):
