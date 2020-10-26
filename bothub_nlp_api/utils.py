@@ -117,7 +117,7 @@ def send_job_train_ai_platform(
         args.extend(["--AIPLATFORM_LANGUAGE_MODEL", type_model])
     training_inputs = {
         "scaleTier": "CUSTOM",
-        "masterType": "standard_p100",
+        "masterType": "standard_gpu",
         "masterConfig": {
             "imageUri": f"{settings.BOTHUB_GOOGLE_AI_PLATFORM_REGISTRY}:"
             f"{settings.BOTHUB_GOOGLE_AI_PLATFORM_IMAGE_VERSION}{image_sufix}"
