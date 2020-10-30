@@ -76,60 +76,60 @@ async def debug_parse_options():
     return {}  # pragma: no cover
 
 
-@router.post(r"/sentence_suggestion/?", response_model=SentenceSuggestionResponse)
-async def sentence_suggestion_post_handler(item: SentenceSuggestionRequest,):
-
-    return sentence_suggestion._sentence_suggestion(
-        item.text,
-        item.language,
-        item.n_sentences_to_generate,
-        item.percentage_to_replace,
-        item.intent,
-    )
-
-
-@router.options(r"/sentence_suggestion/?", status_code=204, include_in_schema=False)
-async def sentence_suggestion_options():
-    return {}  # pragma: no cover
-
-
-@router.post(
-    r"/intent_sentence_suggestion/?", response_model=IntentSentenceSuggestionResponse
-)
-async def intent_sentence_suggestion_post_handler(
-    item: IntentSentenceSuggestionRequest,
-    request: Request = Depends(AuthorizationRequired()),
-    Authorization: str = Header(..., description="Bearer your_key"),
-):
-
-    return intent_sentence_suggestion._intent_sentence_suggestion(
-        Authorization,
-        item.language,
-        item.intent,
-        item.n_sentences_to_generate,
-        item.percentage_to_replace,
-        item.repository_version,
-    )
+# @router.post(r"/sentence_suggestion/?", response_model=SentenceSuggestionResponse)
+# async def sentence_suggestion_post_handler(item: SentenceSuggestionRequest,):
+#
+#     return sentence_suggestion._sentence_suggestion(
+#         item.text,
+#         item.language,
+#         item.n_sentences_to_generate,
+#         item.percentage_to_replace,
+#         item.intent,
+#     )
+#
+#
+# @router.options(r"/sentence_suggestion/?", status_code=204, include_in_schema=False)
+# async def sentence_suggestion_options():
+#     return {}  # pragma: no cover
 
 
-@router.options(
-    r"/intent_sentence_suggestion/?", status_code=204, include_in_schema=False
-)
-async def intent_sentence_suggestion_options():
-    return {}  # pragma: no cover
+# @router.post(
+#     r"/intent_sentence_suggestion/?", response_model=IntentSentenceSuggestionResponse
+# )
+# async def intent_sentence_suggestion_post_handler(
+#     item: IntentSentenceSuggestionRequest,
+#     request: Request = Depends(AuthorizationRequired()),
+#     Authorization: str = Header(..., description="Bearer your_key"),
+# ):
+#
+#     return intent_sentence_suggestion._intent_sentence_suggestion(
+#         Authorization,
+#         item.language,
+#         item.intent,
+#         item.n_sentences_to_generate,
+#         item.percentage_to_replace,
+#         item.repository_version,
+#     )
+#
+#
+# @router.options(
+#     r"/intent_sentence_suggestion/?", status_code=204, include_in_schema=False
+# )
+# async def intent_sentence_suggestion_options():
+#     return {}  # pragma: no cover
 
 
-@router.post(r"/word_suggestion/?", response_model=WordSuggestionResponse)
-async def word_suggestion_post_handler(item: WordSuggestionRequest,):
-
-    return word_suggestion._word_suggestion(
-        item.text, item.language, item.n_words_to_generate
-    )
-
-
-@router.options(r"/word_suggestion/?", status_code=204, include_in_schema=False)
-async def word_suggestion_options():
-    return {}  # pragma: no cover
+# @router.post(r"/word_suggestion/?", response_model=WordSuggestionResponse)
+# async def word_suggestion_post_handler(item: WordSuggestionRequest,):
+#
+#     return word_suggestion._word_suggestion(
+#         item.text, item.language, item.n_words_to_generate
+#     )
+#
+#
+# @router.options(r"/word_suggestion/?", status_code=204, include_in_schema=False)
+# async def word_suggestion_options():
+#     return {}  # pragma: no cover
 
 
 @router.post(r"/words_distribution/?", response_model=WordsDistributionResponse)
