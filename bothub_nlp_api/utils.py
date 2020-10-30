@@ -13,6 +13,7 @@ def backend():
         "bothub_backend.bothub.BothubBackend", bothub_nlp_api.settings.BOTHUB_ENGINE_URL
     )
 
+BERT_LANGUAGES = ['en', 'pt_br']
 
 DEFAULT_LANGS_PRIORITY = {
     "english": ["en"],
@@ -97,7 +98,13 @@ def send_job_train_ai_platform(
     type_model,
     operation="train",
 ):
-    image_sufix = f"-{language}-{type_model}" if type_model is not None else "-xx-SPACY"
+    if type_model == 'BERT' and language not in BERT_LANGUAGES:
+        image_sufix = "-xx-BERT"
+    elif type_model is not None:
+        image_sufix = f"-{language}-{type_model}"
+    else:
+        image_sufix = "-xx-SPACY"
+        
     args = [
         "--operation",
         operation,
