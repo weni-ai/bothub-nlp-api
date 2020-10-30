@@ -206,22 +206,3 @@ async def evaluate_options():
 async def task_queue_handler(id_task: str, from_queue: str):
 
     return task_queue.task_queue_handler(id_task, from_queue)
-
-
-@router.get(r"/score/?", response_model=ScoreResponse)
-async def score_handler(
-    repository_version: str,
-    language: str,
-    request: Request = Depends(AuthorizationRequired()),
-    authorization: str = Header(..., description="Bearer your_key"),
-):
-    result = score_calculation.score_handler(
-        authorization, repository_version, language
-    )
-
-    return result
-
-
-@router.options(r"/score/?")
-async def score_options():
-    return {}  # pragma: no cover
