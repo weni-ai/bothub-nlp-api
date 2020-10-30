@@ -13,6 +13,7 @@ def backend():
         "bothub_backend.bothub.BothubBackend", bothub_nlp_api.settings.BOTHUB_ENGINE_URL
     )
 
+
 DEFAULT_LANGS_PRIORITY = {
     "english": ["en"],
     "portuguese": ["pt_br", "pt"],

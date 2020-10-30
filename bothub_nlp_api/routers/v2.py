@@ -1,7 +1,7 @@
 from fastapi import Depends, APIRouter, Header, HTTPException
 from starlette.requests import Request
 
-from bothub_nlp_api.handlers import evaluate, task_queue, score_calculation
+from bothub_nlp_api.handlers import evaluate, task_queue
 from bothub_nlp_api.handlers import parse
 from bothub_nlp_api.handlers import debug_parse
 from bothub_nlp_api.handlers import sentence_suggestion
@@ -28,7 +28,6 @@ from bothub_nlp_api.models import IntentSentenceSuggestionResponse
 from bothub_nlp_api.models import WordSuggestionResponse
 from bothub_nlp_api.models import TrainResponse
 from bothub_nlp_api.models import EvaluateResponse
-from bothub_nlp_api.models import ScoreResponse
 from bothub_nlp_api.utils import backend, AuthorizationRequired
 from bothub_nlp_api.utils import get_repository_authorization
 
