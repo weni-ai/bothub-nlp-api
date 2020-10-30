@@ -24,7 +24,9 @@ def train_handler(authorization, repository_version=None):
             repository_authorization, language, repository_version
         )
 
-        if not update.get("ready_for_train"):
+        # if not update.get("ready_for_train"):
+        #     continue
+        if not update.get("language") == "pt_br":
             continue
 
         model = get_language_model(update)
