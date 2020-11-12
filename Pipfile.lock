@@ -1,7 +1,7 @@
 {
     "_meta": {
         "hash": {
-            "sha256": "21ceafd6538619bc53c6614686aad4d698d55b6b382ee204332ad893967ddc90"
+            "sha256": "af55f4448857e6876fe29da649531360bab1b13f623ceeb723047824f6d43292"
         },
         "pipfile-spec": 6,
         "requires": {
@@ -55,7 +55,7 @@
         },
         "bothub-nlp-celery": {
             "git": "https://github.com/Ilhasoft/bothub-nlp-celery",
-            "ref": "c7feaad1bbd8211eee19aeb586f91036ddbd9305"
+            "ref": "ab33e53e7ee9ae337427fafac65479babda25807"
         },
         "cachetools": {
             "hashes": [
@@ -75,10 +75,10 @@
         },
         "certifi": {
             "hashes": [
-                "sha256:5930595817496dd21bb8dc35dad090f1c2cd0adfaf21204bf6732ca5d8ee34d3",
-                "sha256:8fc0819f1f30ba15bdb34cceffb9ef04d99f420f68eb75d901e9560b8749fc41"
+                "sha256:1f422849db327d534e3d0c5f02a263458c3955ec0aae4ff09b95f195c59f4edd",
+                "sha256:f05def092c44fbf25834a51509ef6e631dc19765ab8a57b4e7ab85531f0a9cf4"
             ],
-            "version": "==2020.6.20"
+            "version": "==2020.11.8"
         },
         "chardet": {
             "hashes": [
@@ -549,21 +549,21 @@
         },
         "srsly": {
             "hashes": [
-                "sha256:0d74328b0c9d6c4694ee2d0ab35232d1d7996cf1c205b253a636a9e1a2686490",
-                "sha256:15d3edf65eb91281991f9c02405c7c0c00d6e92cf50fefbd896b96df21c325a4",
-                "sha256:228665f648e5f88a21790c044428bd05d05b71e4466a89bba0752e0da0b8c791",
-                "sha256:25bd33819a0e95dbe5d49072d07c361827658cf5f7d69d15e580c43d5adb873a",
-                "sha256:2e1359a6fe106904b129651fed3dd240df07fe0669aaa68755e0133a6f222e40",
-                "sha256:310568b273602bfa922866bd503fd1892aef6e62040af4a783bd5de24865b28e",
-                "sha256:3a80183e7f31a1c9d9e4777c34e62b08105131412b72498a7406702843cfe522",
-                "sha256:6186dff418f4240a274ede369e69c304d7486de110f911d1b748d26af8138413",
-                "sha256:924a73334503d69b17ad85af22378bffe55ffb7210a0966fac115831a3e1ddec",
-                "sha256:c23ff73ade789bc621fa1152d407622ba4bbe6b113fd84fcb65bdceb12997aab",
-                "sha256:c8bf0111ce888831e22d092a573135281b495dee9d9b3c18dddae0fcacd0e4ca",
-                "sha256:e68198bc7a27d5c485aefaeac4dbd8630f4b501a95b34b3d09993db00fa9bd45",
-                "sha256:fb575a6b288da19fed05ed5f97528e9242a276e9a109b18f94074117cc435431"
+                "sha256:02acfa09769380023e9bbed5c63f5f41b04dbc13ff392a7284df685127d224ae",
+                "sha256:2ae6327e013934126f2b7082ce36284785eed951635ac99c73e39de75ecd1345",
+                "sha256:2b9e2b7c00e522d6e54952564d702e72bc4729cc828e27a01b4dac70b870d44a",
+                "sha256:39a8bd6b383b4ea5c3a6793d790e1356e236701f421badef278a0ea80bc95d30",
+                "sha256:3f46e5efbbb0e857f302394257539aae4487c201cdafc3519db4bde897341fee",
+                "sha256:4b8bd311fa20fa5d1a0deac0dd8f3c43c7ca23df2c483a7102d96acf2cddb506",
+                "sha256:660b80ffa3ea4ef9db254e5a22d2f52294f15342910c3274844a8f5a81369cbc",
+                "sha256:713766bf4289ebe6f21d1e5203b6b75f71fd4512e877dbe5a3f660b4a51d77ac",
+                "sha256:9ca5633a5303ce0d0b84d1bdb6d029f665ba2b7d320f5482525b125ddfb8a390",
+                "sha256:b4fb0ff57e25a99e9ac9a61b262478efe8493b3cff0f50812c09534c76688b0b",
+                "sha256:c1fa001bbd87a771998c8e2487991fc0dfe16edc09e3dec0d64f9472832f89bd",
+                "sha256:deee259837443ea8a4c194967f56eb62809c3cf3a11cd9d4f425de4aea5ecb81",
+                "sha256:f7aee40cd66f190e7694d7e7c83be018b1a7b9546a305db52c8793d93b1d0a7e"
             ],
-            "version": "==1.0.3"
+            "version": "==1.0.4"
         },
         "starlette": {
             "hashes": [

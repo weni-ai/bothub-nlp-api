@@ -14,7 +14,7 @@ kombu = "==4.6.11"
 celery = "==4.4.0"
 gunicorn = "==19.9.0"
 gevent = "==1.4.0"
-bothub_nlp_celery = {ref = "0.1.30staging",git = "https://github.com/Ilhasoft/bothub-nlp-celery"}
+bothub_nlp_celery = {ref = "0.1.30",git = "https://github.com/Ilhasoft/bothub-nlp-celery"}
 django-environ = "==0.4.5"
 redis = "==3.5.3"
 fastapi = "==0.42.0"
