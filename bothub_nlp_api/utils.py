@@ -1,6 +1,8 @@
 import bothub_backend
 import google.oauth2.credentials
 import bothub_nlp_api.settings
+import bothub_nlp_celery.settings as celery_settings
+
 from fastapi import HTTPException, Header
 from googleapiclient import discovery
 from googleapiclient import errors
@@ -12,6 +14,7 @@ def backend():
     return bothub_backend.get_backend(
         "bothub_backend.bothub.BothubBackend", bothub_nlp_api.settings.BOTHUB_ENGINE_URL
     )
+
 
 DEFAULT_LANGS_PRIORITY = {
     "english": ["en"],
@@ -96,7 +99,7 @@ def send_job_train_ai_platform(
     type_model,
     operation="train",
 ):
-    if type_model == 'BERT' and language not in settings.BERT_LANGUAGES:
+    if type_model == 'BERT' and language not in celery_settings.BERT_LANGUAGES:
         image_sufix = "-xx-BERT"
     elif type_model is not None:
         image_sufix = f"-{language}-{type_model}"
