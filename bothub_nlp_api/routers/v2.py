@@ -1,21 +1,15 @@
 from fastapi import Depends, APIRouter, Header, HTTPException
 from starlette.requests import Request
 
-from bothub_nlp_api.handlers import evaluate, task_queue, score_calculation
+from bothub_nlp_api.handlers import evaluate, task_queue
 from bothub_nlp_api.handlers import parse
 from bothub_nlp_api.handlers import debug_parse
-from bothub_nlp_api.handlers import sentence_suggestion
-from bothub_nlp_api.handlers import intent_sentence_suggestion
-from bothub_nlp_api.handlers import word_suggestion
 from bothub_nlp_api.handlers import words_distribution
 from bothub_nlp_api.handlers import train
 from bothub_nlp_api.models import (
     ParseRequest,
     DebugParseRequest,
     WordsDistributionRequest,
-    SentenceSuggestionRequest,
-    IntentSentenceSuggestionRequest,
-    WordSuggestionRequest,
     WordsDistributionResponse,
     TrainRequest,
     EvaluateRequest,
@@ -23,12 +17,8 @@ from bothub_nlp_api.models import (
 )
 from bothub_nlp_api.models import ParseResponse
 from bothub_nlp_api.models import DebugParseResponse
-from bothub_nlp_api.models import SentenceSuggestionResponse
-from bothub_nlp_api.models import IntentSentenceSuggestionResponse
-from bothub_nlp_api.models import WordSuggestionResponse
 from bothub_nlp_api.models import TrainResponse
 from bothub_nlp_api.models import EvaluateResponse
-from bothub_nlp_api.models import ScoreResponse
 from bothub_nlp_api.utils import backend, AuthorizationRequired
 from bothub_nlp_api.utils import get_repository_authorization
 
@@ -206,22 +196,3 @@ async def evaluate_options():
 async def task_queue_handler(id_task: str, from_queue: str):
 
     return task_queue.task_queue_handler(id_task, from_queue)
-
-
-@router.get(r"/score/?", response_model=ScoreResponse)
-async def score_handler(
-    repository_version: str,
-    language: str,
-    request: Request = Depends(AuthorizationRequired()),
-    authorization: str = Header(..., description="Bearer your_key"),
-):
-    result = score_calculation.score_handler(
-        authorization, repository_version, language
-    )
-
-    return result
-
-
-@router.options(r"/score/?")
-async def score_options():
-    return {}  # pragma: no cover

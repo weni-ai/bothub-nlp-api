@@ -28,7 +28,6 @@ def train_handler(authorization, repository_version=None):
             continue
 
         model = get_language_model(update)
-
         if settings.BOTHUB_SERVICE_TRAIN == "celery":
             train_task = celery_app.send_task(
                 TASK_NLU_TRAIN_UPDATE,
