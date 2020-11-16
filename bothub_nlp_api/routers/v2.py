@@ -4,18 +4,12 @@ from starlette.requests import Request
 from bothub_nlp_api.handlers import evaluate, task_queue
 from bothub_nlp_api.handlers import parse
 from bothub_nlp_api.handlers import debug_parse
-from bothub_nlp_api.handlers import sentence_suggestion
-from bothub_nlp_api.handlers import intent_sentence_suggestion
-from bothub_nlp_api.handlers import word_suggestion
 from bothub_nlp_api.handlers import words_distribution
 from bothub_nlp_api.handlers import train
 from bothub_nlp_api.models import (
     ParseRequest,
     DebugParseRequest,
     WordsDistributionRequest,
-    SentenceSuggestionRequest,
-    IntentSentenceSuggestionRequest,
-    WordSuggestionRequest,
     WordsDistributionResponse,
     TrainRequest,
     EvaluateRequest,
@@ -23,9 +17,6 @@ from bothub_nlp_api.models import (
 )
 from bothub_nlp_api.models import ParseResponse
 from bothub_nlp_api.models import DebugParseResponse
-from bothub_nlp_api.models import SentenceSuggestionResponse
-from bothub_nlp_api.models import IntentSentenceSuggestionResponse
-from bothub_nlp_api.models import WordSuggestionResponse
 from bothub_nlp_api.models import TrainResponse
 from bothub_nlp_api.models import EvaluateResponse
 from bothub_nlp_api.utils import backend, AuthorizationRequired
