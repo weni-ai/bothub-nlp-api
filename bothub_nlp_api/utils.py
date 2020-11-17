@@ -92,14 +92,15 @@ def get_train_job_status(job_name):
     return response
 
 
-def cancel_job_after_time(t, cloudml, jobId):
+def cancel_job_after_time(t, cloudml, job_name):
+    print(f"Cancelling job after {t} seconds")
     time.sleep(t)
 
-    request = cloudml.projects().jobs().cancel(name=jobId)
+    request = cloudml.projects().jobs().cancel(name=job_name)
 
     try:
         request.execute()
-        print(f"Canceling job {jobId} due timeout.")
+        print(f"Canceling job {job_name} due timeout.")
     except Exception:
         pass
 
@@ -173,7 +174,14 @@ def send_job_train_ai_platform(
 
     try:
         request.execute()
-        threading.Thread(target=cancel_job_after_time, args=(60, cloudml, jobId)).start()
+        threading.Thread(
+            target=cancel_job_after_time,
+            args=(
+                int(settings.BOTHUB_GOOGLE_AI_PLATFORM_JOB_TIMEOUT),
+                cloudml,
+                project_id + "/jobs/" + jobId,
+            )
+        ).start()
     except errors.HttpError as err:
         raise HTTPException(
             status_code=401,

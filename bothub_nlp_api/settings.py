@@ -34,6 +34,7 @@ env = environ.Env(
             "gs://poc-training-ai-platform/bothub-nlp-ai-platform/bothub-nlp-ai-platform-0.1.tar.gz"
         ],
     ),
+    BOTHUB_GOOGLE_AI_PLATFORM_JOB_TIMEOUT=(int, None)
 )
 
 ENVIRONMENT = env.str("ENVIRONMENT")
@@ -75,3 +76,5 @@ BOTHUB_GOOGLE_AI_PLATFORM_REGISTRY = env.str("BOTHUB_GOOGLE_AI_PLATFORM_REGISTRY
 BOTHUB_GOOGLE_AI_PLATFORM_PACKAGE_URI = env.list(
     "BOTHUB_GOOGLE_AI_PLATFORM_PACKAGE_URI"
 )
+
+BOTHUB_GOOGLE_AI_PLATFORM_JOB_TIMEOUT = env.int("BOTHUB_GOOGLE_AI_PLATFORM_PACKAGE_URI")
