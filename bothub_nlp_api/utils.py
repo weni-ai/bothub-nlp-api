@@ -1,3 +1,5 @@
+import time
+import threading
 import bothub_backend
 import google.oauth2.credentials
 import bothub_nlp_api.settings
@@ -90,6 +92,18 @@ def get_train_job_status(job_name):
     return response
 
 
+def cancel_job_after_time(t, cloudml, jobId):
+    time.sleep(t)
+
+    request = cloudml.projects().jobs().cancel(name=jobId)
+
+    try:
+        request.execute()
+        print(f"Canceling job {jobId} due timeout.")
+    except Exception:
+        pass
+
+
 def send_job_train_ai_platform(
     jobId,
     repository_version,
@@ -159,6 +173,7 @@ def send_job_train_ai_platform(
 
     try:
         request.execute()
+        threading.Thread(target=cancel_job_after_time, args=(60, cloudml, jobId)).start()
     except errors.HttpError as err:
         raise HTTPException(
             status_code=401,
