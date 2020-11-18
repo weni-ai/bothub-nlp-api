@@ -93,7 +93,6 @@ def get_train_job_status(job_name):
 
 
 def cancel_job_after_time(t, cloudml, job_name):
-    print(f"Cancelling job after {t} seconds")
     time.sleep(t)
 
     request = cloudml.projects().jobs().cancel(name=job_name)
