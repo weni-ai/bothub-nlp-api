@@ -91,6 +91,10 @@ class SentenceSuggestionResponse(BaseModel):
 class IntentSentenceSuggestionResponse(BaseModel):
     intent: str
     suggested_sentences: List[str]
+    repository_version: int = None
+    language: str
+    n_sentences_to_generate: int
+    percentage_to_replace: float
 
 
 class WordSuggestionResponse(BaseModel):
