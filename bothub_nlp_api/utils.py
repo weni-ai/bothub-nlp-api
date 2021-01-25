@@ -4,6 +4,7 @@ import bothub_backend
 import google.oauth2.credentials
 import bothub_nlp_api.settings
 import bothub_nlp_celery.settings as celery_settings
+import logging
 
 from fastapi import HTTPException, Header
 from googleapiclient import discovery
@@ -99,7 +100,7 @@ def cancel_job_after_time(t, cloudml, job_name):
 
     try:
         request.execute()
-        print(f"Canceling job {job_name} due timeout.")
+        logging.debug(f"Canceling job {job_name} due timeout.")
     except Exception:
         pass
 
@@ -183,7 +184,7 @@ def send_job_train_ai_platform(
                 args=(
                     int(settings.BOTHUB_GOOGLE_AI_PLATFORM_JOB_TIMEOUT),
                     cloudml,
-                    project_id + "/jobs/" + jobId,
+                    f"{project_id}/jobs/{jobId}",
                 )
             ).start()
     except errors.HttpError as err:
