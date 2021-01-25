@@ -100,15 +100,12 @@ def cancel_job_after_time(t, cloudml, job_name):
 
     try:
         request.execute()
-        print(f"Canceling job {job_name} due timeout.")
-    except errors.HttpError as err:
-        raise HTTPException(
-            status_code=401,
-            detail=f"There was an error cancelling the training job. Check the details: {err}",
-        )
-    except Exception as e:
-        print(e)
+        logging.debug(f"Canceling job {job_name} due timeout.")
+    except errors.HttpError:
         pass
+    except Exception as err:
+        logging.debug(err)
+        raise Exception(f'Something went wrong with job {job_name}: {err}')
 
 
 def send_job_train_ai_platform(
@@ -185,10 +182,14 @@ def send_job_train_ai_platform(
         # Envia requisição de cancelamento depois de <settings.BOTHUB_GOOGLE_AI_PLATFORM_JOB_TIMEOUT> segundos
         # para jobs que travaram e continuam rodando
         if settings.BOTHUB_GOOGLE_AI_PLATFORM_JOB_TIMEOUT is not None:
+            time_seconds = int(settings.BOTHUB_GOOGLE_AI_PLATFORM_JOB_TIMEOUT)
+            if operation == 'evaluate':
+                time_seconds = time_seconds * 2
+
             threading.Thread(
                 target=cancel_job_after_time,
                 args=(
-                    int(settings.BOTHUB_GOOGLE_AI_PLATFORM_JOB_TIMEOUT),
+                    time_seconds,
                     cloudml,
                     f"{project_id}/jobs/{jobId}",
                 )
