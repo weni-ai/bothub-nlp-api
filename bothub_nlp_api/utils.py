@@ -172,7 +172,11 @@ def send_job_train_ai_platform(
     request = cloudml.projects().jobs().create(body=job_spec, parent=project_id)
 
     try:
+        # Envia job de treinamento
         request.execute()
+
+        # Envia requisição de cancelamento depois de <settings.BOTHUB_GOOGLE_AI_PLATFORM_JOB_TIMEOUT> segundos
+        # para jobs que travaram e continuam rodando
         threading.Thread(
             target=cancel_job_after_time,
             args=(
