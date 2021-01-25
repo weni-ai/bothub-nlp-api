@@ -100,8 +100,14 @@ def cancel_job_after_time(t, cloudml, job_name):
 
     try:
         request.execute()
-        logging.debug(f"Canceling job {job_name} due timeout.")
-    except Exception:
+        print(f"Canceling job {job_name} due timeout.")
+    except errors.HttpError as err:
+        raise HTTPException(
+            status_code=401,
+            detail=f"There was an error cancelling the training job. Check the details: {err}",
+        )
+    except Exception as e:
+        print(e)
         pass
 
 
