@@ -177,14 +177,15 @@ def send_job_train_ai_platform(
 
         # Envia requisição de cancelamento depois de <settings.BOTHUB_GOOGLE_AI_PLATFORM_JOB_TIMEOUT> segundos
         # para jobs que travaram e continuam rodando
-        threading.Thread(
-            target=cancel_job_after_time,
-            args=(
-                int(settings.BOTHUB_GOOGLE_AI_PLATFORM_JOB_TIMEOUT),
-                cloudml,
-                project_id + "/jobs/" + jobId,
-            )
-        ).start()
+        if settings.BOTHUB_GOOGLE_AI_PLATFORM_JOB_TIMEOUT is not None:
+            threading.Thread(
+                target=cancel_job_after_time,
+                args=(
+                    int(settings.BOTHUB_GOOGLE_AI_PLATFORM_JOB_TIMEOUT),
+                    cloudml,
+                    project_id + "/jobs/" + jobId,
+                )
+            ).start()
     except errors.HttpError as err:
         raise HTTPException(
             status_code=401,
