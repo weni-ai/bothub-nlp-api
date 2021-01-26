@@ -161,3 +161,21 @@ def send_job_train_ai_platform(
             status_code=401,
             detail=f"There was an error creating the training job. Check the details: {err}",
         )
+
+
+def get_language_model(update):
+    model = ALGORITHM_TO_LANGUAGE_MODEL[update.get("algorithm")]
+    language = update.get("language")
+
+    if model == "SPACY" and language not in settings.SPACY_LANGUAGES:
+        model = None
+
+    # Send parse to SPACY worker to use name_entities (only if BERT not in use)
+    if (
+        (update.get("use_name_entities"))
+        and (model is None)
+        and (language in settings.SPACY_LANGUAGES)
+    ):
+        model = "SPACY"
+
+    return model

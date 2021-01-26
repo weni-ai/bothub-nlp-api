@@ -2,10 +2,9 @@ import time
 from bothub_nlp_celery.actions import ACTION_TRAIN, queue_name
 from bothub_nlp_celery.app import celery_app
 from bothub_nlp_celery.tasks import TASK_NLU_TRAIN_UPDATE
-from bothub_nlp_celery.utils import get_language_model
 
 from .. import settings, utils
-from ..utils import backend, get_repository_authorization
+from ..utils import backend, get_repository_authorization, get_language_model
 
 TRAIN_STATUS_TRAINED = "trained"
 TRAIN_STATUS_PROCESSING = "processing"
