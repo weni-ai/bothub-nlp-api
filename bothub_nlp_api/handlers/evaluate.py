@@ -2,13 +2,13 @@ from bothub_nlp_celery.actions import ACTION_EVALUATE, queue_name
 from bothub_nlp_celery.app import celery_app
 from bothub_nlp_celery.tasks import TASK_NLU_EVALUATE_UPDATE
 
-from .. import settings
-from ..utils import AuthorizationIsRequired
-from ..utils import DEFAULT_LANGS_PRIORITY
-from ..utils import ValidationError, get_repository_authorization
-from ..utils import backend
-from ..utils import send_job_train_ai_platform
-from ..utils import get_language_model
+from bothub_nlp_api import settings
+from bothub_nlp_api.utils import AuthorizationIsRequired
+from bothub_nlp_api.utils import DEFAULT_LANGS_PRIORITY
+from bothub_nlp_api.utils import ValidationError, get_repository_authorization
+from bothub_nlp_api.utils import backend
+from bothub_nlp_api.utils import send_job_train_ai_platform
+from bothub_nlp_api.utils import get_language_model
 import time
 
 EVALUATE_STATUS_EVALUATED = "evaluated"

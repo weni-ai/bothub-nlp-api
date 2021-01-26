@@ -3,8 +3,8 @@ from bothub_nlp_celery.actions import ACTION_TRAIN, queue_name
 from bothub_nlp_celery.app import celery_app
 from bothub_nlp_celery.tasks import TASK_NLU_TRAIN_UPDATE
 
-from .. import settings, utils
-from ..utils import backend, get_repository_authorization, get_language_model
+from bothub_nlp_api import settings
+from bothub_nlp_api.utils import backend, get_repository_authorization, get_language_model, send_job_train_ai_platform
 
 TRAIN_STATUS_TRAINED = "trained"
 TRAIN_STATUS_PROCESSING = "processing"
@@ -40,7 +40,7 @@ def train_handler(authorization, repository_version=None):
             train_tasks.append({"task": train_task, "language": language})
         elif settings.BOTHUB_SERVICE_TRAIN == "ai-platform":
             job_id = f'bothub_{settings.ENVIRONMENT}_train_{str(update.get("current_version_id"))}_{language}_{str(int(time.time()))}'
-            utils.send_job_train_ai_platform(
+            send_job_train_ai_platform(
                 jobId=job_id,
                 repository_version=str(update.get("current_version_id")),
                 by_id=str(update.get("repository_authorization_user_id")),
