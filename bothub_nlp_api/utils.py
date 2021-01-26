@@ -1,7 +1,10 @@
+import time
+import threading
 import bothub_backend
 import google.oauth2.credentials
 import bothub_nlp_api.settings
 import bothub_nlp_celery.settings as celery_settings
+import logging
 
 from fastapi import HTTPException, Header
 from googleapiclient import discovery
@@ -90,6 +93,21 @@ def get_train_job_status(job_name):
     return response
 
 
+def cancel_job_after_time(t, cloudml, job_name):
+    time.sleep(t)
+
+    request = cloudml.projects().jobs().cancel(name=job_name)
+
+    try:
+        request.execute()
+        logging.debug(f"Canceling job {job_name} due timeout.")
+    except errors.HttpError:
+        pass
+    except Exception as err:
+        logging.debug(err)
+        raise Exception(f'Something went wrong with job {job_name}: {err}')
+
+
 def send_job_train_ai_platform(
     jobId,
     repository_version,
@@ -158,7 +176,24 @@ def send_job_train_ai_platform(
     request = cloudml.projects().jobs().create(body=job_spec, parent=project_id)
 
     try:
+        # Envia job de treinamento
         request.execute()
+
+        # Envia requisição de cancelamento depois de <settings.BOTHUB_GOOGLE_AI_PLATFORM_JOB_TIMEOUT> segundos
+        # para jobs que travaram e continuam rodando
+        if settings.BOTHUB_GOOGLE_AI_PLATFORM_JOB_TIMEOUT is not None:
+            time_seconds = int(settings.BOTHUB_GOOGLE_AI_PLATFORM_JOB_TIMEOUT)
+            if operation == 'evaluate':
+                time_seconds = time_seconds * 2
+
+            threading.Thread(
+                target=cancel_job_after_time,
+                args=(
+                    time_seconds,
+                    cloudml,
+                    f"{project_id}/jobs/{jobId}",
+                )
+            ).start()
     except errors.HttpError as err:
         raise HTTPException(
             status_code=401,
