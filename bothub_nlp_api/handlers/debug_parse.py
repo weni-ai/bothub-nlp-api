@@ -1,6 +1,6 @@
 from bothub_nlp_celery.actions import ACTION_DEBUG_PARSE, queue_name
 from bothub_nlp_celery.app import celery_app
-from bothub_nlp_celery.tasks import TASK_NLU_DEBUG_PARSE_TEXT\
+from bothub_nlp_celery.tasks import TASK_NLU_DEBUG_PARSE_TEXT
 
 from bothub_nlp_api import settings
 from bothub_nlp_api.utils import AuthorizationIsRequired
