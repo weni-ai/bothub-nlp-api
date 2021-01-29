@@ -7,7 +7,7 @@ from bothub_nlp_api.utils import ValidationError
 
 
 def _word_suggestion(text, language, n_words_to_generate):
-    from ..utils import DEFAULT_LANGS_PRIORITY
+    from bothub_nlp_api.utils import DEFAULT_LANGS_PRIORITY
 
     if language and (
         language not in settings.SUPPORTED_LANGUAGES.keys()

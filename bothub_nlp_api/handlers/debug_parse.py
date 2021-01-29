@@ -1,13 +1,13 @@
 from bothub_nlp_celery.actions import ACTION_DEBUG_PARSE, queue_name
 from bothub_nlp_celery.app import celery_app
 from bothub_nlp_celery.tasks import TASK_NLU_DEBUG_PARSE_TEXT
-from bothub_nlp_celery.utils import get_language_model
 
 from bothub_nlp_api import settings
 from bothub_nlp_api.utils import AuthorizationIsRequired
 from bothub_nlp_api.utils import ValidationError
 from bothub_nlp_api.utils import backend
 from bothub_nlp_api.utils import get_repository_authorization
+from bothub_nlp_api.utils import get_language_model
 
 
 def _debug_parse(authorization, text, language, repository_version=None):
