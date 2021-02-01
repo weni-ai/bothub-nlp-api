@@ -94,9 +94,6 @@ def _parse(
         raise ValidationError("This repository has never been trained")
 
     model = get_language_model(update)
-    import json
-    print(json.dumps(update, indent=2))
-    print(model)
 
     answer_task = celery_app.send_task(
         TASK_NLU_PARSE_TEXT,
