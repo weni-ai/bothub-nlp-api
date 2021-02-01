@@ -75,10 +75,6 @@ def validate_language(language, repository_authorization, repository_version):
     return update
 
 
-import logging
-logger = logging.getLogger(__name__)
-
-
 def _parse(
     authorization,
     text,
@@ -99,7 +95,8 @@ def _parse(
 
     model = get_language_model(update)
     import json
-    logger.info(json.dumps(update, indent=2))
+    print(json.dumps(update, indent=2))
+    print(model)
 
     answer_task = celery_app.send_task(
         TASK_NLU_PARSE_TEXT,
