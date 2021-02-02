@@ -60,7 +60,7 @@ def validate_language(language, repository_authorization, repository_version):
             except Exception:
                 update = {}
 
-            if update.get("version"):
+            if update.get("total_training_end"):
                 break
 
     # Else tries to get most generic repository ('LANG' only)
