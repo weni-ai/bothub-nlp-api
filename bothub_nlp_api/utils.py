@@ -213,14 +213,14 @@ def get_language_model(update):
     model = ALGORITHM_TO_LANGUAGE_MODEL[update.get("algorithm")]
     language = update.get("language")
 
-    if model == "SPACY" and language not in settings.SPACY_LANGUAGES:
+    if model == "SPACY" and language not in celery_settings.SPACY_LANGUAGES:
         model = None
 
     # Send parse to SPACY worker to use name_entities (only if BERT not in use)
     if (
         (update.get("use_name_entities"))
         and (model is None)
-        and (language in settings.SPACY_LANGUAGES)
+        and (language in celery_settings.SPACY_LANGUAGES)
     ):
         model = "SPACY"
 
