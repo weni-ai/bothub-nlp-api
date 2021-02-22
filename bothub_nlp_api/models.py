@@ -179,3 +179,15 @@ class EvaluateResponse(BaseModel):
 class TaskQueueResponse(BaseModel):
     status: str
     ml_units: float = None
+
+
+class QuestionAnsweringRequest(BaseModel):
+    context: str = None
+    question: str = None
+    language: str = None
+
+
+class QuestionAnsweringResponse(BaseModel):
+    answers: List[Dict[str, str]]
+    id: str
+
