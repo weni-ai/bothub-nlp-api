@@ -222,8 +222,6 @@ async def question_answering_handler(
         )
     except QuestionAnsweringException as err:
         raise HTTPException(status_code=400, detail=err.__str__())
-    except Exception:
-        raise HTTPException(status_code=500, detail='Internal Server Error')
     if result.get("status") and result.get("error"):
         raise HTTPException(status_code=400, detail=result)
 
