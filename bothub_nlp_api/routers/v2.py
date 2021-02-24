@@ -33,6 +33,7 @@ from bothub_nlp_api.models import TrainResponse
 from bothub_nlp_api.models import EvaluateResponse
 from bothub_nlp_api.utils import backend, AuthorizationRequired
 from bothub_nlp_api.utils import get_repository_authorization
+from bothub_nlp_api.exceptions.question_answering_exceptions import QuestionAnsweringException
 
 router = APIRouter(redirect_slashes=False)
 
@@ -215,11 +216,16 @@ async def question_answering_handler(
     item: QuestionAnsweringRequest,
     # Authorization: str = Header(..., description="Bearer your_key"),
 ):
-    result = question_answering.qa_handler(
-        item.context, item.question, item.language
-    )
-
+    try:
+        result = question_answering.qa_handler(
+            item.context, item.question, item.language
+        )
+    except QuestionAnsweringException as err:
+        raise HTTPException(status_code=400, detail=err.__str__())
+    except Exception:
+        raise HTTPException(status_code=500, detail='Internal Server Error')
     if result.get("status") and result.get("error"):
         raise HTTPException(status_code=400, detail=result)
+
     return result
 
