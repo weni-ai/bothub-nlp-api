@@ -72,6 +72,7 @@ def evaluate_handler(
                 repository_authorization=str(repository_authorization),
                 task_id=job_id,
                 from_queue=0,
+                type_processing=2,
             )
 
         evaluate_report = {
