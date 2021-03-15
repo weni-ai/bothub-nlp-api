@@ -182,12 +182,11 @@ class TaskQueueResponse(BaseModel):
 
 
 class QuestionAnsweringRequest(BaseModel):
-    context: str = None
+    knowledge_base_id: str = None
     question: str = None
     language: str = None
 
 
 class QuestionAnsweringResponse(BaseModel):
     answers: List[Dict[str, str]]
-    id: str
 

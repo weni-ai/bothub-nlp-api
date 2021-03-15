@@ -1,28 +1,32 @@
 from bothub_nlp_celery.app import celery_app
 from bothub_nlp_celery.tasks import TASK_NLU_QUESTION_ANSWERING
 from bothub_nlp_celery.actions import ACTION_QUESTION_ANSWERING, queue_name
+from bothub_nlp_api.utils import AuthorizationIsRequired
+from bothub_nlp_api.utils import get_repository_authorization
 from bothub_nlp_api.exceptions.question_answering_exceptions import (
     LargeQuestionException,
-    LargeContextException,
     EmptyInputException
 )
 
 
-def qa_handler(context, question, language):
-    # TODO: Repository Authentication
+def qa_handler(knowledge_base_id, question, language, authorization):
 
-    if len(context) > 25000:
-        raise LargeContextException(len(context))
+    repository_authorization = get_repository_authorization(authorization)
+    if not repository_authorization:
+        raise AuthorizationIsRequired()
+
     if len(question) > 500:
         raise LargeQuestionException(len(question))
-    if len(context) == 0 or len(question) == 0:
+    if len(question) == 0:
         raise EmptyInputException()
 
     answer_task = celery_app.send_task(
         TASK_NLU_QUESTION_ANSWERING,
         args=[
-            context,
+            knowledge_base_id,
             question,
+            language,
+            repository_authorization
         ],
         queue=queue_name(language, ACTION_QUESTION_ANSWERING, "QA"),
     )
