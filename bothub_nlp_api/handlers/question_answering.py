@@ -1,6 +1,5 @@
 from bothub_nlp_celery.app import celery_app
 from bothub_nlp_celery.tasks import TASK_NLU_QUESTION_ANSWERING
-from bothub_nlp_celery.actions import ACTION_QUESTION_ANSWERING, queue_name
 from bothub_nlp_api.utils import AuthorizationIsRequired
 from bothub_nlp_api.utils import get_repository_authorization
 from bothub_nlp_api.exceptions.question_answering_exceptions import (
@@ -28,7 +27,7 @@ def qa_handler(knowledge_base_id, question, language, authorization):
             language,
             repository_authorization
         ],
-        queue=queue_name(language, ACTION_QUESTION_ANSWERING, "QA"),
+        queue="QA",
     )
     answer_task.wait()
     answer = answer_task.result
