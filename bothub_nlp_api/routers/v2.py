@@ -214,11 +214,11 @@ async def task_queue_handler(id_task: str, from_queue: str):
 @router.post(r"/question-answering/?", response_model=QuestionAnsweringResponse)
 async def question_answering_handler(
     item: QuestionAnsweringRequest,
-    authorization: str = Header(..., description="Bearer your_key"),
+    # authorization: str = Header(..., description="Bearer your_key"),
 ):
     try:
         result = question_answering.qa_handler(
-            item.knowledge_base_id, item.question, item.language, authorization
+            item.context, item.question, item.language
         )
     except QuestionAnsweringException as err:
         raise HTTPException(status_code=400, detail=err.__str__())
