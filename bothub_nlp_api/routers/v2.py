@@ -5,6 +5,8 @@ from bothub_nlp_api.handlers import evaluate, task_queue
 from bothub_nlp_api.handlers import parse
 from bothub_nlp_api.handlers import debug_parse
 from bothub_nlp_api.handlers import sentence_suggestion
+from bothub_nlp_api.handlers import intent_sentence_suggestion
+from bothub_nlp_api.handlers import word_suggestion
 from bothub_nlp_api.handlers import words_distribution
 from bothub_nlp_api.handlers import train
 from bothub_nlp_api.models import (
@@ -12,6 +14,8 @@ from bothub_nlp_api.models import (
     DebugParseRequest,
     WordsDistributionRequest,
     SentenceSuggestionRequest,
+    IntentSentenceSuggestionRequest,
+    WordSuggestionRequest,
     WordsDistributionResponse,
     TrainRequest,
     EvaluateRequest,
@@ -20,6 +24,8 @@ from bothub_nlp_api.models import (
 from bothub_nlp_api.models import ParseResponse
 from bothub_nlp_api.models import DebugParseResponse
 from bothub_nlp_api.models import SentenceSuggestionResponse
+from bothub_nlp_api.models import IntentSentenceSuggestionResponse
+from bothub_nlp_api.models import WordSuggestionResponse
 from bothub_nlp_api.models import TrainResponse
 from bothub_nlp_api.models import EvaluateResponse
 from bothub_nlp_api.utils import backend, AuthorizationRequired
@@ -77,11 +83,51 @@ async def sentence_suggestion_post_handler(item: SentenceSuggestionRequest,):
         item.language,
         item.n_sentences_to_generate,
         item.percentage_to_replace,
+        item.intent,
     )
 
 
 @router.options(r"/sentence_suggestion/?", status_code=204, include_in_schema=False)
 async def sentence_suggestion_options():
+    return {}  # pragma: no cover
+
+
+@router.post(
+    r"/intent_sentence_suggestion/?", response_model=IntentSentenceSuggestionResponse
+)
+async def intent_sentence_suggestion_post_handler(
+    item: IntentSentenceSuggestionRequest,
+    request: Request = Depends(AuthorizationRequired()),
+    Authorization: str = Header(..., description="Bearer your_key"),
+):
+
+    return intent_sentence_suggestion._intent_sentence_suggestion(
+        Authorization,
+        item.language,
+        item.intent,
+        item.n_sentences_to_generate,
+        item.percentage_to_replace,
+        item.repository_version,
+    )
+
+
+@router.options(
+    r"/intent_sentence_suggestion/?", status_code=204, include_in_schema=False
+)
+async def intent_sentence_suggestion_options():
+    return {}  # pragma: no cover
+
+
+@router.post(r"/word_suggestion/?", response_model=WordSuggestionResponse)
+async def word_suggestion_post_handler(item: WordSuggestionRequest,):
+
+    return word_suggestion._word_suggestion(
+        item.text, item.language, item.n_words_to_generate
+    )
+
+
+@router.options(r"/word_suggestion/?", status_code=204, include_in_schema=False)
+async def word_suggestion_options():
     return {}  # pragma: no cover
 
 
@@ -143,7 +189,7 @@ async def evaluate_handler(
     Authorization: str = Header(..., description="Bearer your_key"),
 ):
     result = evaluate.evaluate_handler(
-        Authorization, item.language, item.repository_version
+        Authorization, item.language, item.repository_version, item.cross_validation
     )
     if result.get("status") and result.get("error"):
         raise HTTPException(status_code=400, detail=result)

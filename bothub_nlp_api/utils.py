@@ -1,11 +1,15 @@
+import time
+import threading
 import bothub_backend
 import google.oauth2.credentials
+import bothub_nlp_api.settings
+import bothub_nlp_celery.settings as celery_settings
+import logging
+
 from fastapi import HTTPException, Header
 from googleapiclient import discovery
 from googleapiclient import errors
 from starlette.requests import Request
-
-import bothub_nlp_api.settings
 from bothub_nlp_api import settings
 
 
@@ -15,12 +19,20 @@ def backend():
     )
 
 
-NEXT_LANGS = {
+DEFAULT_LANGS_PRIORITY = {
     "english": ["en"],
-    "portuguese": ["pt", "pt_br"],
-    "pt": ["pt_br"],
+    "portuguese": ["pt_br", "pt"],
+    "pt": ["pt_br", "pt"],
     "pt-br": ["pt_br"],
     "br": ["pt_br"],
+}
+
+ALGORITHM_TO_LANGUAGE_MODEL = {
+    "neural_network_internal": None,
+    "neural_network_external": "SPACY",
+    "transformer_network_diet": None,
+    "transformer_network_diet_word_embedding": "SPACY",
+    "transformer_network_diet_bert": "BERT",
 }
 
 
@@ -89,27 +101,57 @@ def get_train_job_status(job_name):
     return response
 
 
+def cancel_job_after_time(t, cloudml, job_name):
+    time.sleep(t)
+
+    request = cloudml.projects().jobs().cancel(name=job_name)
+
+    try:
+        request.execute()
+        logging.debug(f"Canceling job {job_name} due timeout.")
+    except errors.HttpError:
+        pass
+    except Exception as err:
+        logging.debug(err)
+        raise Exception(f'Something went wrong with job {job_name}: {err}')
+
+
 def send_job_train_ai_platform(
-    jobId, repository_version, by_id, repository_authorization, language, type_model
+    jobId,
+    repository_version,
+    by_id,
+    repository_authorization,
+    language,
+    type_model,
+    operation="train",
 ):
-    image_sufix = f"-{language}-{type_model}" if type_model is not None else "-xx-SPACY"
+    if type_model == 'BERT' and language not in celery_settings.BERT_LANGUAGES:
+        image_sufix = "-xx-BERT"
+    elif type_model is not None:
+        image_sufix = f"-{language}-{type_model}"
+    else:
+        image_sufix = "-xx-SPACY"
+
     args = [
-            "--repository-version",
-            repository_version,
-            "--by-id",
-            by_id,
-            "--repository-authorization",
-            repository_authorization,
-            "--base_url",
-            bothub_nlp_api.settings.BOTHUB_ENGINE_URL,
-            "--AIPLATFORM_LANGUAGE_QUEUE",
-            language,
-        ]
+        "--operation",
+        operation,
+        "--repository-version",
+        repository_version,
+        "--by-id",
+        by_id,
+        "--repository-authorization",
+        repository_authorization,
+        "--base_url",
+        bothub_nlp_api.settings.BOTHUB_ENGINE_URL,
+        "--AIPLATFORM_LANGUAGE_QUEUE",
+        language,
+    ]
+
     if type_model is not None:
         args.extend(["--AIPLATFORM_LANGUAGE_MODEL", type_model])
     training_inputs = {
         "scaleTier": "CUSTOM",
-        "masterType": "standard_p100",
+        "masterType": "standard_gpu",
         "masterConfig": {
             "imageUri": f"{settings.BOTHUB_GOOGLE_AI_PLATFORM_REGISTRY}:"
             f"{settings.BOTHUB_GOOGLE_AI_PLATFORM_IMAGE_VERSION}{image_sufix}"
@@ -142,9 +184,44 @@ def send_job_train_ai_platform(
     request = cloudml.projects().jobs().create(body=job_spec, parent=project_id)
 
     try:
+        # Envia job de treinamento
         request.execute()
+
+        # Envia requisição de cancelamento depois de <settings.BOTHUB_GOOGLE_AI_PLATFORM_JOB_TIMEOUT> segundos
+        # para jobs que travaram e continuam rodando
+        if settings.BOTHUB_GOOGLE_AI_PLATFORM_JOB_TIMEOUT is not None:
+            time_seconds = int(settings.BOTHUB_GOOGLE_AI_PLATFORM_JOB_TIMEOUT)
+            if operation == 'evaluate':
+                time_seconds = time_seconds * 2
+
+            threading.Thread(
+                target=cancel_job_after_time,
+                args=(
+                    time_seconds,
+                    cloudml,
+                    f"{project_id}/jobs/{jobId}",
+                )
+            ).start()
     except errors.HttpError as err:
         raise HTTPException(
             status_code=401,
             detail=f"There was an error creating the training job. Check the details: {err}",
         )
+
+
+def get_language_model(update):
+    model = ALGORITHM_TO_LANGUAGE_MODEL[update.get("algorithm")]
+    language = update.get("language")
+
+    if model == "SPACY" and language not in celery_settings.SPACY_LANGUAGES:
+        model = None
+
+    # Send parse to SPACY worker to use name_entities (only if BERT not in use)
+    if (
+        (update.get("use_name_entities"))
+        and (model is None)
+        and (language in celery_settings.SPACY_LANGUAGES)
+    ):
+        model = "SPACY"
+
+    return model

@@ -34,6 +34,7 @@ env = environ.Env(
             "gs://poc-training-ai-platform/bothub-nlp-ai-platform/bothub-nlp-ai-platform-0.1.tar.gz"
         ],
     ),
+    BOTHUB_GOOGLE_AI_PLATFORM_JOB_TIMEOUT=(int, None)
 )
 
 ENVIRONMENT = env.str("ENVIRONMENT")
@@ -76,54 +77,4 @@ BOTHUB_GOOGLE_AI_PLATFORM_PACKAGE_URI = env.list(
     "BOTHUB_GOOGLE_AI_PLATFORM_PACKAGE_URI"
 )
 
-BABEL_NOT_SUPPORT = [
-    "kh",
-    "ab",
-    "aa",
-    "an",
-    "av",
-    "ae",
-    "ay",
-    "ba",
-    "bh",
-    "bi",
-    "ch",
-    "ny",
-    "cv",
-    "co",
-    "cr",
-    "dv",
-    "fj",
-    "ht",
-    "hz",
-    "ho",
-    "ie",
-    "ik",
-    "io",
-    "iu",
-    "kr",
-    "kv",
-    "kg",
-    "kj",
-    "la",
-    "li",
-    "mh",
-    "na",
-    "nv",
-    "ng",
-    "nr",
-    "oc",
-    "oj",
-    "pi",
-    "sa",
-    "sc",
-    "sm",
-    "st",
-    "su",
-    "ss",
-    "tn",
-    "ty",
-    "ve",
-    "wa",
-    "za",
-]
+BOTHUB_GOOGLE_AI_PLATFORM_JOB_TIMEOUT = env.int("BOTHUB_GOOGLE_AI_PLATFORM_JOB_TIMEOUT")
