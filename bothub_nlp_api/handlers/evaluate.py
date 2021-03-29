@@ -46,7 +46,7 @@ def crossvalidation_evaluate_handler(
         job_id = f'bothub_{settings.ENVIRONMENT}_evaluate_{update.get("repository_version_language_id")}_{language}_{str(int(time.time()))}'
         send_job_train_ai_platform(
             jobId=job_id,
-            repository_version=update.get("repository_version_language_id"),
+            repository_version=str(update.get("repository_version_language_id")),
             by_id=str(update.get("user_id")),
             repository_authorization=str(repository_authorization),
             language=language,
