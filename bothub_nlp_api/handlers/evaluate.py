@@ -106,9 +106,9 @@ def evaluate_handler(
             TASK_NLU_EVALUATE_UPDATE,
             args=[
                 update.get("repository_version"),
-                update.get("user_id"),
                 repository_authorization,
                 cross_validation,
+                update.get("language")
             ],
             queue=queue_name(update.get("language"), ACTION_EVALUATE, model),
         )
