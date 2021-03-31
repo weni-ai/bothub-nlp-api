@@ -105,7 +105,8 @@ def evaluate_handler(
         evaluate_task = celery_app.send_task(
             TASK_NLU_EVALUATE_UPDATE,
             args=[
-                update.get("repository_version"),
+                repository_version,
+                update.get("repository_version"),  # repository_version_language_id
                 repository_authorization,
                 cross_validation,
                 update.get("language")
