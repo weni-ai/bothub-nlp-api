@@ -44,6 +44,7 @@ class WordsDistributionRequest(BaseModel):
 
 
 class TrainRequest(BaseModel):
+    language: str = None
     repository_version: int = None
 
 
