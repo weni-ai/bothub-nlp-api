@@ -153,7 +153,7 @@ async def train_handler(
     request: Request = Depends(AuthorizationRequired()),
     Authorization: str = Header(..., description="Bearer your_key"),
 ):
-    result = train.train_handler(Authorization, item.repository_version)
+    result = train.train_handler(Authorization, item.repository_version, item.language)
     if result.get("status") and result.get("error"):
         raise HTTPException(status_code=400, detail=result)
     return result
