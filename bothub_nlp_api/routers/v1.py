@@ -108,9 +108,10 @@ async def sentence_suggestion_options():
 async def train_handler(
     request: Request = Depends(AuthorizationRequired()),
     repository_version: Optional[int] = Form(default=None),
+    language: Optional[str] = Form(default=None),
     Authorization: str = Header(..., description="Bearer your_key"),
 ):
-    result = train.train_handler(Authorization, repository_version)
+    result = train.train_handler(Authorization, repository_version, language)
     if result.get("status") and result.get("error"):
         raise HTTPException(status_code=400, detail=result)
     return result
