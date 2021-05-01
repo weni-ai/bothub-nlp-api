@@ -83,7 +83,6 @@ async def sentence_suggestion_post_handler(item: SentenceSuggestionRequest,):
         item.language,
         item.n_sentences_to_generate,
         item.percentage_to_replace,
-        item.intent,
     )
 
 
