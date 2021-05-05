@@ -33,8 +33,7 @@ def crossvalidation_evaluate_handler(
         update = backend().request_backend_start_automatic_evaluate(
             repository_authorization, repository_version, language
         )
-    except Exception as err:
-        print(err)
+    except Exception:
         update = {}
 
     if not update.get("can_run_automatic_evaluate"):

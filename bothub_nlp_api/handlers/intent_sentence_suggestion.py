@@ -16,7 +16,6 @@ def _intent_sentence_suggestion(
     percentage_to_replace,
     repository_version=None,
 ):
-    print(authorization)
     from ..utils import DEFAULT_LANGS_PRIORITY
 
     if language and (
