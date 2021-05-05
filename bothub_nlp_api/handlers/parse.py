@@ -36,15 +36,14 @@ def get_entities_dict(answer):
 
 
 def validate_language(language, repository_authorization, repository_version):
-    try:
-        language = str(language.lower())
-        language = re.split(r"[-_]", language)[0]
-    except Exception:
-        language = None
+    if not language:
+        raise ValidationError("Language required.")
+
+    language = str(language).lower()
+    language = re.split(r"[-_]", language)[0]
 
     if (
-        language
-        and language not in settings.SUPPORTED_LANGUAGES.keys()
+        language not in settings.SUPPORTED_LANGUAGES.keys()
         and language not in DEFAULT_LANGS_PRIORITY.keys()
     ):
         raise ValidationError("Language '{}' not supported by now.".format(language))
@@ -88,10 +87,13 @@ def _parse(
     if not repository_authorization:
         raise AuthorizationIsRequired()
 
+    if type(text) != str or not text:
+        raise ValidationError("Text required.")
+
     update = validate_language(language, repository_authorization, repository_version)
 
     if not update.get("version"):
-        raise ValidationError("This repository has never been trained")
+        raise ValidationError("This repository has never been trained.")
 
     model = get_language_model(update)
 
