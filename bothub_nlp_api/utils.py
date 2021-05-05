@@ -160,7 +160,6 @@ def send_job_train_ai_platform(
             ]
         )
 
-
     training_inputs = {
         "scaleTier": "CUSTOM",
         "masterType": "standard_gpu",
