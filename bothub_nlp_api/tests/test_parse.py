@@ -2,7 +2,7 @@ import unittest
 from unittest.mock import patch
 from bothub_nlp_api.utils import ValidationError, AuthorizationIsRequired
 
-from bothub_nlp_api.handlers.parse import validate_language, _parse
+from bothub_nlp_api.handlers.parse import check_language_priority, _parse
 
 
 def fake_wait():
@@ -50,8 +50,8 @@ class TestParseHandler(unittest.TestCase):
             "use_analyze_char": False,
         },
     )
-    def test_validate_language_default(self, *args):
-        validate_language(self.language, self.authorization, self.repository_version)
+    def test_check_language_priority_default(self, *args):
+        check_language_priority(self.language, self.authorization, self.repository_version)
 
     @patch(
         'bothub_nlp_api.handlers.parse.DEFAULT_LANGS_PRIORITY',
@@ -70,23 +70,23 @@ class TestParseHandler(unittest.TestCase):
             "use_analyze_char": False,
         },
     )
-    def test_validate_language(self, *args):
-        validate_language(self.language, self.authorization, self.repository_version)
+    def test_check_language_priority(self, *args):
+        check_language_priority(self.language, self.authorization, self.repository_version)
 
     def test_validate_incorrect_language(self, *args):
         with self.assertRaises(ValidationError):
-            validate_language("unknown_lang", self.authorization, self.repository_version)
+            check_language_priority("unknown_lang", self.authorization, self.repository_version)
 
     def test_validate_incorrect_region(self, *args):
-        validate_language("pt_zz", self.authorization, self.repository_version)
+        check_language_priority("pt_zz", self.authorization, self.repository_version)
 
     def test_validate_no_language(self, *args):
         with self.assertRaises(ValidationError):
-            validate_language(None, self.authorization, self.repository_version)
-            validate_language('', self.authorization, self.repository_version)
+            check_language_priority(None, self.authorization, self.repository_version)
+            check_language_priority('', self.authorization, self.repository_version)
 
     @patch(
-        'bothub_nlp_api.handlers.parse.validate_language',
+        'bothub_nlp_api.handlers.parse.check_language_priority',
         return_value={},
     )
     def test_parse_invalid_language(self, *args):
@@ -94,7 +94,7 @@ class TestParseHandler(unittest.TestCase):
             _parse(self.authorization, 'text', 'pt_br', self.repository_version)
 
     @patch(
-        'bothub_nlp_api.handlers.parse.validate_language',
+        'bothub_nlp_api.handlers.parse.check_language_priority',
         return_value={
             "version": True,
             "repository_version": 121212,

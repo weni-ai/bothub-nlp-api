@@ -72,6 +72,16 @@ class AuthorizationRequired:
         return True
 
 
+def language_validation(language):
+    if language and (
+        language not in settings.SUPPORTED_LANGUAGES.keys()
+        and language not in DEFAULT_LANGS_PRIORITY.keys()
+    ):
+        raise ValidationError("Language '{}' not supported by now.".format(language))
+
+    return
+
+
 def get_train_job_status(job_name):
     jobId = f"projects/{settings.BOTHUB_GOOGLE_PROJECT_ID}/jobs/{job_name}"
 
