@@ -5,6 +5,31 @@ from bothub_nlp_api.utils import ValidationError, AuthorizationIsRequired
 from bothub_nlp_api.handlers.parse import validate_language, _parse
 
 
+def fake_wait():
+    return {}
+
+
+class MockAsyncResult:
+    result = {
+        'intents': [],
+        'entities': []
+    }
+
+    def __init__(self):
+        pass
+
+    def wait(self):
+        pass
+
+
+class MockThread:
+    def __init__(self):
+        pass
+
+    def start(self):
+        pass
+
+
 class TestParseHandler(unittest.TestCase):
     def setUp(self):
         self.authorization = 'da39f8a1-532a-459e-85c0-bfd8f96db828'
@@ -58,10 +83,15 @@ class TestParseHandler(unittest.TestCase):
     def test_validate_no_language(self, *args):
         with self.assertRaises(ValidationError):
             validate_language(None, self.authorization, self.repository_version)
-
-        with self.assertRaises(ValidationError):
             validate_language('', self.authorization, self.repository_version)
 
+    @patch(
+        'bothub_nlp_api.handlers.parse.validate_language',
+        return_value={},
+    )
+    def test_parse_invalid_language(self, *args):
+        with self.assertRaises(ValidationError):
+            _parse(self.authorization, 'text', 'pt_br', self.repository_version)
 
     @patch(
         'bothub_nlp_api.handlers.parse.validate_language',
@@ -76,7 +106,15 @@ class TestParseHandler(unittest.TestCase):
             "use_analyze_char": False,
         },
     )
-    def test_parse_default(self, *args):
+    @patch(
+        'bothub_nlp_api.handlers.parse.celery_app.send_task',
+        return_value=MockAsyncResult(),
+    )
+    @patch(
+        'bothub_nlp_api.handlers.parse.threading.Thread',
+        return_value=MockThread()
+    )
+    def test_parse_mocked_celery(self, *args):
         with self.assertRaises(AuthorizationIsRequired):
             _parse('', 'text', 'pt_br', self.repository_version)
 
@@ -85,13 +123,4 @@ class TestParseHandler(unittest.TestCase):
             _parse(self.authorization, None, 'pt_br', self.repository_version)
             _parse(self.authorization, 23, 'pt_br', self.repository_version)
 
-        #_parse(self.authorization, 'text', 'pt_br',  self.repository_version)
-
-    @patch(
-        'bothub_nlp_api.handlers.parse.validate_language',
-        return_value={},
-    )
-    def test_parse_invalid_language(self, *args):
-        with self.assertRaises(ValidationError):
-            _parse(self.authorization, 'text', 'pt_br', self.repository_version)
-
+        _parse(self.authorization, 'text', 'pt_br', self.repository_version)
