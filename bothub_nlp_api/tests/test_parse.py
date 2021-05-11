@@ -1,30 +1,27 @@
 import unittest
 from unittest.mock import patch
+from celery.result import AsyncResult
+from threading import Thread
 from bothub_nlp_api.utils import ValidationError, AuthorizationIsRequired
-
 from bothub_nlp_api.handlers.parse import check_language_priority, _parse
 
 
-def fake_wait():
-    return {}
-
-
-class MockAsyncResult:
+class MockAsyncResult(AsyncResult):
     result = {
         'intents': [],
         'entities': []
     }
 
-    def __init__(self):
-        pass
+    def __init__(self, fake_id):
+        super().__init__(fake_id)
 
     def wait(self):
         pass
 
 
-class MockThread:
+class MockThread(Thread):
     def __init__(self):
-        pass
+        super().__init__()
 
     def start(self):
         pass
@@ -32,10 +29,34 @@ class MockThread:
 
 class TestParseHandler(unittest.TestCase):
     def setUp(self):
-        self.authorization = 'da39f8a1-532a-459e-85c0-bfd8f96db828'
+        self.authorization = 'Bearer da39f8a1-532a-459e-85c0-bfd8f96db828'
         self.repository_version = 299
         self.language = 'pt_br'
         self.text = "parse test"
+
+    def test_invalid_auth(self):
+        with self.assertRaises(AuthorizationIsRequired):
+            _parse('', 'text', 'pt_br', self.repository_version)
+        with self.assertRaises(AuthorizationIsRequired):
+            _parse(3, 'text', 'pt_br', self.repository_version)
+        with self.assertRaises(AuthorizationIsRequired):
+            _parse(None, 'text', 'pt_br', self.repository_version)
+
+    def test_invalid_language(self):
+        with self.assertRaises(ValidationError):
+            _parse(self.authorization, 'text', 'invalid_language', self.repository_version)
+        with self.assertRaises(ValidationError):
+            _parse(self.authorization, 'text', None, self.repository_version)
+        with self.assertRaises(ValidationError):
+            _parse(self.authorization, 'text', 3, self.repository_version)
+
+    def test_invalid_text(self):
+        with self.assertRaises(ValidationError):
+            _parse(self.authorization, '', self.language, self.repository_version)
+        with self.assertRaises(ValidationError):
+            _parse(self.authorization, None, self.language, self.repository_version)
+        with self.assertRaises(ValidationError):
+            _parse(self.authorization, 3, self.language, self.repository_version)
 
     @patch(
         'bothub_backend.bothub.BothubBackend.request_backend_parse',
@@ -73,16 +94,13 @@ class TestParseHandler(unittest.TestCase):
     def test_check_language_priority(self, *args):
         check_language_priority(self.language, self.authorization, self.repository_version)
 
-    def test_validate_incorrect_language(self, *args):
-        with self.assertRaises(ValidationError):
-            check_language_priority("unknown_lang", self.authorization, self.repository_version)
-
-    def test_validate_incorrect_region(self, *args):
+    def test_validate_incorrect_region(self):
         check_language_priority("pt_zz", self.authorization, self.repository_version)
 
-    def test_validate_no_language(self, *args):
+    def test_validate_no_language(self):
         with self.assertRaises(ValidationError):
             check_language_priority(None, self.authorization, self.repository_version)
+        with self.assertRaises(ValidationError):
             check_language_priority('', self.authorization, self.repository_version)
 
     @patch(
@@ -108,7 +126,7 @@ class TestParseHandler(unittest.TestCase):
     )
     @patch(
         'bothub_nlp_api.handlers.parse.celery_app.send_task',
-        return_value=MockAsyncResult(),
+        return_value=MockAsyncResult(fake_id=0),
     )
     @patch(
         'bothub_nlp_api.handlers.parse.threading.Thread',
@@ -117,10 +135,11 @@ class TestParseHandler(unittest.TestCase):
     def test_parse_mocked_celery(self, *args):
         with self.assertRaises(AuthorizationIsRequired):
             _parse('', 'text', 'pt_br', self.repository_version)
-
         with self.assertRaises(ValidationError):
             _parse(self.authorization, '', 'pt_br', self.repository_version)
+        with self.assertRaises(ValidationError):
             _parse(self.authorization, None, 'pt_br', self.repository_version)
+        with self.assertRaises(ValidationError):
             _parse(self.authorization, 23, 'pt_br', self.repository_version)
 
         _parse(self.authorization, 'text', 'pt_br', self.repository_version)

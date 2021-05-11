@@ -1,6 +1,7 @@
 import unittest
 from bothub_nlp_api.utils import ValidationError, AuthorizationIsRequired
 
+from celery.result import AsyncResult
 from unittest.mock import patch
 
 from bothub_nlp_api.handlers.evaluate import (
@@ -9,37 +10,52 @@ from bothub_nlp_api.handlers.evaluate import (
 )
 
 
-class MockAsyncResult:
+class MockAsyncResult(AsyncResult):
     result = {
         'id': 1,
         'version': 1,
     }
 
-    def __init__(self):
-        pass
+    def __init__(self, fake_id):
+        super().__init__(fake_id)
 
     def wait(self):
         pass
 
 
-class TestTrainHandler(unittest.TestCase):
+class TestEvaluateHandler(unittest.TestCase):
     def setUp(self):
-        self.authorization = 'da39f8a1-532a-459e-85c0-bfd8f96db828'
+        self.authorization = 'Bearer da39f8a1-532a-459e-85c0-bfd8f96db828'
         self.repository_version = 299
         self.language = 'pt_br'
 
-    def test_invalid_input(self):
+    def test_invalid_lang(self):
         with self.assertRaises(ValidationError):
             evaluate_handler(self.authorization, "unknown_lang", self.repository_version)
+        with self.assertRaises(ValidationError):
             evaluate_handler(self.authorization, None, self.repository_version)
+        with self.assertRaises(ValidationError):
+            evaluate_handler(self.authorization, 2, self.repository_version)
+        with self.assertRaises(ValidationError):
             crossvalidation_evaluate_handler(self.authorization, "unknown_lang", self.repository_version)
+        with self.assertRaises(ValidationError):
             crossvalidation_evaluate_handler(self.authorization, None, self.repository_version)
+        with self.assertRaises(ValidationError):
+            crossvalidation_evaluate_handler(self.authorization, 2, self.repository_version)
 
+    def test_invalid_auth(self):
         with self.assertRaises(AuthorizationIsRequired):
             evaluate_handler('', "en", self.repository_version)
+        with self.assertRaises(AuthorizationIsRequired):
             evaluate_handler(None, "en", self.repository_version)
+        with self.assertRaises(AuthorizationIsRequired):
+            evaluate_handler(2, "en", self.repository_version)
+        with self.assertRaises(AuthorizationIsRequired):
             crossvalidation_evaluate_handler('', "en", self.repository_version)
+        with self.assertRaises(AuthorizationIsRequired):
             crossvalidation_evaluate_handler(None, "en", self.repository_version)
+        with self.assertRaises(AuthorizationIsRequired):
+            crossvalidation_evaluate_handler(2, "en", self.repository_version)
 
     @patch(
         'bothub_backend.bothub.BothubBackend.request_backend_evaluate',
@@ -89,7 +105,7 @@ class TestTrainHandler(unittest.TestCase):
     )
     @patch(
         'bothub_nlp_api.handlers.evaluate.celery_app.send_task',
-        return_value=MockAsyncResult(),
+        return_value=MockAsyncResult(fake_id=0),
     )
     def test_evaluate_mocked_celery(self, *args):
         evaluate_handler(self.authorization, "en", self.repository_version)

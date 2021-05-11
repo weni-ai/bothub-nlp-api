@@ -1,14 +1,32 @@
 import unittest
 from unittest.mock import patch
 
-from bothub_nlp_api.handlers.train import train_handler as train
+from bothub_nlp_api.utils import (
+    AuthorizationIsRequired,
+    ValidationError,
+)
+from bothub_nlp_api.handlers.train import train_handler
 
 
 class TestTrainHandler(unittest.TestCase):
     def setUp(self):
-        self.authorization = 'da39f8a1-532a-459e-85c0-bfd8f96db828'
+        self.authorization = 'Bearer da39f8a1-532a-459e-85c0-bfd8f96db828'
         self.repository_version = 299
         self.language = 'pt_br'
+
+    def test_invalid_auth(self):
+        with self.assertRaises(AuthorizationIsRequired):
+            train_handler('', self.repository_version, "pt_br")
+        with self.assertRaises(AuthorizationIsRequired):
+            train_handler(None, self.repository_version, "pt_br")
+        with self.assertRaises(AuthorizationIsRequired):
+            train_handler(3, self.repository_version, "pt_br")
+
+    def test_invalid_language(self):
+        with self.assertRaises(ValidationError):
+            train_handler(self.authorization, self.repository_version, "invalid_language")
+        with self.assertRaises(ValidationError):
+            train_handler(self.authorization, self.repository_version, 3)
 
     @patch(
         'bothub_backend.bothub.BothubBackend.request_all_readytotrain_languages',
@@ -50,7 +68,7 @@ class TestTrainHandler(unittest.TestCase):
         },
     )
     def test_default(self, *args):
-        r = train(self.authorization, self.repository_version)
+        r = train_handler(self.authorization, self.repository_version)
         expected = {
             'SUPPORTED_LANGUAGES': ['pt_br', 'en'],
             'languages_report': {
@@ -90,7 +108,7 @@ class TestTrainHandler(unittest.TestCase):
         },
     )
     def test_specific_language(self, *args):
-        r = train(self.authorization, self.repository_version, "pt_br")
+        r = train_handler(self.authorization, self.repository_version, "pt_br")
         expected = {
             'SUPPORTED_LANGUAGES': ['pt_br', 'en'],
             'languages_report': {
