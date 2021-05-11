@@ -72,8 +72,20 @@ class AuthorizationRequired:
         return True
 
 
+def repository_authorization_validation(authorization_header_value):
+    if type(authorization_header_value) != str:
+        raise AuthorizationIsRequired()
+
+    authorization_uuid = authorization_header_value and authorization_header_value[7:]
+
+    if not authorization_uuid:
+        raise AuthorizationIsRequired()
+
+    return authorization_uuid
+
+
 def language_validation(language):
-    if language and (
+    if not language or (
         language not in settings.SUPPORTED_LANGUAGES.keys()
         and language not in DEFAULT_LANGS_PRIORITY.keys()
     ):

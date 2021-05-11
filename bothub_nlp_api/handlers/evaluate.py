@@ -3,12 +3,15 @@ from bothub_nlp_celery.app import celery_app
 from bothub_nlp_celery.tasks import TASK_NLU_EVALUATE_UPDATE
 
 from bothub_nlp_api import settings
-from bothub_nlp_api.utils import AuthorizationIsRequired
-from bothub_nlp_api.utils import ValidationError, get_repository_authorization
-from bothub_nlp_api.utils import backend
-from bothub_nlp_api.utils import send_job_train_ai_platform
-from bothub_nlp_api.utils import get_language_model
-from bothub_nlp_api.utils import language_validation
+from bothub_nlp_api.utils import (
+    ValidationError,
+    backend,
+    send_job_train_ai_platform,
+    get_language_model,
+    language_validation,
+    repository_authorization_validation
+)
+
 import time
 
 EVALUATE_STATUS_EVALUATED = "evaluated"
@@ -19,11 +22,8 @@ EVALUATE_STATUS_FAILED = "failed"
 def crossvalidation_evaluate_handler(
     authorization, language, repository_version=None
 ):
+    repository_authorization = repository_authorization_validation(authorization)
     language_validation(language)
-
-    repository_authorization = get_repository_authorization(authorization)
-    if not repository_authorization:
-        raise AuthorizationIsRequired()
 
     try:
         repository = backend().request_backend_start_automatic_evaluate(
@@ -72,11 +72,8 @@ def crossvalidation_evaluate_handler(
 def evaluate_handler(
     authorization, language, repository_version=None
 ):
+    repository_authorization = repository_authorization_validation(authorization)
     language_validation(language)
-
-    repository_authorization = get_repository_authorization(authorization)
-    if not repository_authorization:
-        raise AuthorizationIsRequired()
 
     try:
         repository = backend().request_backend_evaluate(

@@ -4,7 +4,13 @@ from bothub_nlp_celery.app import celery_app
 from bothub_nlp_celery.tasks import TASK_NLU_TRAIN_UPDATE
 
 from bothub_nlp_api import settings
-from bothub_nlp_api.utils import backend, get_repository_authorization, get_language_model, send_job_train_ai_platform
+from bothub_nlp_api.utils import (
+    backend,
+    repository_authorization_validation,
+    get_language_model,
+    send_job_train_ai_platform,
+    language_validation
+)
 
 TRAIN_STATUS_TRAINED = "trained"
 TRAIN_STATUS_PROCESSING = "processing"
@@ -12,12 +18,13 @@ TRAIN_STATUS_FAILED = "failed"
 
 
 def train_handler(authorization, repository_version=None, language=None):
-    repository_authorization = get_repository_authorization(authorization)
+    repository_authorization = repository_authorization_validation(authorization)
 
     languages_report = {}
     train_tasks = []
 
     if language:
+        language_validation(language)
         language_status = backend().request_backend_train(
             repository_authorization, language, repository_version
         )

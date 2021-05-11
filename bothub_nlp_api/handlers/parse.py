@@ -6,13 +6,13 @@ from bothub_nlp_celery.actions import ACTION_PARSE, queue_name
 from bothub_nlp_celery.app import celery_app
 from bothub_nlp_celery.tasks import TASK_NLU_PARSE_TEXT
 
-from bothub_nlp_api import settings
-from bothub_nlp_api.utils import AuthorizationIsRequired
-from bothub_nlp_api.utils import ValidationError
-from bothub_nlp_api.utils import backend
-from bothub_nlp_api.utils import get_repository_authorization
-from bothub_nlp_api.utils import get_language_model
-from bothub_nlp_api.utils import language_validation
+from bothub_nlp_api.utils import (
+    ValidationError,
+    backend,
+    get_language_model,
+    language_validation,
+    repository_authorization_validation
+)
 
 from ..utils import DEFAULT_LANGS_PRIORITY
 
@@ -81,12 +81,10 @@ def _parse(
     user_agent=None,
     from_backend=False,
 ):
-    repository_authorization = get_repository_authorization(authorization)
-    if not repository_authorization:
-        raise AuthorizationIsRequired()
+    repository_authorization = repository_authorization_validation(authorization)
 
     if type(text) != str or not text:
-        raise ValidationError("Text required.")
+        raise ValidationError("Invalid text.")
 
     repository = check_language_priority(language, repository_authorization, repository_version)
 
@@ -124,7 +122,7 @@ def _parse(
                 "text": text,
                 "from_backend": from_backend,
                 "user_agent": user_agent,
-                "user": str(get_repository_authorization(authorization)),
+                "user": str(repository_authorization),
                 "repository_version_language": int(repository.get("repository_version")),
                 "nlp_log": json.dumps(answer),
                 "log_intent": [
