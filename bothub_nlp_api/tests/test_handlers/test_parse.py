@@ -94,7 +94,20 @@ class TestParseHandler(unittest.TestCase):
     def test_check_language_priority(self, *args):
         check_language_priority(self.language, self.authorization, self.repository_version)
 
-    def test_validate_incorrect_region(self):
+    @patch(
+        'bothub_backend.bothub.BothubBackend.request_backend_parse',
+        return_value={
+            "version": True,
+            "repository_version": 121212,
+            "total_training_end": 1,
+            "language": 'pt_br',
+            "algorithm": 'transformer_network_diet_bert',
+            "use_name_entities": False,
+            "use_competing_intents": False,
+            "use_analyze_char": False,
+        },
+    )
+    def test_validate_incorrect_region(self, *args):
         check_language_priority("pt_zz", self.authorization, self.repository_version)
 
     def test_validate_no_language(self):
