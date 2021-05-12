@@ -84,7 +84,7 @@ class TestIntentSentenceSuggestionHandler(unittest.TestCase):
         },
     )
     @patch(
-        'bothub_nlp_api.handlers.parse.celery_app.send_task',
+        'bothub_nlp_api.handlers.intent_sentence_suggestion.celery_app.send_task',
         return_value=MockAsyncResult(fake_id=0),
     )
     def test_default(self, *args):
