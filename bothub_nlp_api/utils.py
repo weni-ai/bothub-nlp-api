@@ -48,11 +48,14 @@ class ValidationError(HTTPException):
         self.detail = message
 
 
-def get_repository_authorization(authorization_header_value):
+def repository_authorization_validation(authorization_header_value):
+    if type(authorization_header_value) != str:
+        raise AuthorizationIsRequired()
+
     authorization_uuid = authorization_header_value and authorization_header_value[7:]
 
     if not authorization_uuid:
-        return False
+        raise AuthorizationIsRequired()
 
     return authorization_uuid
 
@@ -66,22 +69,8 @@ class AuthorizationRequired:
         if request.method == "OPTIONS":
             return True
 
-        repository_authorization = get_repository_authorization(Authorization)
-        if not repository_authorization:
-            raise HTTPException(status_code=401, detail="Authorization is required")
+        repository_authorization_validation(Authorization)
         return True
-
-
-def repository_authorization_validation(authorization_header_value):
-    if type(authorization_header_value) != str:
-        raise AuthorizationIsRequired()
-
-    authorization_uuid = authorization_header_value and authorization_header_value[7:]
-
-    if not authorization_uuid:
-        raise AuthorizationIsRequired()
-
-    return authorization_uuid
 
 
 def language_validation(language):
