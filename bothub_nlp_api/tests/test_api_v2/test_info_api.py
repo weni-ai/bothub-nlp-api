@@ -4,7 +4,7 @@ from bothub_nlp_api import app as api
 from unittest.mock import patch
 
 
-class TestDoc(unittest.TestCase):
+class TestInfoRoute(unittest.TestCase):
     def setUp(self):
         self.app = TestClient(api.app)
         self.header = {
