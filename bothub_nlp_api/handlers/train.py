@@ -57,6 +57,7 @@ def train_handler(authorization, repository_version=None, language=None):
                 repository_authorization=str(repository_authorization),
                 task_id=job_id,
                 from_queue=0,
+                type_processing=0,
             )
         languages_report[update.get("language")] = {"status": TRAIN_STATUS_PROCESSING}
 

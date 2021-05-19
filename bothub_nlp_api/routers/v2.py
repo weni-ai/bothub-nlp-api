@@ -1,7 +1,8 @@
 from fastapi import Depends, APIRouter, Header, HTTPException
 from starlette.requests import Request
 
-from bothub_nlp_api.handlers import evaluate, task_queue
+from bothub_nlp_api.handlers import evaluate
+from bothub_nlp_api.handlers import task_queue
 from bothub_nlp_api.handlers import parse
 from bothub_nlp_api.handlers import debug_parse
 from bothub_nlp_api.handlers import sentence_suggestion
@@ -187,9 +188,14 @@ async def evaluate_handler(
     request: Request = Depends(AuthorizationRequired()),
     Authorization: str = Header(..., description="Bearer your_key"),
 ):
-    result = evaluate.evaluate_handler(
-        Authorization, item.language, item.repository_version, item.cross_validation
-    )
+    if item.cross_validation:
+        result = evaluate.crossvalidation_evaluate_handler(
+            Authorization, item.language, item.repository_version
+        )
+    else:
+        result = evaluate.evaluate_handler(
+            Authorization, item.language, item.repository_version
+        )
     if result.get("status") and result.get("error"):
         raise HTTPException(status_code=400, detail=result)
     return result

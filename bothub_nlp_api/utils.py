@@ -149,6 +149,18 @@ def send_job_train_ai_platform(
 
     if type_model is not None:
         args.extend(["--AIPLATFORM_LANGUAGE_MODEL", type_model])
+
+    if operation == "evaluate":
+        args.extend(
+            [
+                "--BOTHUB_NLP_AWS_S3_BUCKET_NAME", settings.BOTHUB_NLP_AWS_S3_BUCKET_NAME,
+                "--BOTHUB_NLP_AWS_ACCESS_KEY_ID", settings.BOTHUB_NLP_AWS_ACCESS_KEY_ID,
+                "--BOTHUB_NLP_AWS_SECRET_ACCESS_KEY", settings.BOTHUB_NLP_AWS_SECRET_ACCESS_KEY,
+                "--BOTHUB_NLP_AWS_REGION_NAME", settings.BOTHUB_NLP_AWS_REGION_NAME,
+            ]
+        )
+
+
     training_inputs = {
         "scaleTier": "CUSTOM",
         "masterType": "standard_gpu",
