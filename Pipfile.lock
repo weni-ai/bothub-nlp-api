@@ -52,6 +52,7 @@
         "bothub-backend": {
             "git": "https://github.com/Ilhasoft/bothub-backend",
             "ref": "c606d93ade3f84f0110d56b1609601bb4524abde"
+
         },
         "bothub-nlp-celery": {
             "git": "https://github.com/Ilhasoft/bothub-nlp-celery",
