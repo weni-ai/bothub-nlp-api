@@ -10,6 +10,7 @@ from bothub_nlp_api.handlers import intent_sentence_suggestion
 from bothub_nlp_api.handlers import word_suggestion
 from bothub_nlp_api.handlers import words_distribution
 from bothub_nlp_api.handlers import train
+from bothub_nlp_api.handlers import question_answering
 from bothub_nlp_api.models import (
     ParseRequest,
     DebugParseRequest,
@@ -21,6 +22,8 @@ from bothub_nlp_api.models import (
     TrainRequest,
     EvaluateRequest,
     TaskQueueResponse,
+    QuestionAnsweringResponse,
+    QuestionAnsweringRequest
 )
 from bothub_nlp_api.models import ParseResponse
 from bothub_nlp_api.models import DebugParseResponse
@@ -31,6 +34,7 @@ from bothub_nlp_api.models import TrainResponse
 from bothub_nlp_api.models import EvaluateResponse
 from bothub_nlp_api.utils import backend, AuthorizationRequired
 from bothub_nlp_api.utils import get_repository_authorization
+from bothub_nlp_api.exceptions.question_answering_exceptions import QuestionAnsweringException
 
 router = APIRouter(redirect_slashes=False)
 
@@ -210,3 +214,21 @@ async def evaluate_options():
 async def task_queue_handler(id_task: str, from_queue: str):
 
     return task_queue.task_queue_handler(id_task, from_queue)
+
+
+@router.post(r"/question-answering/?", response_model=QuestionAnsweringResponse)
+async def question_answering_handler(
+    item: QuestionAnsweringRequest,
+    # authorization: str = Header(..., description="Bearer your_key"),
+):
+    try:
+        result = question_answering.qa_handler(
+            item.context, item.question, item.language
+        )
+    except QuestionAnsweringException as err:
+        raise HTTPException(status_code=400, detail=err.__str__())
+    if result.get("status") and result.get("error"):
+        raise HTTPException(status_code=400, detail=result)
+
+    return result
+
