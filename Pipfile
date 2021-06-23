@@ -9,7 +9,7 @@ lint = "flake8"
 [packages]
 raven = "==6.10.0"
 requests = "==2.20.1"
-bothub_backend = {ref = "1.0.15",git = "https://github.com/Ilhasoft/bothub-backend"}
+bothub_backend = {ref = "1.0.21-hotfix",git = "https://github.com/Ilhasoft/bothub-backend"}
 kombu = "==4.6.11"
 celery = "==4.4.0"
 gunicorn = "==19.9.0"
