@@ -12,9 +12,8 @@ RUN apk update \
         alpine-sdk \
         git \
         python3-dev \
-        build-base \
     && pip install --upgrade pip \
-    && pip install -U pip setuptools \
+    # && pip install -U pip setuptools \
     && pip install pipenv==2021.5.29 redis \
     && pipenv install --system --deploy \
     && apk del .build-dependencies \
