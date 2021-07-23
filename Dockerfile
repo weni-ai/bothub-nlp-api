@@ -14,9 +14,9 @@ RUN apk update \
         python3-dev \
     && pip install --upgrade pip \
     && pip install -U pip setuptools \
-    && pip install pipenv==2020.6.2 redis \
+    && pip install pipenv==2021.5.29 redis \
     && pipenv install --system --deploy \
-    && apk del .build-dependencies \
+    # && apk del .build-dependencies \
     && rm -rf /var/cache/apk/*
 
 RUN chmod +x ./entrypoint.sh
