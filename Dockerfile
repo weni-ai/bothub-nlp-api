@@ -13,9 +13,8 @@ RUN apk update \
         git \
         python3-dev \
     && pip install --upgrade pip \
-    # && pip install -U pip setuptools \
-    && pip install pipenv==2021.5.29 redis \
-    && pipenv install --system --deploy \
+    && pip install -U pip setuptools \
+    && pip install -r requirements.txt --no-deps \
     && apk del .build-dependencies \
     && rm -rf /var/cache/apk/*
 
