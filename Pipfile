@@ -18,10 +18,10 @@ fastapi = "==0.42.0"
 sentry-sdk = "==0.13.2"
 django-environ = "==0.4.5"
 email-validator = "==1.1.1"
+redis = "==3.5.3"
 
 [dev-packages]
 gunicorn = "==19.9.0"
-redis = "==3.5.3"
 "flake8" = "*"
 black = "==19.3b0"
 coverage = "*"
