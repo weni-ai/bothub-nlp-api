@@ -1,6 +1,5 @@
 amqp==2.6.1
 billiard==3.6.4.0
-blis==0.2.4
 git+https://github.com/bothub-it/bothub-nlp-celery.git@0.1.34
 git+https://github.com/bothub-it/bothub-backend.git@1.0.21-hotfix
 cachetools==4.2.2
@@ -8,7 +7,6 @@ celery==4.4.0
 certifi==2021.5.30
 chardet==3.0.4
 click==7.1.2
-cymem==2.0.5
 dataclasses==0.8
 django-environ==0.4.5
 dnspython==2.1.0
@@ -26,11 +24,8 @@ httptools==0.1.2
 idna==2.7
 importlib-metadata==4.6.1
 kombu==4.6.11
-murmurhash==1.0.5
 numpy==1.18.1
 packaging==21.0
-plac==0.9.6
-preshed==2.0.1
 protobuf==3.17.3
 pyasn1==0.4.8
 pyasn1-modules==0.2.8
@@ -43,9 +38,7 @@ requests==2.20.1
 rsa==4.7.2
 sentry-sdk==0.13.2
 six==1.16.0
-srsly==1.0.5
 starlette==0.12.9
-thinc==7.0.8
 tqdm==4.61.2
 typing-extensions==3.10.0.0
 uritemplate==3.0.1
@@ -53,6 +46,5 @@ urllib3==1.24.3
 uvicorn==0.11.8
 uvloop==0.14.0
 vine==1.3.0
-wasabi==0.8.2
 websockets==8.1
 zipp==3.5.0

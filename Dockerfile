@@ -11,11 +11,13 @@ RUN apk update \
     && apk add --virtual .build-dependencies --no-cache \
         alpine-sdk \
         git \
-        python3-dev \
-    && pip install --upgrade pip \
+        python3-dev
+
+RUN pip install --upgrade pip \
     && pip install -U pip setuptools \
-    && pip install -r requirements.txt --no-deps \
-    && apk del .build-dependencies \
+    && pip install -r requirements.txt --no-deps
+
+RUN apk del .build-dependencies \
     && rm -rf /var/cache/apk/*
 
 RUN chmod +x ./entrypoint.sh
