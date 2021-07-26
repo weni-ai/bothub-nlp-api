@@ -16,11 +16,11 @@ requests = "==2.20.1"
 google-api-python-client = "==1.9.1"
 fastapi = "==0.42.0"
 sentry-sdk = "==0.13.2"
-gunicorn = "==19.9.0"
 django-environ = "==0.4.5"
 email-validator = "==1.1.1"
 
 [dev-packages]
+gunicorn = "==19.9.0"
 redis = "==3.5.3"
 "flake8" = "*"
 black = "==19.3b0"
