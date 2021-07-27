@@ -15,13 +15,9 @@ RUN pip install gunicorn==19.9.0
 RUN apt-get install -y libjpeg-dev libgpgme-dev linux-libc-dev musl-dev libffi-dev libssl-dev
 ENV LIBRARY_PATH=/lib:/usr/lib
 
-COPY Pipfile Pipfile
-COPY Pipfile.lock Pipfile.lock
-
-RUN pipenv install --system
-
 COPY . .
 
+RUN pipenv install --system
 
 RUN chmod +x ./entrypoint.sh
 
