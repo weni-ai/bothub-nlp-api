@@ -15,7 +15,7 @@ from bothub_nlp_api.models import SentenceSuggestionResponse
 from bothub_nlp_api.models import TrainResponse
 from bothub_nlp_api.utils import AuthorizationRequired
 from bothub_nlp_api.utils import backend
-from bothub_nlp_api.utils import get_repository_authorization
+from bothub_nlp_api.utils import repository_authorization_validation
 
 router = APIRouter(redirect_slashes=False)
 
@@ -128,7 +128,7 @@ async def info_handler(
     request: Request = Depends(AuthorizationRequired()),
     Authorization: str = Header(..., description="Bearer your_key"),
 ):
-    repository_authorization = get_repository_authorization(Authorization)
+    repository_authorization = repository_authorization_validation(Authorization)
     info = backend().request_backend_info(repository_authorization)
     if info.get("detail"):
         raise HTTPException(status_code=400, detail=info)

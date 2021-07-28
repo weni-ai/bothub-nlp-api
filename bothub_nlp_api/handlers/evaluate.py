@@ -3,12 +3,15 @@ from bothub_nlp_celery.app import celery_app
 from bothub_nlp_celery.tasks import TASK_NLU_EVALUATE_UPDATE
 
 from bothub_nlp_api import settings
-from bothub_nlp_api.utils import AuthorizationIsRequired
-from bothub_nlp_api.utils import DEFAULT_LANGS_PRIORITY
-from bothub_nlp_api.utils import ValidationError, get_repository_authorization
-from bothub_nlp_api.utils import backend
-from bothub_nlp_api.utils import send_job_train_ai_platform
-from bothub_nlp_api.utils import get_language_model
+from bothub_nlp_api.utils import (
+    ValidationError,
+    backend,
+    send_job_train_ai_platform,
+    get_language_model,
+    language_validation,
+    repository_authorization_validation
+)
+
 import time
 
 EVALUATE_STATUS_EVALUATED = "evaluated"
@@ -19,42 +22,34 @@ EVALUATE_STATUS_FAILED = "failed"
 def crossvalidation_evaluate_handler(
     authorization, language, repository_version=None
 ):
-    if language and (
-        language not in settings.SUPPORTED_LANGUAGES.keys()
-        and language not in DEFAULT_LANGS_PRIORITY.keys()
-    ):
-        raise ValidationError("Language '{}' not supported by now.".format(language))
-
-    repository_authorization = get_repository_authorization(authorization)
-    if not repository_authorization:
-        raise AuthorizationIsRequired()
+    repository_authorization = repository_authorization_validation(authorization)
+    language_validation(language)
 
     try:
-        update = backend().request_backend_start_automatic_evaluate(
+        repository = backend().request_backend_start_automatic_evaluate(
             repository_authorization, repository_version, language
         )
-    except Exception as err:
-        print(err)
-        update = {}
+    except Exception:
+        repository = {}
 
-    if not update.get("can_run_automatic_evaluate"):
+    if not repository.get("can_run_automatic_evaluate"):
         raise ValidationError("Validation error")
 
-    model = get_language_model(update)
+    model = get_language_model(repository)
 
     try:
-        job_id = f'bothub_{settings.ENVIRONMENT}_evaluate_{update.get("repository_version_language_id")}_{language}_{str(int(time.time()))}'
+        job_id = f'bothub_{settings.ENVIRONMENT}_evaluate_{repository.get("repository_version_language_id")}_{language}_{str(int(time.time()))}'
         send_job_train_ai_platform(
             jobId=job_id,
-            repository_version=str(update.get("repository_version_language_id")),
-            by_id=str(update.get("user_id")),
+            repository_version=str(repository.get("repository_version_language_id")),
+            by_id=str(repository.get("user_id")),
             repository_authorization=str(repository_authorization),
             language=language,
             type_model=model,
             operation="evaluate",
         )
         backend().request_backend_save_queue_id(
-            update_id=str(update.get("repository_version_language_id")),
+            update_id=str(repository.get("repository_version_language_id")),
             repository_authorization=str(repository_authorization),
             task_id=job_id,
             from_queue=0,
@@ -63,7 +58,7 @@ def crossvalidation_evaluate_handler(
         evaluate_report = {
             "language": language,
             "status": EVALUATE_STATUS_PROCESSING,
-            "repository_version": update.get("repository_version_language_id"),
+            "repository_version": repository.get("repository_version_language_id"),
             "evaluate_id": None,
             "evaluate_version": None,
             "cross_validation": True,
@@ -77,41 +72,33 @@ def crossvalidation_evaluate_handler(
 def evaluate_handler(
     authorization, language, repository_version=None
 ):
-    if language and (
-        language not in settings.SUPPORTED_LANGUAGES.keys()
-        and language not in DEFAULT_LANGS_PRIORITY.keys()
-    ):
-        raise ValidationError("Language '{}' not supported by now.".format(language))
-
-    repository_authorization = get_repository_authorization(authorization)
-    if not repository_authorization:
-        raise AuthorizationIsRequired()
+    repository_authorization = repository_authorization_validation(authorization)
+    language_validation(language)
 
     try:
-        update = backend().request_backend_evaluate(
+        repository = backend().request_backend_evaluate(
             repository_authorization, language, repository_version
         )
     except Exception:
-        update = {}
+        repository = {}
 
-    if not update.get("update"):
+    if not repository.get("update"):
         raise ValidationError("This repository has never been trained")
 
-    model = get_language_model(update)
+    model = get_language_model(repository)
 
     try:
-        evaluate = None
         cross_validation = False
         evaluate_task = celery_app.send_task(
             TASK_NLU_EVALUATE_UPDATE,
             args=[
                 repository_version,
-                update.get("repository_version"),  # repository_version_language_id
+                repository.get("repository_version"),  # repository_version_language_id
                 repository_authorization,
                 cross_validation,
-                update.get("language")
+                repository.get("language")
             ],
-            queue=queue_name(update.get("language"), ACTION_EVALUATE, model),
+            queue=queue_name(repository.get("language"), ACTION_EVALUATE, model),
         )
         evaluate_task.wait()
         evaluate = evaluate_task.result
@@ -119,7 +106,7 @@ def evaluate_handler(
         evaluate_report = {
             "language": language,
             "status": EVALUATE_STATUS_PROCESSING,
-            "repository_version": update.get("repository_version"),
+            "repository_version": repository.get("repository_version"),
             "evaluate_id": evaluate.get("id") if evaluate is not None else None,
             "evaluate_version": evaluate.get("version")
             if evaluate is not None

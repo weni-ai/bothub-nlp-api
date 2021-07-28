@@ -1,11 +1,13 @@
 from bothub_nlp_celery.actions import ACTION_INTENT_SENTENCE_SUGGESTION, queue_name
 from bothub_nlp_celery.app import celery_app
 from bothub_nlp_celery.tasks import TASK_NLU_INTENT_SENTENCE_SUGGESTION_TEXT
-from bothub_nlp_api.utils import get_repository_authorization
-from bothub_nlp_api.utils import backend
-from bothub_nlp_api import settings
-from bothub_nlp_api.utils import ValidationError
-from bothub_nlp_api.utils import AuthorizationIsRequired
+
+from bothub_nlp_api.utils import (
+    ValidationError,
+    backend,
+    language_validation,
+    repository_authorization_validation
+)
 
 
 def _intent_sentence_suggestion(
@@ -16,18 +18,25 @@ def _intent_sentence_suggestion(
     percentage_to_replace,
     repository_version=None,
 ):
-    print(authorization)
-    from ..utils import DEFAULT_LANGS_PRIORITY
+    repository_authorization = repository_authorization_validation(authorization)
+    language_validation(language)
 
-    if language and (
-        language not in settings.SUPPORTED_LANGUAGES.keys()
-        and language not in DEFAULT_LANGS_PRIORITY.keys()
+    if not intent or type(intent) != str:
+        raise ValidationError("Invalid intent")
+    if (
+        not n_sentences_to_generate
+        or type(n_sentences_to_generate) != int
+        or n_sentences_to_generate <= 0
+        or n_sentences_to_generate > 50
     ):
-        raise ValidationError("Language '{}' not supported by now.".format(language))
-
-    repository_authorization = get_repository_authorization(authorization)
-    if not repository_authorization:
-        raise AuthorizationIsRequired()
+        raise ValidationError("Invalid number of sentences to generate")
+    if (
+        not percentage_to_replace
+        or type(percentage_to_replace) != int
+        or percentage_to_replace <= 0
+        or percentage_to_replace > 100
+    ):
+        raise ValidationError("Invalid percentage to replace")
 
     try:
         update = backend().request_backend_parse(

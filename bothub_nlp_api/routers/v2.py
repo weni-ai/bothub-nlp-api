@@ -1,40 +1,43 @@
 from fastapi import Depends, APIRouter, Header, HTTPException
 from starlette.requests import Request
 
-from bothub_nlp_api.handlers import evaluate
-from bothub_nlp_api.handlers import task_queue
-from bothub_nlp_api.handlers import parse
-from bothub_nlp_api.handlers import debug_parse
-from bothub_nlp_api.handlers import sentence_suggestion
-from bothub_nlp_api.handlers import intent_sentence_suggestion
-from bothub_nlp_api.handlers import word_suggestion
-from bothub_nlp_api.handlers import words_distribution
-from bothub_nlp_api.handlers import train
-from bothub_nlp_api.handlers import question_answering
+from bothub_nlp_api.handlers import (
+    evaluate,
+    task_queue,
+    parse,
+    debug_parse,
+    sentence_suggestion,
+    intent_sentence_suggestion,
+    word_suggestion,
+    words_distribution,
+    train
+)
+
 from bothub_nlp_api.models import (
     ParseRequest,
+    ParseResponse,
     DebugParseRequest,
+    DebugParseResponse,
     WordsDistributionRequest,
     SentenceSuggestionRequest,
+    SentenceSuggestionResponse,
     IntentSentenceSuggestionRequest,
+    IntentSentenceSuggestionResponse,
     WordSuggestionRequest,
+    WordSuggestionResponse,
     WordsDistributionResponse,
     TrainRequest,
+    TrainResponse,
     EvaluateRequest,
+    EvaluateResponse,
     TaskQueueResponse,
-    QuestionAnsweringResponse,
-    QuestionAnsweringRequest
 )
-from bothub_nlp_api.models import ParseResponse
-from bothub_nlp_api.models import DebugParseResponse
-from bothub_nlp_api.models import SentenceSuggestionResponse
-from bothub_nlp_api.models import IntentSentenceSuggestionResponse
-from bothub_nlp_api.models import WordSuggestionResponse
-from bothub_nlp_api.models import TrainResponse
-from bothub_nlp_api.models import EvaluateResponse
-from bothub_nlp_api.utils import backend, AuthorizationRequired
-from bothub_nlp_api.utils import get_repository_authorization
-from bothub_nlp_api.exceptions.question_answering_exceptions import QuestionAnsweringException
+
+from bothub_nlp_api.utils import (
+    backend,
+    AuthorizationRequired,
+    repository_authorization_validation,
+)
 
 router = APIRouter(redirect_slashes=False)
 
@@ -174,7 +177,7 @@ async def info_handler(
     request: Request = Depends(AuthorizationRequired()),
     Authorization: str = Header(..., description="Bearer your_key"),
 ):
-    repository_authorization = get_repository_authorization(Authorization)
+    repository_authorization = repository_authorization_validation(Authorization)
     info = backend().request_backend_info(repository_authorization)
     if info.get("detail"):
         raise HTTPException(status_code=400, detail=info)

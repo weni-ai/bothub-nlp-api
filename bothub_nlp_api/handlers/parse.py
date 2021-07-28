@@ -6,12 +6,13 @@ from bothub_nlp_celery.actions import ACTION_PARSE, queue_name
 from bothub_nlp_celery.app import celery_app
 from bothub_nlp_celery.tasks import TASK_NLU_PARSE_TEXT
 
-from bothub_nlp_api import settings
-from bothub_nlp_api.utils import AuthorizationIsRequired
-from bothub_nlp_api.utils import ValidationError
-from bothub_nlp_api.utils import backend
-from bothub_nlp_api.utils import get_repository_authorization
-from bothub_nlp_api.utils import get_language_model
+from bothub_nlp_api.utils import (
+    ValidationError,
+    backend,
+    get_language_model,
+    language_validation,
+    repository_authorization_validation
+)
 
 from ..utils import DEFAULT_LANGS_PRIORITY
 
@@ -35,44 +36,40 @@ def get_entities_dict(answer):
     return entities_dict
 
 
-def validate_language(language, repository_authorization, repository_version):
-    try:
-        language = str(language.lower())
-        language = re.split(r"[-_]", language)[0]
-    except Exception:
-        language = None
+def check_language_priority(language, repository_authorization, repository_version):
+    if not language:
+        raise ValidationError("Language required.")
 
-    if (
-        language
-        and language not in settings.SUPPORTED_LANGUAGES.keys()
-        and language not in DEFAULT_LANGS_PRIORITY.keys()
-    ):
-        raise ValidationError("Language '{}' not supported by now.".format(language))
+    language = str(language).lower()
+    language = re.split(r"[-_]", language)[0]
+
+    language_validation(language)
 
     # Tries to get repository by DEFAULT_LANGS (hard-coded exceptions)
+    repository = {}
     if language in DEFAULT_LANGS_PRIORITY.keys():
         priority_ordered_langs = DEFAULT_LANGS_PRIORITY.get(language)
         for lang in priority_ordered_langs:
             try:
-                update = backend().request_backend_parse(
+                repository = backend().request_backend_parse(
                     repository_authorization, lang, repository_version
                 )
             except Exception:
-                update = {}
+                repository = {}
 
-            if update.get("total_training_end"):
+            if repository.get("total_training_end"):
                 break
 
     # Else tries to get most generic repository ('LANG' only)
     else:
         try:
-            update = backend().request_backend_parse(
+            repository = backend().request_backend_parse(
                 repository_authorization, language, repository_version
             )
         except Exception:
-            update = {}
+            repository = {}
 
-    return update
+    return repository
 
 
 def _parse(
@@ -84,22 +81,23 @@ def _parse(
     user_agent=None,
     from_backend=False,
 ):
-    repository_authorization = get_repository_authorization(authorization)
-    if not repository_authorization:
-        raise AuthorizationIsRequired()
+    repository_authorization = repository_authorization_validation(authorization)
 
-    update = validate_language(language, repository_authorization, repository_version)
+    if type(text) != str or not text:
+        raise ValidationError("Invalid text.")
 
-    if not update.get("version"):
-        raise ValidationError("This repository has never been trained")
+    repository = check_language_priority(language, repository_authorization, repository_version)
 
-    model = get_language_model(update)
+    if not repository.get("version"):
+        raise ValidationError("This repository has never been trained.")
+
+    model = get_language_model(repository)
 
     answer_task = celery_app.send_task(
         TASK_NLU_PARSE_TEXT,
-        args=[update.get("repository_version"), repository_authorization, text],
+        args=[repository.get("repository_version"), repository_authorization, text],
         kwargs={"rasa_format": rasa_format},
-        queue=queue_name(update.get("language"), ACTION_PARSE, model),
+        queue=queue_name(repository.get("language"), ACTION_PARSE, model),
     )
     answer_task.wait()
     answer = answer_task.result
@@ -107,8 +105,8 @@ def _parse(
     answer.update(
         {
             "text": text,
-            "repository_version": update.get("repository_version"),
-            "language": update.get("language"),
+            "repository_version": repository.get("repository_version"),
+            "language": repository.get("language"),
             "group_list": list(entities_dict.keys()),
             "entities": entities_dict,
         }
@@ -124,8 +122,8 @@ def _parse(
                 "text": text,
                 "from_backend": from_backend,
                 "user_agent": user_agent,
-                "user": str(get_repository_authorization(authorization)),
-                "repository_version_language": int(update.get("repository_version")),
+                "user": str(repository_authorization),
+                "repository_version_language": int(repository.get("repository_version")),
                 "nlp_log": json.dumps(answer),
                 "log_intent": [
                     {

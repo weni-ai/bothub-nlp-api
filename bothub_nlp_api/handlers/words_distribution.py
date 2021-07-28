@@ -1,22 +1,17 @@
-from bothub_nlp_api import settings
 from bothub_nlp_celery.actions import ACTION_WORDS_DISTIRBUTION, queue_name
 from bothub_nlp_celery.app import celery_app
 from bothub_nlp_celery.tasks import TASK_NLU_WORDS_DISTRIBUTION
-from bothub_nlp_api.utils import get_repository_authorization
-from bothub_nlp_api.utils import ValidationError
-from bothub_nlp_api.utils import backend
+
+from bothub_nlp_api.utils import (
+    backend,
+    language_validation,
+    repository_authorization_validation,
+)
 
 
 def _words_distribution(authorization, language, repository_version=None):
-    from bothub_nlp_api.utils import DEFAULT_LANGS_PRIORITY
-
-    if language and (
-        language not in settings.SUPPORTED_LANGUAGES.keys()
-        and language not in DEFAULT_LANGS_PRIORITY.keys()
-    ):
-        raise ValidationError("Language '{}' not supported by now.".format(language))
-
-    repository_authorization = get_repository_authorization(authorization)
+    language_validation(language)
+    repository_authorization = repository_authorization_validation(authorization)
 
     current_update = backend().request_backend_train(
         repository_authorization, language, repository_version
