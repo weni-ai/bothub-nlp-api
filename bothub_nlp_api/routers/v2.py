@@ -31,6 +31,8 @@ from bothub_nlp_api.models import (
     EvaluateRequest,
     EvaluateResponse,
     TaskQueueResponse,
+    QuestionAnsweringResponse,
+    QuestionAnsweringRequest,
 )
 
 from bothub_nlp_api.utils import (
