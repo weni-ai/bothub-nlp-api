@@ -217,3 +217,21 @@ async def evaluate_options():
 async def task_queue_handler(id_task: str, from_queue: str):
 
     return task_queue.task_queue_handler(id_task, from_queue)
+
+
+@router.post(r"/question-answering/?", response_model=QuestionAnsweringResponse)
+async def question_answering_handler(
+    item: QuestionAnsweringRequest,
+    # authorization: str = Header(..., description="Bearer your_key"),
+):
+    try:
+        result = question_answering.qa_handler(
+            item.context, item.question, item.language
+        )
+    except QuestionAnsweringException as err:
+        raise HTTPException(status_code=400, detail=err.__str__())
+    if result.get("status") and result.get("error"):
+        raise HTTPException(status_code=400, detail=result)
+
+    return result
+

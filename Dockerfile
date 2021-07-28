@@ -1,23 +1,23 @@
-FROM python:3.6-alpine
+FROM python:3.6-slim
 
-ENV WORKDIR /root/app
+ENV WORKDIR /home/app
 ENV BOTHUB_NLP_API_PORT 2657
-
 WORKDIR $WORKDIR
+
+RUN apt-get update \
+ && apt-get install --no-install-recommends --no-install-suggests -y apt-utils \
+ && apt-get install --no-install-recommends --no-install-suggests -y gcc bzip2 git curl nginx libpq-dev gettext \
+    libgdal-dev python3-cffi python3-gdal vim
+
+RUN pip install -U pip==20.2.2 setuptools==49.6.0
+RUN pip install pipenv==2018.11.26
+RUN pip install gunicorn==19.9.0
+RUN apt-get install -y libjpeg-dev libgpgme-dev linux-libc-dev musl-dev libffi-dev libssl-dev
+ENV LIBRARY_PATH=/lib:/usr/lib
 
 COPY . .
 
-RUN apk update \
-    && apk add --virtual .build-dependencies --no-cache \
-        alpine-sdk \
-        git \
-        python3-dev \
-    && pip install --upgrade pip \
-    && pip install -U pip setuptools \
-    && pip install pipenv==2018.11.26 redis \
-    && pipenv install --system --deploy \
-    && apk del .build-dependencies \
-    && rm -rf /var/cache/apk/*
+RUN pipenv install --system
 
 RUN chmod +x ./entrypoint.sh
 
