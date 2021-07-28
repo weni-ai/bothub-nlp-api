@@ -110,12 +110,6 @@ class TestParseHandler(unittest.TestCase):
     def test_validate_incorrect_region(self, *args):
         check_language_priority("pt_zz", self.authorization, self.repository_version)
 
-    def test_validate_no_language(self):
-        with self.assertRaises(ValidationError):
-            check_language_priority(None, self.authorization, self.repository_version)
-        with self.assertRaises(ValidationError):
-            check_language_priority('', self.authorization, self.repository_version)
-
     @patch(
         'bothub_nlp_api.handlers.parse.check_language_priority',
         return_value={},

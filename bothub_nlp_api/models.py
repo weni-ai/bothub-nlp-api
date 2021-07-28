@@ -5,7 +5,7 @@ from pydantic import BaseModel
 
 class ParseRequest(BaseModel):
     text: str
-    language: str
+    language: str = None
     rasa_format: bool = False
     repository_version: int = None
     from_backend: bool = False

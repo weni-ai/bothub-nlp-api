@@ -25,10 +25,26 @@ class TestParseRoute(unittest.TestCase):
         response = self.app.post("v2/parse", headers=self.header, json=invalid_body)
         self.assertEqual(422, response.status_code)
 
-    def test_v2_invalid_language(self):
-        invalid_body = {"text": "test"}
-        response = self.app.post("v2/parse", headers=self.header, json=invalid_body)
-        self.assertEqual(422, response.status_code)
+    @patch(
+        'bothub_nlp_api.handlers.parse._parse',
+        return_value={
+            'intent': {
+                'name': 'intent',
+                'confidence': 1
+            },
+            'intent_ranking': [],
+            'group_list': [],
+            'entities_list': [],
+            'entities': {},
+            'text': 'text',
+            'repository_version': 1,
+            'language': 'pt',
+        }
+    )
+    def test_v2_no_language(self, *args):
+        body = {"text": "test"}
+        response = self.app.post("v2/parse", headers=self.header, json=body)
+        self.assertEqual(200, response.status_code)
 
     @patch(
         'bothub_nlp_api.handlers.parse._parse',

@@ -37,13 +37,10 @@ def get_entities_dict(answer):
 
 
 def check_language_priority(language, repository_authorization, repository_version):
-    if not language:
-        raise ValidationError("Language required.")
-
-    language = str(language).lower()
-    language = re.split(r"[-_]", language)[0]
-
-    language_validation(language)
+    if language:
+        language = str(language).lower()
+        language = re.split(r"[-_]", language)[0]
+        language_validation(language)
 
     # Tries to get repository by DEFAULT_LANGS (hard-coded exceptions)
     repository = {}
