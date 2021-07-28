@@ -9,13 +9,13 @@ class TestTaskQueueRoute(unittest.TestCase):
         self.app = TestClient(api.app)
 
     def test_v2_invalid_id_task(self):
-        params = {"from_queue": "example"}
-        response = self.app.get("v2/task-queue", params=params)
+        invalid_params = {"from_queue": "example"}
+        response = self.app.get("v2/task-queue", params=invalid_params)
         self.assertEqual(422, response.status_code)
 
     def test_v2_invalid_queue(self):
-        params = {"id_task": "example"}
-        response = self.app.get("v2/task-queue", params=params)
+        invalid_params = {"id_task": "example"}
+        response = self.app.get("v2/task-queue", params=invalid_params)
         self.assertEqual(422, response.status_code)
 
     @patch(

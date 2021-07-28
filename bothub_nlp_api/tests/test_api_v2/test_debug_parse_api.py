@@ -21,13 +21,13 @@ class TestDebugParseRoute(unittest.TestCase):
         self.assertEqual(422, response.status_code)
 
     def test_v2_invalid_text(self):
-        body = {"language": "en"}
-        response = self.app.post("v2/debug_parse", headers=self.header, json=body)
+        invalid_body = {"language": "en"}
+        response = self.app.post("v2/debug_parse", headers=self.header, json=invalid_body)
         self.assertEqual(422, response.status_code)
 
     def test_v2_invalid_language(self):
-        body = {"text": "test"}
-        response = self.app.post("v2/debug_parse", headers=self.header, json=body)
+        invalid_body = {"text": "test"}
+        response = self.app.post("v2/debug_parse", headers=self.header, json=invalid_body)
         self.assertEqual(422, response.status_code)
 
     @patch(

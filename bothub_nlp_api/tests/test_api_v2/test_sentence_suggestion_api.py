@@ -9,13 +9,13 @@ class TestSentenceSuggestionRoute(unittest.TestCase):
         self.app = TestClient(api.app)
 
     def test_v2_invalid_text(self):
-        body = {"language": "en"}
-        response = self.app.post("v2/sentence_suggestion", headers={}, json=body)
+        invalid_body = {"language": "en"}
+        response = self.app.post("v2/sentence_suggestion", headers={}, json=invalid_body)
         self.assertEqual(422, response.status_code)
 
     def test_v2_invalid_language(self):
-        body = {"text": "test"}
-        response = self.app.post("v2/sentence_suggestion", headers={}, json=body)
+        invalid_body = {"text": "test"}
+        response = self.app.post("v2/sentence_suggestion", headers={}, json=invalid_body)
         self.assertEqual(422, response.status_code)
 
     @patch(

@@ -21,8 +21,8 @@ class TestEvaluateRoute(unittest.TestCase):
         self.assertEqual(422, response.status_code)
 
     def test_v2_invalid_language(self):
-        body = {}
-        response = self.app.post("v2/evaluate", headers=self.header, json=body)
+        invalid_body = {}
+        response = self.app.post("v2/evaluate", headers=self.header, json=invalid_body)
         self.assertEqual(422, response.status_code)
 
     @patch(

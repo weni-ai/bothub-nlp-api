@@ -21,13 +21,13 @@ class TestIntentSentenceSuggestionRoute(unittest.TestCase):
         self.assertEqual(422, response.status_code)
 
     def test_v2_invalid_intent(self):
-        body = {"language": "en"}
-        response = self.app.post("v2/intent_sentence_suggestion", headers=self.header, json=body)
+        invalid_body = {"language": "en"}
+        response = self.app.post("v2/intent_sentence_suggestion", headers=self.header, json=invalid_body)
         self.assertEqual(422, response.status_code)
 
     def test_v2_invalid_language(self):
-        body = {"intent": "test"}
-        response = self.app.post("v2/intent_sentence_suggestion", headers=self.header, json=body)
+        invalid_body = {"intent": "test"}
+        response = self.app.post("v2/intent_sentence_suggestion", headers=self.header, json=invalid_body)
         self.assertEqual(422, response.status_code)
 
     @patch(

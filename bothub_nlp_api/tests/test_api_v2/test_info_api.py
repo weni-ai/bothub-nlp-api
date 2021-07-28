@@ -12,12 +12,12 @@ class TestInfoRoute(unittest.TestCase):
         }
 
     def test_v2_info_invalid_auth(self):
-        headers = {"Authorization": ""}
-        response = self.app.get("v2/info", headers=headers)
+        invalid_header = {"Authorization": ""}
+        response = self.app.get("v2/info", headers=invalid_header)
         self.assertEqual(401, response.status_code)
 
-        headers = {}
-        response = self.app.get("v2/info", headers=headers)
+        invalid_header = {}
+        response = self.app.get("v2/info", headers=invalid_header)
         self.assertEqual(422, response.status_code)
 
     @patch(
