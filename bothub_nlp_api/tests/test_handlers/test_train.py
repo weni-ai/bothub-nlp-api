@@ -10,7 +10,7 @@ from bothub_nlp_api.handlers.train import train_handler
 
 class TestTrainHandler(unittest.TestCase):
     def setUp(self):
-        self.authorization = 'Bearer da39f8a1-532a-459e-85c0-bfd8f96db828'
+        self.authorization = 'Bearer aa11a1a1-111a-111a-11a1-aaa1a11aa111'
         self.repository_version = 299
         self.language = 'pt_br'
 

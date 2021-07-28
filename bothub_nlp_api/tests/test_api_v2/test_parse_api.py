@@ -8,7 +8,7 @@ class TestParseRoute(unittest.TestCase):
     def setUp(self):
         self.app = TestClient(api.app)
         self.header = {
-            'Authorization': 'Bearer da39f8a1-532a-459e-85c0-bfd8f96db828'
+            'Authorization': 'Bearer aa11a1a1-111a-111a-11a1-aaa1a11aa111'
         }
 
     def test_v2_invalid_authorization(self):
