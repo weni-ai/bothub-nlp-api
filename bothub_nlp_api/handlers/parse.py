@@ -27,7 +27,7 @@ def order_by_confidence(entities):
 
 def get_entities_dict(answer):
     entities_dict = {}
-    entities = answer.get("entities")
+    entities = answer.get("entities", [])
     for entity in reversed(order_by_confidence(entities)):
         group_value = entity.get("role") if entity.get("role") else "other"
         if not entities_dict.get(group_value):
