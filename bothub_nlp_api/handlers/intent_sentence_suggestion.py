@@ -8,7 +8,7 @@ from bothub_nlp_api.utils import (
     ValidationError,
     backend,
     language_validation,
-    repository_authorization_validation
+    repository_authorization_validation,
 )
 
 

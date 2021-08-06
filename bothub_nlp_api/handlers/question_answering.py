@@ -20,13 +20,7 @@ def qa_handler(context, question, language):
 
     try:
         answer_task = celery_app.send_task(
-            TASK_NLU_QUESTION_ANSWERING,
-            args=[
-                context,
-                question,
-                language
-            ],
-            queue="QA",
+            TASK_NLU_QUESTION_ANSWERING, args=[context, question, language], queue="QA"
         )
         answer_task.wait()
         answer = answer_task.result

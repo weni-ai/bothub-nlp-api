@@ -7,9 +7,7 @@ from unittest.mock import patch
 class TestInfoRoute(unittest.TestCase):
     def setUp(self):
         self.app = TestClient(api.app)
-        self.header = {
-            'Authorization': 'Bearer aa11a1a1-111a-111a-11a1-aaa1a11aa111'
-        }
+        self.header = {"Authorization": "Bearer aa11a1a1-111a-111a-11a1-aaa1a11aa111"}
 
     def test_v2_info_invalid_auth(self):
         invalid_header = {"Authorization": ""}
@@ -21,7 +19,7 @@ class TestInfoRoute(unittest.TestCase):
         self.assertEqual(422, response.status_code)
 
     @patch(
-        'bothub_backend.bothub.BothubBackend.request_backend_info',
+        "bothub_backend.bothub.BothubBackend.request_backend_info",
         return_value={"intents": []},
     )
     def test_v2_info(self, *args):

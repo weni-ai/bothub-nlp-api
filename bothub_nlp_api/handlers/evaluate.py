@@ -11,7 +11,7 @@ from bothub_nlp_api.utils import (
     send_job_train_ai_platform,
     get_language_model,
     language_validation,
-    repository_authorization_validation
+    repository_authorization_validation,
 )
 
 import time
@@ -21,9 +21,7 @@ EVALUATE_STATUS_PROCESSING = "processing"
 EVALUATE_STATUS_FAILED = "failed"
 
 
-def crossvalidation_evaluate_handler(
-    authorization, language, repository_version=None
-):
+def crossvalidation_evaluate_handler(authorization, language, repository_version=None):
     repository_authorization = repository_authorization_validation(authorization)
     language_validation(language)
 
@@ -71,9 +69,7 @@ def crossvalidation_evaluate_handler(
     return evaluate_report
 
 
-def evaluate_handler(
-    authorization, language, repository_version=None
-):
+def evaluate_handler(authorization, language, repository_version=None):
     repository_authorization = repository_authorization_validation(authorization)
     language_validation(language)
 
@@ -98,7 +94,7 @@ def evaluate_handler(
                 repository.get("repository_version"),  # repository_version_language_id
                 repository_authorization,
                 cross_validation,
-                repository.get("language")
+                repository.get("language"),
             ],
             queue=queue_name(repository.get("language"), ACTION_EVALUATE, model),
         )

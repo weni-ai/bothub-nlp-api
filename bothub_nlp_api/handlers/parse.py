@@ -13,7 +13,7 @@ from bothub_nlp_api.utils import (
     backend,
     get_language_model,
     language_validation,
-    repository_authorization_validation
+    repository_authorization_validation,
 )
 
 from ..utils import DEFAULT_LANGS_PRIORITY
@@ -85,7 +85,9 @@ def _parse(
     if type(text) != str or not text:
         raise ValidationError("Invalid text.")
 
-    repository = check_language_priority(language, repository_authorization, repository_version)
+    repository = check_language_priority(
+        language, repository_authorization, repository_version
+    )
 
     if not repository.get("version"):
         raise ValidationError("This repository has never been trained.")
@@ -126,7 +128,9 @@ def _parse(
                 "from_backend": from_backend,
                 "user_agent": user_agent,
                 "user": str(repository_authorization),
-                "repository_version_language": int(repository.get("repository_version")),
+                "repository_version_language": int(
+                    repository.get("repository_version")
+                ),
                 "nlp_log": json.dumps(answer),
                 "log_intent": [
                     {

@@ -10,7 +10,7 @@ from bothub_nlp_api.utils import (
     backend,
     get_language_model,
     language_validation,
-    repository_authorization_validation
+    repository_authorization_validation,
 )
 
 

@@ -2,10 +2,7 @@ from bothub_nlp_celery.actions import ACTION_SENTENCE_SUGGESTION, queue_name
 from bothub_nlp_celery.app import celery_app
 from bothub_nlp_celery.tasks import TASK_NLU_SENTENCE_SUGGESTION_TEXT
 
-from bothub_nlp_api.utils import (
-    language_validation,
-    ValidationError
-)
+from bothub_nlp_api.utils import language_validation, ValidationError
 from bothub_nlp_api.exceptions.celery_exceptions import CeleryTimeoutException
 from celery.exceptions import TimeLimitExceeded
 
