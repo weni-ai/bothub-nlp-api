@@ -4,6 +4,8 @@ from unittest.mock import patch
 
 from bothub_nlp_api.utils import ValidationError, AuthorizationIsRequired
 from bothub_nlp_api.handlers.words_distribution import _words_distribution
+from celery.exceptions import TimeLimitExceeded
+from bothub_nlp_api.exceptions.celery_exceptions import CeleryTimeoutException
 
 
 class MockAsyncResult(AsyncResult):
@@ -17,6 +19,11 @@ class MockAsyncResult(AsyncResult):
 
     def wait(self):
         pass
+
+
+class MockAsyncResultTimeout(MockAsyncResult):
+    def wait(self):
+        raise TimeLimitExceeded
 
 
 class TestWordsDistributionHandler(unittest.TestCase):
@@ -55,7 +62,31 @@ class TestWordsDistributionHandler(unittest.TestCase):
     )
     @patch(
         'bothub_nlp_api.handlers.words_distribution.celery_app.send_task',
-        return_value=MockAsyncResult(fake_id=0),
+        return_value=MockAsyncResultTimeout(fake_id='0'),
+    )
+    def test_default(self, *args):
+        with self.assertRaises(CeleryTimeoutException):
+            _words_distribution(
+                self.authorization,
+                self.language
+            )
+
+    @patch(
+        'bothub_backend.bothub.BothubBackend.request_backend_train',
+        return_value={
+            "ready_for_train": True,
+            "current_version_id": 1,
+            "repository_authorization_user_id": 1,
+            "language": 'pt_br',
+            "algorithm": 'transformer_network_diet_bert',
+            "use_name_entities": False,
+            "use_competing_intents": False,
+            "use_analyze_char": False,
+        },
+    )
+    @patch(
+        'bothub_nlp_api.handlers.words_distribution.celery_app.send_task',
+        return_value=MockAsyncResult(fake_id='0'),
     )
     def test_default(self, *args):
         _words_distribution(

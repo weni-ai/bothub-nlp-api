@@ -4,6 +4,8 @@ from unittest.mock import patch
 
 from bothub_nlp_api.utils import ValidationError, AuthorizationIsRequired
 from bothub_nlp_api.handlers.intent_sentence_suggestion import _intent_sentence_suggestion
+from celery.exceptions import TimeLimitExceeded
+from bothub_nlp_api.exceptions.celery_exceptions import CeleryTimeoutException
 
 
 class MockAsyncResult(AsyncResult):
@@ -17,6 +19,11 @@ class MockAsyncResult(AsyncResult):
 
     def wait(self):
         pass
+
+
+class MockAsyncResultTimeout(MockAsyncResult):
+    def wait(self):
+        raise TimeLimitExceeded
 
 
 class TestIntentSentenceSuggestionHandler(unittest.TestCase):
@@ -85,7 +92,34 @@ class TestIntentSentenceSuggestionHandler(unittest.TestCase):
     )
     @patch(
         'bothub_nlp_api.handlers.intent_sentence_suggestion.celery_app.send_task',
-        return_value=MockAsyncResult(fake_id=0),
+        return_value=MockAsyncResultTimeout(fake_id='0'),
+    )
+    def test_celery_timeout(self, *args):
+        with self.assertRaises(CeleryTimeoutException):
+            _intent_sentence_suggestion(
+                self.authorization,
+                self.language,
+                self.intent,
+                5,
+                60,
+            )
+
+    @patch(
+        'bothub_backend.bothub.BothubBackend.request_backend_parse',
+        return_value={
+            "version": True,
+            "repository_version": 121212,
+            "total_training_end": 1,
+            "language": 'pt_br',
+            "algorithm": 'transformer_network_diet_bert',
+            "use_name_entities": False,
+            "use_competing_intents": False,
+            "use_analyze_char": False,
+        },
+    )
+    @patch(
+        'bothub_nlp_api.handlers.intent_sentence_suggestion.celery_app.send_task',
+        return_value=MockAsyncResult(fake_id='0'),
     )
     def test_default(self, *args):
         _intent_sentence_suggestion(

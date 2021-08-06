@@ -4,6 +4,8 @@ from unittest.mock import patch
 
 from bothub_nlp_api.utils import ValidationError, AuthorizationIsRequired
 from bothub_nlp_api.handlers.sentence_suggestion import _sentence_suggestion
+from celery.exceptions import TimeLimitExceeded
+from bothub_nlp_api.exceptions.celery_exceptions import CeleryTimeoutException
 
 
 class MockAsyncResult(AsyncResult):
@@ -17,6 +19,11 @@ class MockAsyncResult(AsyncResult):
 
     def wait(self):
         pass
+
+
+class MockAsyncResultTimeout(MockAsyncResult):
+    def wait(self):
+        raise TimeLimitExceeded
 
 
 class TestSentenceSuggestionHandler(unittest.TestCase):
@@ -62,7 +69,20 @@ class TestSentenceSuggestionHandler(unittest.TestCase):
 
     @patch(
         'bothub_nlp_api.handlers.sentence_suggestion.celery_app.send_task',
-        return_value=MockAsyncResult(fake_id=0),
+        return_value=MockAsyncResultTimeout(fake_id='0'),
+    )
+    def test_celery_timeout(self, *args):
+        with self.assertRaises(CeleryTimeoutException):
+            _sentence_suggestion(
+                self.text,
+                self.language,
+                5,
+                60,
+            )
+
+    @patch(
+        'bothub_nlp_api.handlers.sentence_suggestion.celery_app.send_task',
+        return_value=MockAsyncResult(fake_id='0'),
     )
     def test_default(self, *args):
         _sentence_suggestion(

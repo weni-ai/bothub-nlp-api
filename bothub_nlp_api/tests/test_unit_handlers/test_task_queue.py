@@ -44,7 +44,7 @@ class TestTaskQueueHandler(unittest.TestCase):
 
     @patch(
         'bothub_nlp_api.handlers.task_queue.AsyncResult',
-        return_value=MockAsyncResult(fake_id=1)
+        return_value=MockAsyncResult(fake_id='1')
     )
     def test_celery_default(self, *args):
         task_queue_handler(self.id_task, 'celery')
