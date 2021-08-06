@@ -5,6 +5,8 @@ import re
 from bothub_nlp_celery.actions import ACTION_PARSE, queue_name
 from bothub_nlp_celery.app import celery_app
 from bothub_nlp_celery.tasks import TASK_NLU_PARSE_TEXT
+from celery.exceptions import TimeLimitExceeded
+from bothub_nlp_api.exceptions.celery_exceptions import CeleryTimeoutException
 
 from bothub_nlp_api.utils import (
     ValidationError,
@@ -90,14 +92,18 @@ def _parse(
 
     model = get_language_model(repository)
 
-    answer_task = celery_app.send_task(
-        TASK_NLU_PARSE_TEXT,
-        args=[repository.get("repository_version"), repository_authorization, text],
-        kwargs={"rasa_format": rasa_format},
-        queue=queue_name(repository.get("language"), ACTION_PARSE, model),
-    )
-    answer_task.wait()
-    answer = answer_task.result
+    try:
+        answer_task = celery_app.send_task(
+            TASK_NLU_PARSE_TEXT,
+            args=[repository.get("repository_version"), repository_authorization, text],
+            kwargs={"rasa_format": rasa_format},
+            queue=queue_name(repository.get("language"), ACTION_PARSE, model),
+        )
+        answer_task.wait()
+        answer = answer_task.result
+    except TimeLimitExceeded:
+        raise CeleryTimeoutException()
+
     entities_dict = get_entities_dict(answer)
     answer.update(
         {

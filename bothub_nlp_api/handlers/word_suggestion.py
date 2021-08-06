@@ -6,6 +6,8 @@ from bothub_nlp_api.utils import (
     ValidationError,
     language_validation
 )
+from bothub_nlp_api.exceptions.celery_exceptions import CeleryTimeoutException
+from celery.exceptions import TimeLimitExceeded
 
 
 def _word_suggestion(text, language, n_words_to_generate):
@@ -21,13 +23,17 @@ def _word_suggestion(text, language, n_words_to_generate):
     ):
         raise ValidationError("Invalid number of words to generate")
 
-    answer_task = celery_app.send_task(
-        TASK_NLU_WORD_SUGGESTION_TEXT,
-        args=[text, n_words_to_generate],
-        queue=queue_name(language, ACTION_WORD_SUGGESTION, "SPACY"),
-    )
-    answer_task.wait()
-    answer = answer_task.result
+    try:
+        answer_task = celery_app.send_task(
+            TASK_NLU_WORD_SUGGESTION_TEXT,
+            args=[text, n_words_to_generate],
+            queue=queue_name(language, ACTION_WORD_SUGGESTION, "SPACY"),
+        )
+        answer_task.wait()
+        answer = answer_task.result
+    except TimeLimitExceeded:
+        raise CeleryTimeoutException()
+
     answer.update(
         {"text": text, "language": language, "n_words_to_generate": n_words_to_generate}
     )

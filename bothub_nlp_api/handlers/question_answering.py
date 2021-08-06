@@ -3,8 +3,10 @@ from bothub_nlp_celery.tasks import TASK_NLU_QUESTION_ANSWERING
 from bothub_nlp_api.exceptions.question_answering_exceptions import (
     LargeQuestionException,
     LargeContextException,
-    EmptyInputException
+    EmptyInputException,
 )
+from bothub_nlp_api.exceptions.celery_exceptions import CeleryTimeoutException
+from celery.exceptions import TimeLimitExceeded
 
 
 def qa_handler(context, question, language):
@@ -16,16 +18,19 @@ def qa_handler(context, question, language):
     if len(context) == 0 or len(question) == 0:
         raise EmptyInputException()
 
-    answer_task = celery_app.send_task(
-        TASK_NLU_QUESTION_ANSWERING,
-        args=[
-            context,
-            question,
-            language
-        ],
-        queue="QA",
-    )
-    answer_task.wait()
-    answer = answer_task.result
+    try:
+        answer_task = celery_app.send_task(
+            TASK_NLU_QUESTION_ANSWERING,
+            args=[
+                context,
+                question,
+                language
+            ],
+            queue="QA",
+        )
+        answer_task.wait()
+        answer = answer_task.result
+    except TimeLimitExceeded:
+        raise CeleryTimeoutException()
 
     return answer

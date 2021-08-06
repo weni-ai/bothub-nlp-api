@@ -6,6 +6,8 @@ from bothub_nlp_api.utils import (
     language_validation,
     ValidationError
 )
+from bothub_nlp_api.exceptions.celery_exceptions import CeleryTimeoutException
+from celery.exceptions import TimeLimitExceeded
 
 
 def _sentence_suggestion(
@@ -30,13 +32,17 @@ def _sentence_suggestion(
     ):
         raise ValidationError("Invalid percentage to replace")
 
-    answer_task = celery_app.send_task(
-        TASK_NLU_SENTENCE_SUGGESTION_TEXT,
-        args=[text, percentage_to_replace, n_sentences_to_generate],
-        queue=queue_name(language, ACTION_SENTENCE_SUGGESTION, "SPACY"),
-    )
-    answer_task.wait()
-    answer = answer_task.result
+    try:
+        answer_task = celery_app.send_task(
+            TASK_NLU_SENTENCE_SUGGESTION_TEXT,
+            args=[text, percentage_to_replace, n_sentences_to_generate],
+            queue=queue_name(language, ACTION_SENTENCE_SUGGESTION, "SPACY"),
+        )
+        answer_task.wait()
+        answer = answer_task.result
+    except TimeLimitExceeded:
+        raise CeleryTimeoutException()
+
     answer.update(
         {
             "text": text,
