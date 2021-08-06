@@ -1,6 +1,10 @@
 from fastapi import Depends, APIRouter, Header, HTTPException
 from starlette.requests import Request
 
+from bothub_nlp_api.exceptions.question_answering_exceptions import (
+    QuestionAnsweringException,
+)
+
 from bothub_nlp_api.handlers import (
     evaluate,
     task_queue,
@@ -10,7 +14,8 @@ from bothub_nlp_api.handlers import (
     intent_sentence_suggestion,
     word_suggestion,
     words_distribution,
-    train
+    train,
+    question_answering,
 )
 
 from bothub_nlp_api.models import (
@@ -236,4 +241,3 @@ async def question_answering_handler(
         raise HTTPException(status_code=400, detail=result)
 
     return result
-

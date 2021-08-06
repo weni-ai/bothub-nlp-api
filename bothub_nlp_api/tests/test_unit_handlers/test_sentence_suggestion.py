@@ -2,17 +2,14 @@ import unittest
 from celery.result import AsyncResult
 from unittest.mock import patch
 
-from bothub_nlp_api.utils import ValidationError, AuthorizationIsRequired
+from bothub_nlp_api.utils import ValidationError
 from bothub_nlp_api.handlers.sentence_suggestion import _sentence_suggestion
 from celery.exceptions import TimeLimitExceeded
 from bothub_nlp_api.exceptions.celery_exceptions import CeleryTimeoutException
 
 
 class MockAsyncResult(AsyncResult):
-    result = {
-        'id': 1,
-        'version': 1,
-    }
+    result = {"id": 1, "version": 1}
 
     def __init__(self, fake_id):
         super().__init__(fake_id)
@@ -28,20 +25,20 @@ class MockAsyncResultTimeout(MockAsyncResult):
 
 class TestSentenceSuggestionHandler(unittest.TestCase):
     def setUp(self):
-        self.text = 'some text'
-        self.language = 'pt_br'
+        self.text = "some text"
+        self.language = "pt_br"
 
     def test_invalid_language(self):
         with self.assertRaises(ValidationError):
-            _sentence_suggestion(self.text, 'invalid_language', 5, 60)
+            _sentence_suggestion(self.text, "invalid_language", 5, 60)
         with self.assertRaises(ValidationError):
-            _sentence_suggestion(self.text, '', 5, 60)
+            _sentence_suggestion(self.text, "", 5, 60)
         with self.assertRaises(ValidationError):
             _sentence_suggestion(self.text, None, 5, 60)
 
     def test_invalid_text(self):
         with self.assertRaises(ValidationError):
-            _sentence_suggestion('', self.language, 5, 60)
+            _sentence_suggestion("", self.language, 5, 60)
         with self.assertRaises(ValidationError):
             _sentence_suggestion(3, self.language, 5, 60)
         with self.assertRaises(ValidationError):
@@ -49,7 +46,7 @@ class TestSentenceSuggestionHandler(unittest.TestCase):
 
     def test_invalid_n_sentences(self):
         with self.assertRaises(ValidationError):
-            _sentence_suggestion(self.text, self.language, '1', 60)
+            _sentence_suggestion(self.text, self.language, "1", 60)
         with self.assertRaises(ValidationError):
             _sentence_suggestion(self.text, self.language, None, 60)
         with self.assertRaises(ValidationError):
@@ -59,7 +56,7 @@ class TestSentenceSuggestionHandler(unittest.TestCase):
 
     def test_invalid_percentage_replace(self):
         with self.assertRaises(ValidationError):
-            _sentence_suggestion(self.text, self.language, 4, 'a')
+            _sentence_suggestion(self.text, self.language, 4, "a")
         with self.assertRaises(ValidationError):
             _sentence_suggestion(self.text, self.language, 4, None)
         with self.assertRaises(ValidationError):
@@ -68,27 +65,16 @@ class TestSentenceSuggestionHandler(unittest.TestCase):
             _sentence_suggestion(self.text, self.language, 4, 101)
 
     @patch(
-        'bothub_nlp_api.handlers.sentence_suggestion.celery_app.send_task',
-        return_value=MockAsyncResultTimeout(fake_id='0'),
+        "bothub_nlp_api.handlers.sentence_suggestion.celery_app.send_task",
+        return_value=MockAsyncResultTimeout(fake_id="0"),
     )
     def test_celery_timeout(self, *args):
         with self.assertRaises(CeleryTimeoutException):
-            _sentence_suggestion(
-                self.text,
-                self.language,
-                5,
-                60,
-            )
+            _sentence_suggestion(self.text, self.language, 5, 60)
 
     @patch(
-        'bothub_nlp_api.handlers.sentence_suggestion.celery_app.send_task',
-        return_value=MockAsyncResult(fake_id='0'),
+        "bothub_nlp_api.handlers.sentence_suggestion.celery_app.send_task",
+        return_value=MockAsyncResult(fake_id="0"),
     )
     def test_default(self, *args):
-        _sentence_suggestion(
-            self.text,
-            self.language,
-            5,
-            60,
-        )
-
+        _sentence_suggestion(self.text, self.language, 5, 60)
