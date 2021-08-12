@@ -7,9 +7,7 @@ from unittest.mock import patch
 class TestEvaluateRoute(unittest.TestCase):
     def setUp(self):
         self.app = TestClient(api.app)
-        self.header = {
-            'Authorization': 'Bearer aa11a1a1-111a-111a-11a1-aaa1a11aa111'
-        }
+        self.header = {"Authorization": "Bearer aa11a1a1-111a-111a-11a1-aaa1a11aa111"}
 
     def test_v2_invalid_authorization(self):
         invalid_header = {"Authorization": ""}
@@ -26,15 +24,15 @@ class TestEvaluateRoute(unittest.TestCase):
         self.assertEqual(422, response.status_code)
 
     @patch(
-        'bothub_nlp_api.handlers.evaluate.evaluate_handler',
+        "bothub_nlp_api.handlers.evaluate.evaluate_handler",
         return_value={
-            'language': 'en',
-            'status': 'x',
-            'repository_version': 1,
-            'evaluate_id': 1,
-            'evaluate_version': 1,
-            'cross_validation': False,
-        }
+            "language": "en",
+            "status": "x",
+            "repository_version": 1,
+            "evaluate_id": 1,
+            "evaluate_version": 1,
+            "cross_validation": False,
+        },
     )
     def test_v2_evaluate(self, *args):
         body = {"language": "en"}
@@ -46,15 +44,15 @@ class TestEvaluateRoute(unittest.TestCase):
         self.assertEqual(200, response.status_code)
 
     @patch(
-        'bothub_nlp_api.handlers.evaluate.crossvalidation_evaluate_handler',
+        "bothub_nlp_api.handlers.evaluate.crossvalidation_evaluate_handler",
         return_value={
-            'language': 'en',
-            'status': 'x',
-            'repository_version': 1,
-            'evaluate_id': 1,
-            'evaluate_version': 1,
-            'cross_validation': True,
-        }
+            "language": "en",
+            "status": "x",
+            "repository_version": 1,
+            "evaluate_id": 1,
+            "evaluate_version": 1,
+            "cross_validation": True,
+        },
     )
     def test_v2_evaluate_crossval(self, *args):
         body = {"language": "en", "cross_validation": True}

@@ -6,7 +6,7 @@ from bothub_nlp_api.handlers.task_queue import task_queue_handler
 
 
 class MockAsyncResult(AsyncResult):
-    status = 'SUCCESS'
+    status = "SUCCESS"
 
     def __init__(self, fake_id):
         super().__init__(fake_id)
@@ -15,12 +15,7 @@ class MockAsyncResult(AsyncResult):
         pass
 
 
-MockResponse = {
-    'state': 'SUCCEEDED',
-    'trainingOutput': {
-        'consumedMLUnits': 2
-    }
-}
+MockResponse = {"state": "SUCCEEDED", "trainingOutput": {"consumedMLUnits": 2}}
 
 
 class TestTaskQueueHandler(unittest.TestCase):
@@ -31,20 +26,20 @@ class TestTaskQueueHandler(unittest.TestCase):
         with self.assertRaises(ValidationError):
             task_queue_handler(self.id_task, None)
         with self.assertRaises(ValidationError):
-            task_queue_handler(self.id_task, 'invalid queue')
+            task_queue_handler(self.id_task, "invalid queue")
         with self.assertRaises(ValidationError):
             task_queue_handler(self.id_task, 3)
 
     @patch(
-        'bothub_nlp_api.handlers.task_queue.get_train_job_status',
-        return_value=MockResponse
+        "bothub_nlp_api.handlers.task_queue.get_train_job_status",
+        return_value=MockResponse,
     )
     def test_ai_platform_default(self, *args):
-        task_queue_handler(self.id_task, 'ai-platform')
+        task_queue_handler(self.id_task, "ai-platform")
 
     @patch(
-        'bothub_nlp_api.handlers.task_queue.AsyncResult',
-        return_value=MockAsyncResult(fake_id=1)
+        "bothub_nlp_api.handlers.task_queue.AsyncResult",
+        return_value=MockAsyncResult(fake_id="1"),
     )
     def test_celery_default(self, *args):
-        task_queue_handler(self.id_task, 'celery')
+        task_queue_handler(self.id_task, "celery")

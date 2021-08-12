@@ -191,4 +191,3 @@ class QuestionAnsweringRequest(BaseModel):
 class QuestionAnsweringResponse(BaseModel):
     answers: List[Dict[str, str]]
     id: str
-

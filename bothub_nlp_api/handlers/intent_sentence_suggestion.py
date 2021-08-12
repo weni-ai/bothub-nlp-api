@@ -1,12 +1,14 @@
 from bothub_nlp_celery.actions import ACTION_INTENT_SENTENCE_SUGGESTION, queue_name
 from bothub_nlp_celery.app import celery_app
 from bothub_nlp_celery.tasks import TASK_NLU_INTENT_SENTENCE_SUGGESTION_TEXT
+from celery.exceptions import TimeLimitExceeded
+from bothub_nlp_api.exceptions.celery_exceptions import CeleryTimeoutException
 
 from bothub_nlp_api.utils import (
     ValidationError,
     backend,
     language_validation,
-    repository_authorization_validation
+    repository_authorization_validation,
 )
 
 
@@ -44,19 +46,23 @@ def _intent_sentence_suggestion(
         )
     except Exception:
         update = {}
-    answer_task = celery_app.send_task(
-        TASK_NLU_INTENT_SENTENCE_SUGGESTION_TEXT,
-        args=[
-            update.get("repository_version"),
-            repository_authorization,
-            intent,
-            percentage_to_replace,
-            n_sentences_to_generate,
-        ],
-        queue=queue_name(language, ACTION_INTENT_SENTENCE_SUGGESTION, "SPACY"),
-    )
-    answer_task.wait()
-    answer = answer_task.result
+    try:
+        answer_task = celery_app.send_task(
+            TASK_NLU_INTENT_SENTENCE_SUGGESTION_TEXT,
+            args=[
+                update.get("repository_version"),
+                repository_authorization,
+                intent,
+                percentage_to_replace,
+                n_sentences_to_generate,
+            ],
+            queue=queue_name(language, ACTION_INTENT_SENTENCE_SUGGESTION, "SPACY"),
+        )
+        answer_task.wait()
+        answer = answer_task.result
+    except TimeLimitExceeded:
+        raise CeleryTimeoutException()
+
     answer.update(
         {
             "language": language,

@@ -19,11 +19,8 @@ class TestWordSuggestionRoute(unittest.TestCase):
         self.assertEqual(422, response.status_code)
 
     @patch(
-        'bothub_nlp_api.handlers.word_suggestion._word_suggestion',
-        return_value={
-            'text': 'text',
-            'similar_words': []
-        }
+        "bothub_nlp_api.handlers.word_suggestion._word_suggestion",
+        return_value={"text": "text", "similar_words": []},
     )
     def test_v2_word_suggestion(self, *args):
         body = {"text": "test", "language": "en"}

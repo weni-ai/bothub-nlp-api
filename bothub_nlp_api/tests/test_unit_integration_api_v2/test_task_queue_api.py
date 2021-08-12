@@ -19,11 +19,8 @@ class TestTaskQueueRoute(unittest.TestCase):
         self.assertEqual(422, response.status_code)
 
     @patch(
-        'bothub_nlp_api.handlers.task_queue.task_queue_handler',
-        return_value={
-            'status': 'test',
-            'ml_units': 1.0
-        }
+        "bothub_nlp_api.handlers.task_queue.task_queue_handler",
+        return_value={"status": "test", "ml_units": 1.0},
     )
     def test_v2_task_queue(self, *args):
         params = {"id_task": "1", "from_queue": "celery"}

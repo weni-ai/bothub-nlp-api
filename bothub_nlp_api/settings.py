@@ -38,7 +38,7 @@ env = environ.Env(
     BOTHUB_NLP_AWS_S3_BUCKET_NAME=(str, None),
     BOTHUB_NLP_AWS_ACCESS_KEY_ID=(str, None),
     BOTHUB_NLP_AWS_SECRET_ACCESS_KEY=(str, None),
-    BOTHUB_NLP_AWS_REGION_NAME=(str, None)
+    BOTHUB_NLP_AWS_REGION_NAME=(str, None),
 )
 
 ENVIRONMENT = env.str("ENVIRONMENT")
