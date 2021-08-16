@@ -3,7 +3,7 @@ name: Build Production Bothub-NLP-API Image
 on:
   push:
     tags:
-      - 'production-v*.*.*'
+      - 'v*.*.*'
 jobs:
   docker:
     runs-on: ubuntu-latest
