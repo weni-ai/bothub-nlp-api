@@ -114,7 +114,7 @@ class TestIntentSentenceSuggestionHandler(unittest.TestCase):
     def test_celery_timeout(self, *args):
         with self.assertRaises(CeleryTimeoutException):
             _intent_sentence_suggestion(
-                self.authorization, self.language, self.intent, 5, 60
+                self.authorization, self.language, self.intent, 5, 60.0
             )
 
     @patch(
@@ -136,5 +136,5 @@ class TestIntentSentenceSuggestionHandler(unittest.TestCase):
     )
     def test_default(self, *args):
         _intent_sentence_suggestion(
-            self.authorization, self.language, self.intent, 5, 60
+            self.authorization, self.language, self.intent, 5, 60.0
         )

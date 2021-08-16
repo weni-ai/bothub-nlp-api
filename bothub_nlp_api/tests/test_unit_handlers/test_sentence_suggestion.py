@@ -70,11 +70,11 @@ class TestSentenceSuggestionHandler(unittest.TestCase):
     )
     def test_celery_timeout(self, *args):
         with self.assertRaises(CeleryTimeoutException):
-            _sentence_suggestion(self.text, self.language, 5, 60)
+            _sentence_suggestion(self.text, self.language, 5, 60.0)
 
     @patch(
         "bothub_nlp_api.handlers.sentence_suggestion.celery_app.send_task",
         return_value=MockAsyncResult(fake_id="0"),
     )
     def test_default(self, *args):
-        _sentence_suggestion(self.text, self.language, 5, 60)
+        _sentence_suggestion(self.text, self.language, 5, 60.0)

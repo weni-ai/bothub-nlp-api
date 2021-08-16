@@ -23,7 +23,7 @@ def _sentence_suggestion(
         raise ValidationError("Invalid number of sentences to generate")
     if (
         not percentage_to_replace
-        or type(percentage_to_replace) != int
+        or type(percentage_to_replace) != float
         or percentage_to_replace <= 0
         or percentage_to_replace > 100
     ):
