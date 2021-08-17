@@ -13,20 +13,20 @@ class ParseRequest(BaseModel):
 
 class DebugParseRequest(BaseModel):
     text: str
-    language: str = None
+    language: str
     repository_version: int = None
 
 
 class SentenceSuggestionRequest(BaseModel):
     text: str
-    language: str = None
+    language: str
     n_sentences_to_generate: int = 10
     percentage_to_replace: float = 0.3
 
 
 class IntentSentenceSuggestionRequest(BaseModel):
-    language: str = None
-    intent: str = None
+    language: str
+    intent: str
     n_sentences_to_generate: int = 10
     percentage_to_replace: float = 0.3
     repository_version: int = None
@@ -34,12 +34,12 @@ class IntentSentenceSuggestionRequest(BaseModel):
 
 class WordSuggestionRequest(BaseModel):
     text: str
-    language: str = None
+    language: str
     n_words_to_generate: int = 10
 
 
 class WordsDistributionRequest(BaseModel):
-    language: str = None
+    language: str
     repository_version: int = None
 
 
@@ -49,7 +49,7 @@ class TrainRequest(BaseModel):
 
 
 class EvaluateRequest(BaseModel):
-    language: str = None
+    language: str
     repository_version: int = None
     cross_validation: bool = False
 
@@ -180,3 +180,14 @@ class EvaluateResponse(BaseModel):
 class TaskQueueResponse(BaseModel):
     status: str
     ml_units: float = None
+
+
+class QuestionAnsweringRequest(BaseModel):
+    context: str = None
+    question: str = None
+    language: str = None
+
+
+class QuestionAnsweringResponse(BaseModel):
+    answers: List[Dict[str, str]]
+    id: str

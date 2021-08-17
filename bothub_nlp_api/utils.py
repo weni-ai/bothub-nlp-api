@@ -48,11 +48,14 @@ class ValidationError(HTTPException):
         self.detail = message
 
 
-def get_repository_authorization(authorization_header_value):
+def repository_authorization_validation(authorization_header_value):
+    if type(authorization_header_value) != str:
+        raise AuthorizationIsRequired()
+
     authorization_uuid = authorization_header_value and authorization_header_value[7:]
 
     if not authorization_uuid:
-        return False
+        raise AuthorizationIsRequired()
 
     return authorization_uuid
 
@@ -66,10 +69,18 @@ class AuthorizationRequired:
         if request.method == "OPTIONS":
             return True
 
-        repository_authorization = get_repository_authorization(Authorization)
-        if not repository_authorization:
-            raise HTTPException(status_code=401, detail="Authorization is required")
+        repository_authorization_validation(Authorization)
         return True
+
+
+def language_validation(language):
+    if not language or (
+        language not in settings.SUPPORTED_LANGUAGES.keys()
+        and language not in DEFAULT_LANGS_PRIORITY.keys()
+    ):
+        raise ValidationError("Language '{}' not supported by now.".format(language))
+
+    return
 
 
 def get_train_job_status(job_name):
@@ -113,7 +124,7 @@ def cancel_job_after_time(t, cloudml, job_name):
         pass
     except Exception as err:
         logging.debug(err)
-        raise Exception(f'Something went wrong with job {job_name}: {err}')
+        raise Exception(f"Something went wrong with job {job_name}: {err}")
 
 
 def send_job_train_ai_platform(
@@ -125,7 +136,7 @@ def send_job_train_ai_platform(
     type_model,
     operation="train",
 ):
-    if type_model == 'BERT' and language not in celery_settings.BERT_LANGUAGES:
+    if type_model == "BERT" and language not in celery_settings.BERT_LANGUAGES:
         image_sufix = "-xx-BERT"
     elif type_model is not None:
         image_sufix = f"-{language}-{type_model}"
@@ -153,13 +164,16 @@ def send_job_train_ai_platform(
     if operation == "evaluate":
         args.extend(
             [
-                "--BOTHUB_NLP_AWS_S3_BUCKET_NAME", settings.BOTHUB_NLP_AWS_S3_BUCKET_NAME,
-                "--BOTHUB_NLP_AWS_ACCESS_KEY_ID", settings.BOTHUB_NLP_AWS_ACCESS_KEY_ID,
-                "--BOTHUB_NLP_AWS_SECRET_ACCESS_KEY", settings.BOTHUB_NLP_AWS_SECRET_ACCESS_KEY,
-                "--BOTHUB_NLP_AWS_REGION_NAME", settings.BOTHUB_NLP_AWS_REGION_NAME,
+                "--BOTHUB_NLP_AWS_S3_BUCKET_NAME",
+                settings.BOTHUB_NLP_AWS_S3_BUCKET_NAME,
+                "--BOTHUB_NLP_AWS_ACCESS_KEY_ID",
+                settings.BOTHUB_NLP_AWS_ACCESS_KEY_ID,
+                "--BOTHUB_NLP_AWS_SECRET_ACCESS_KEY",
+                settings.BOTHUB_NLP_AWS_SECRET_ACCESS_KEY,
+                "--BOTHUB_NLP_AWS_REGION_NAME",
+                settings.BOTHUB_NLP_AWS_REGION_NAME,
             ]
         )
-
 
     training_inputs = {
         "scaleTier": "CUSTOM",
@@ -203,16 +217,12 @@ def send_job_train_ai_platform(
         # para jobs que travaram e continuam rodando
         if settings.BOTHUB_GOOGLE_AI_PLATFORM_JOB_TIMEOUT is not None:
             time_seconds = int(settings.BOTHUB_GOOGLE_AI_PLATFORM_JOB_TIMEOUT)
-            if operation == 'evaluate':
+            if operation == "evaluate":
                 time_seconds = time_seconds * 2
 
             threading.Thread(
                 target=cancel_job_after_time,
-                args=(
-                    time_seconds,
-                    cloudml,
-                    f"{project_id}/jobs/{jobId}",
-                )
+                args=(time_seconds, cloudml, f"{project_id}/jobs/{jobId}"),
             ).start()
     except errors.HttpError as err:
         raise HTTPException(

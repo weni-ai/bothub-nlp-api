@@ -18,7 +18,7 @@ if settings.BOTHUB_NLP_SENTRY_CLIENT:
         dsn=settings.BOTHUB_NLP_SENTRY, environment=settings.ENVIRONMENT
     )  # pragma: no cover
 
-app = FastAPI(title="Bothub NLP", version="3.0.19", description="", docs_url="/")
+app = FastAPI(title="Bothub NLP", version="3.1.1", description="", docs_url="/")
 
 app.include_router(v1.router, tags=["v1"])
 

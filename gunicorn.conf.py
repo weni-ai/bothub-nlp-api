@@ -4,7 +4,9 @@ import multiprocessing
 from bothub_nlp_api import settings
 
 
-default_web_concurrency = settings.BOTHUB_NLP_API_WORKERS_PER_CORE * multiprocessing.cpu_count()
+default_web_concurrency = (
+    settings.BOTHUB_NLP_API_WORKERS_PER_CORE * multiprocessing.cpu_count()
+)
 if settings.BOTHUB_NLP_API_WEB_CONCURRENCY:
     web_concurrency = int(settings.BOTHUB_NLP_API_WEB_CONCURRENCY)
     assert web_concurrency > 0

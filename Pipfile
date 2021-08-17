@@ -7,27 +7,19 @@ name = "pypi"
 lint = "flake8"
 
 [packages]
-raven = "==6.10.0"
-requests = "==2.20.1"
-bothub_backend = {ref = "1.0.21-hotfix",git = "https://github.com/Ilhasoft/bothub-backend"}
-kombu = "==4.6.11"
-celery = "==4.4.0"
-gunicorn = "==19.9.0"
-gevent = "==1.4.0"
-bothub_nlp_celery = {ref = "0.1.31",git = "https://github.com/Ilhasoft/bothub-nlp-celery"}
-django-environ = "==0.4.5"
-redis = "==3.5.3"
-fastapi = "==0.42.0"
-uvicorn = "==0.11.8"
-uvloop = "==0.14.0"
-python-multipart = "==0.0.5"
-email-validator = "==1.1.1"
-dataclasses = "==0.6"
-sentry-sdk = "==0.13.2"
-numpy = "==1.18.1"
-google-api-python-client = "==1.9.1"
+uvicorn = "~=0.11.8"
+bothub_backend = {ref = "1.0.22",git = "https://github.com/Ilhasoft/bothub-backend"}
+bothub_nlp_celery = {ref = "0.1.35",git = "https://github.com/Ilhasoft/bothub-nlp-celery"}
+requests = "~=2.20.1"
+google-api-python-client = "~=1.9.1"
+fastapi = "~=0.42.0"
+sentry-sdk = "~=0.13.2"
+django-environ = "~=0.4.5"
+email-validator = "~=1.1.1"
+redis = "~=3.5.3"
 
 [dev-packages]
+gunicorn = "~=19.9.0"
 "flake8" = "*"
 black = "==19.3b0"
 coverage = "*"
