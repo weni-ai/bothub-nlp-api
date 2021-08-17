@@ -30,29 +30,29 @@ class TestSentenceSuggestionHandler(unittest.TestCase):
 
     def test_invalid_language(self):
         with self.assertRaises(ValidationError):
-            _sentence_suggestion(self.text, "invalid_language", 5, 60)
+            _sentence_suggestion(self.text, "invalid_language", 5, 0.6)
         with self.assertRaises(ValidationError):
-            _sentence_suggestion(self.text, "", 5, 60)
+            _sentence_suggestion(self.text, "", 5, 0.6)
         with self.assertRaises(ValidationError):
-            _sentence_suggestion(self.text, None, 5, 60)
+            _sentence_suggestion(self.text, None, 5, 0.6)
 
     def test_invalid_text(self):
         with self.assertRaises(ValidationError):
-            _sentence_suggestion("", self.language, 5, 60)
+            _sentence_suggestion("", self.language, 5, 0.6)
         with self.assertRaises(ValidationError):
-            _sentence_suggestion(3, self.language, 5, 60)
+            _sentence_suggestion(3, self.language, 5, 0.6)
         with self.assertRaises(ValidationError):
-            _sentence_suggestion(None, self.language, 5, 60)
+            _sentence_suggestion(None, self.language, 5, 0.6)
 
     def test_invalid_n_sentences(self):
         with self.assertRaises(ValidationError):
-            _sentence_suggestion(self.text, self.language, "1", 60)
+            _sentence_suggestion(self.text, self.language, "1", 0.6)
         with self.assertRaises(ValidationError):
-            _sentence_suggestion(self.text, self.language, None, 60)
+            _sentence_suggestion(self.text, self.language, None, 0.6)
         with self.assertRaises(ValidationError):
-            _sentence_suggestion(self.text, self.language, -3, 60)
+            _sentence_suggestion(self.text, self.language, -3, 0.6)
         with self.assertRaises(ValidationError):
-            _sentence_suggestion(self.text, self.language, 11111111, 60)
+            _sentence_suggestion(self.text, self.language, 11111111, 0.6)
 
     def test_invalid_percentage_replace(self):
         with self.assertRaises(ValidationError):
@@ -60,9 +60,9 @@ class TestSentenceSuggestionHandler(unittest.TestCase):
         with self.assertRaises(ValidationError):
             _sentence_suggestion(self.text, self.language, 4, None)
         with self.assertRaises(ValidationError):
-            _sentence_suggestion(self.text, self.language, 4, -2)
+            _sentence_suggestion(self.text, self.language, 4, -2.0)
         with self.assertRaises(ValidationError):
-            _sentence_suggestion(self.text, self.language, 4, 101)
+            _sentence_suggestion(self.text, self.language, 4, 0)
 
     @patch(
         "bothub_nlp_api.handlers.sentence_suggestion.celery_app.send_task",
@@ -70,11 +70,11 @@ class TestSentenceSuggestionHandler(unittest.TestCase):
     )
     def test_celery_timeout(self, *args):
         with self.assertRaises(CeleryTimeoutException):
-            _sentence_suggestion(self.text, self.language, 5, 60.0)
+            _sentence_suggestion(self.text, self.language, 5, 0.6)
 
     @patch(
         "bothub_nlp_api.handlers.sentence_suggestion.celery_app.send_task",
         return_value=MockAsyncResult(fake_id="0"),
     )
     def test_default(self, *args):
-        _sentence_suggestion(self.text, self.language, 5, 60.0)
+        _sentence_suggestion(self.text, self.language, 5, 0.6)

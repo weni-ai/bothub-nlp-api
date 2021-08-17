@@ -34,46 +34,46 @@ class TestIntentSentenceSuggestionHandler(unittest.TestCase):
 
     def test_invalid_auth(self):
         with self.assertRaises(AuthorizationIsRequired):
-            _intent_sentence_suggestion("", self.language, self.intent, 5, 60)
+            _intent_sentence_suggestion("", self.language, self.intent, 5, 0.6)
         with self.assertRaises(AuthorizationIsRequired):
-            _intent_sentence_suggestion(None, self.language, self.intent, 5, 60)
+            _intent_sentence_suggestion(None, self.language, self.intent, 5, 0.6)
         with self.assertRaises(AuthorizationIsRequired):
-            _intent_sentence_suggestion(2, self.language, self.intent, 5, 60)
+            _intent_sentence_suggestion(2, self.language, self.intent, 5, 0.6)
 
     def test_invalid_language(self):
         with self.assertRaises(ValidationError):
             _intent_sentence_suggestion(
-                self.authorization, "invalid_language", self.intent, 5, 60
+                self.authorization, "invalid_language", self.intent, 5, 0.6
             )
         with self.assertRaises(ValidationError):
-            _intent_sentence_suggestion(self.authorization, "", self.intent, 5, 60)
+            _intent_sentence_suggestion(self.authorization, "", self.intent, 5, 0.6)
         with self.assertRaises(ValidationError):
-            _intent_sentence_suggestion(self.authorization, None, self.intent, 5, 60)
+            _intent_sentence_suggestion(self.authorization, None, self.intent, 5, 0.6)
 
     def test_invalid_intent(self):
         with self.assertRaises(ValidationError):
-            _intent_sentence_suggestion(self.authorization, self.language, "", 5, 60)
+            _intent_sentence_suggestion(self.authorization, self.language, "", 5, 0.6)
         with self.assertRaises(ValidationError):
-            _intent_sentence_suggestion(self.authorization, self.language, None, 5, 60)
+            _intent_sentence_suggestion(self.authorization, self.language, None, 5, 0.6)
         with self.assertRaises(ValidationError):
-            _intent_sentence_suggestion(self.authorization, self.language, 2, 5, 60)
+            _intent_sentence_suggestion(self.authorization, self.language, 2, 5, 0.6)
 
     def test_invalid_n_sentences(self):
         with self.assertRaises(ValidationError):
             _intent_sentence_suggestion(
-                self.authorization, self.language, self.intent, "1", 60
+                self.authorization, self.language, self.intent, "1", 0.6
             )
         with self.assertRaises(ValidationError):
             _intent_sentence_suggestion(
-                self.authorization, self.language, self.intent, None, 60
+                self.authorization, self.language, self.intent, None, 0.6
             )
         with self.assertRaises(ValidationError):
             _intent_sentence_suggestion(
-                self.authorization, self.language, self.intent, -3, 60
+                self.authorization, self.language, self.intent, -3, 0.6
             )
         with self.assertRaises(ValidationError):
             _intent_sentence_suggestion(
-                self.authorization, self.language, self.intent, 11111111, 60
+                self.authorization, self.language, self.intent, 11111111, 0.6
             )
 
     def test_invalid_percentage_replace(self):
@@ -87,11 +87,11 @@ class TestIntentSentenceSuggestionHandler(unittest.TestCase):
             )
         with self.assertRaises(ValidationError):
             _intent_sentence_suggestion(
-                self.authorization, self.language, self.intent, 4, -2
+                self.authorization, self.language, self.intent, 4, -2.0
             )
         with self.assertRaises(ValidationError):
             _intent_sentence_suggestion(
-                self.authorization, self.language, self.intent, 4, 101
+                self.authorization, self.language, self.intent, 4, 2
             )
 
     @patch(
@@ -114,7 +114,7 @@ class TestIntentSentenceSuggestionHandler(unittest.TestCase):
     def test_celery_timeout(self, *args):
         with self.assertRaises(CeleryTimeoutException):
             _intent_sentence_suggestion(
-                self.authorization, self.language, self.intent, 5, 60.0
+                self.authorization, self.language, self.intent, 5, 0.6
             )
 
     @patch(
@@ -136,5 +136,5 @@ class TestIntentSentenceSuggestionHandler(unittest.TestCase):
     )
     def test_default(self, *args):
         _intent_sentence_suggestion(
-            self.authorization, self.language, self.intent, 5, 60.0
+            self.authorization, self.language, self.intent, 5, 0.6
         )

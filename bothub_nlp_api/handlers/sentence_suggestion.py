@@ -25,7 +25,7 @@ def _sentence_suggestion(
         not percentage_to_replace
         or type(percentage_to_replace) != float
         or percentage_to_replace <= 0
-        or percentage_to_replace > 100
+        or percentage_to_replace > 1
     ):
         raise ValidationError("Invalid percentage to replace")
 
