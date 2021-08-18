@@ -17,6 +17,7 @@ sentry-sdk = "~=0.13.2"
 django-environ = "~=0.4.5"
 email-validator = "~=1.1.1"
 redis = "~=3.5.3"
+python-multipart = "~=0.0.5"
 
 [dev-packages]
 gunicorn = "~=19.9.0"
