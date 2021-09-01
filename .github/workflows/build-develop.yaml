@@ -1,0 +1,44 @@
+
+name: Build Develop Bothub-NLP-API Image
+on:
+  push:
+    tags:
+      - 'develop-v*.*.*'
+jobs:
+  docker:
+    runs-on: ubuntu-latest
+    environment: 
+      name: develop
+    steps:
+      - name: Check out the repo
+        uses: actions/checkout@v2
+        with:
+          ref: develop
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v1
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v1
+      - name: Set output
+        id: vars
+        run: echo ::set-output name=tag::${GITHUB_REF#refs/*/}
+      - name: Login to DockerHub
+        uses: docker/login-action@v1 
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+      - name: Build and push
+        id: docker_build
+        uses: docker/build-push-action@v2
+        with:
+          context: .
+          file: ./Dockerfile
+          push: true
+          tags: bothubit/bothub-nlp-api:${{ steps.vars.outputs.tag }}
+          build-args: |
+            ENVIRONMENT='${{ secrets.ENVIRONMENT }}'
+            GIT_BRANCH='${{ secrets.GIT_BRANCH }}'
+            GIT_URL='${{ secrets.GIT_URL }}'
+            PORTAINER_URL='${{ secrets.PORTAINER_URL }}'
+            PORTAINER_STACK_ID='${{ secrets.PORTAINER_STACK_ID }}'
+            PORTAINER_ENDPOINT_ID='${{ secrets.PORTAINER_ENDPOINT_ID }}'
+            TRAEFIK_BASE_URL='${{ secrets.TRAEFIK_BASE_URL }}'
