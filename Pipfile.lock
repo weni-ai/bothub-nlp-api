@@ -55,7 +55,7 @@
         },
         "bothub-nlp-celery": {
             "git": "https://github.com/Ilhasoft/bothub-nlp-celery",
-            "ref": "ef29d97f4004474db714b9bc90def40dde876d96"
+            "ref": "03e2721d4986ff89474062648535c8fe0d419b52"
         },
         "cached-property": {
             "hashes": [
