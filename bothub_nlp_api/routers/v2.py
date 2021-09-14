@@ -231,11 +231,18 @@ if settings.BOTHUB_NLP_API_ENABLE_QA_ROUTE:
     @router.post(r"/question-answering/?", response_model=QuestionAnsweringResponse)
     async def question_answering_handler(
         item: QuestionAnsweringRequest,
-        # authorization: str = Header(..., description="Bearer your_key"),
+        request: Request = Depends(AuthorizationRequired()),
+        authorization: str = Header(..., description="Bearer your_key"),
+        user_agent: str = Header(None),
     ):
         try:
             result = question_answering.qa_handler(
-                item.context, item.question, item.language
+                authorization,
+                item.knowledge_base_id,
+                item.question,
+                item.language,
+                user_agent=user_agent,
+                from_backend=item.from_backend,
             )
         except QuestionAnsweringException as err:
             raise HTTPException(status_code=400, detail=err.__str__())

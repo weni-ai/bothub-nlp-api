@@ -183,9 +183,10 @@ class TaskQueueResponse(BaseModel):
 
 
 class QuestionAnsweringRequest(BaseModel):
-    context: str = None
+    knowledge_base_id: int
     question: str = None
-    language: str = None
+    language: str = None,
+    from_backend: bool = False
 
 
 class QuestionAnsweringResponse(BaseModel):
