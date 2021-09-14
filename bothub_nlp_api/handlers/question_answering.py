@@ -65,4 +65,4 @@ def qa_handler(
     )
     log.start()
 
-    return answer
+    return result
