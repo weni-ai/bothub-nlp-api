@@ -10,10 +10,11 @@ class EmptyInputException(QuestionAnsweringException):
 
 class LargeContextException(QuestionAnsweringException):
     def __init__(
-        self, context_length, message="Invalid context length (over 25000 characters)."
+        self, context_length, limit
     ):
         self.context_length = context_length
-        self.message = message
+        self.limit = limit
+        self.message = f"Invalid context length ({self.context_length} > {self.limit} characters)."
         super().__init__(self.message)
 
     def __str__(self):
@@ -22,10 +23,11 @@ class LargeContextException(QuestionAnsweringException):
 
 class LargeQuestionException(QuestionAnsweringException):
     def __init__(
-        self, question_length, message="Invalid question length (over 500 characters)."
+        self, question_length, limit
     ):
         self.question_length = question_length
-        self.message = message
+        self.limit = limit
+        self.message = f"Invalid question length ({self.question_length} > {self.limit} characters)."
         super().__init__(self.message)
 
     def __str__(self):

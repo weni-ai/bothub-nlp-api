@@ -9,9 +9,10 @@ from bothub_nlp_api.exceptions.question_answering_exceptions import (
     LargeContextException,
     EmptyInputException,
 )
-from bothub_nlp_api.utils import backend, repository_authorization_validation
+from bothub_nlp_api.utils import backend, repository_authorization_validation, language_validation
 from bothub_nlp_api.exceptions.celery_exceptions import CeleryTimeoutException
 from celery.exceptions import TimeLimitExceeded
+from bothub_nlp_api.settings import BOTHUB_NLP_API_QA_TEXT_LIMIT, BOTHUB_NLP_API_QA_QUESTION_LIMIT
 
 
 def qa_handler(
@@ -22,17 +23,21 @@ def qa_handler(
     from_backend=False,
     user_agent=None,
 ):
-    if len(question) > 500:
-        raise LargeQuestionException(len(question))
-
+    language_validation(language)
     user_base_authorization = repository_authorization_validation(authorization)
+
+    if not question or type(question) != str:
+        raise EmptyInputException()
+    elif len(question) > BOTHUB_NLP_API_QA_QUESTION_LIMIT:
+        raise LargeQuestionException(len(question), limit=BOTHUB_NLP_API_QA_QUESTION_LIMIT)
+
     request = backend().request_backend_knowledge_bases(user_base_authorization, knowledge_base_id, language)
     text = request.get("text")
 
-    if len(text) > 25000:
-        raise LargeContextException(len(text))
-    if len(text) == 0 or len(question) == 0:
+    if len(text) == 0:
         raise EmptyInputException()
+    elif len(text) > BOTHUB_NLP_API_QA_TEXT_LIMIT:
+        raise LargeContextException(len(text), limit=BOTHUB_NLP_API_QA_TEXT_LIMIT)
 
     try:
         answer_task = celery_app.send_task(
