@@ -52,8 +52,6 @@ class TestParseHandler(unittest.TestCase):
                 self.authorization, "text", "invalid_language", self.repository_version
             )
         with self.assertRaises(ValidationError):
-            _parse(self.authorization, "text", None, self.repository_version)
-        with self.assertRaises(ValidationError):
             _parse(self.authorization, "text", 3, self.repository_version)
 
     def test_invalid_text(self):
