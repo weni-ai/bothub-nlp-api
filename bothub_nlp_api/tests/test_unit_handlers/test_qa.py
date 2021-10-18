@@ -8,6 +8,7 @@ from bothub_nlp_api.handlers.question_answering import qa_handler
 from bothub_nlp_api.exceptions.celery_exceptions import CeleryTimeoutException
 from bothub_nlp_api.exceptions.question_answering_exceptions import (
     EmptyInputException,
+    EmptyBaseException,
     LargeContextException,
     LargeQuestionException,
 )
@@ -111,7 +112,7 @@ class TestParseHandler(unittest.TestCase):
         },
     )
     def test_empty_text(self, *args):
-        with self.assertRaises(EmptyInputException):
+        with self.assertRaises(EmptyBaseException):
             qa_handler(self.authorization, self.knowledge_base_id, self.question, self.language)
 
     @patch(

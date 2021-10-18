@@ -8,6 +8,12 @@ class EmptyInputException(QuestionAnsweringException):
         super().__init__(self.message)
 
 
+class EmptyBaseException(QuestionAnsweringException):
+    def __init__(self, message="Base text is inaccessible or nonexistent"):
+        self.message = message
+        super().__init__(self.message)
+
+
 class LargeContextException(QuestionAnsweringException):
     def __init__(
         self, context_length, limit
