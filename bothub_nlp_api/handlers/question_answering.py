@@ -8,6 +8,7 @@ from bothub_nlp_api.exceptions.question_answering_exceptions import (
     LargeQuestionException,
     LargeContextException,
     EmptyInputException,
+    EmptyBaseException,
 )
 from bothub_nlp_api.utils import backend, repository_authorization_validation, language_validation
 from bothub_nlp_api.exceptions.celery_exceptions import CeleryTimeoutException
@@ -34,8 +35,8 @@ def qa_handler(
     request = backend().request_backend_knowledge_bases(user_base_authorization, knowledge_base_id, language)
     text = request.get("text")
 
-    if len(text) == 0:
-        raise EmptyInputException()
+    if not text:
+        raise EmptyBaseException()
     elif len(text) > BOTHUB_NLP_API_QA_TEXT_LIMIT:
         raise LargeContextException(len(text), limit=BOTHUB_NLP_API_QA_TEXT_LIMIT)
 
