@@ -1,6 +1,7 @@
-from fastapi import Depends, APIRouter, Header, HTTPException
+from fastapi import Depends, Header, HTTPException
 from starlette.requests import Request
 from bothub_nlp_api import settings
+from bothub_nlp_api.api_router import CustomAPIRouter
 
 from bothub_nlp_api.exceptions.question_answering_exceptions import (
     QuestionAnsweringException,
@@ -47,10 +48,11 @@ from bothub_nlp_api.utils import (
     repository_authorization_validation,
 )
 
-router = APIRouter(redirect_slashes=False)
+
+router = CustomAPIRouter()
 
 
-@router.post(r"/parse/?", response_model=ParseResponse)
+@router.post(r"/parse/", response_model=ParseResponse)
 async def parsepost_handler(
     item: ParseRequest,
     request: Request = Depends(AuthorizationRequired()),
@@ -69,12 +71,12 @@ async def parsepost_handler(
     )
 
 
-@router.options(r"/parse/?", status_code=204, include_in_schema=False)
+@router.options(r"/parse/", status_code=204, include_in_schema=False)
 async def parse_options():
     return {}  # pragma: no cover
 
 
-@router.post(r"/debug_parse/?", response_model=DebugParseResponse)
+@router.post(r"/debug_parse/", response_model=DebugParseResponse)
 async def debug_parsepost_handler(
     item: DebugParseRequest,
     request: Request = Depends(AuthorizationRequired()),
@@ -86,12 +88,12 @@ async def debug_parsepost_handler(
     )
 
 
-@router.options(r"/debug_parse/?", status_code=204, include_in_schema=False)
+@router.options(r"/debug_parse/", status_code=204, include_in_schema=False)
 async def debug_parse_options():
     return {}  # pragma: no cover
 
 
-@router.post(r"/sentence_suggestion/?", response_model=SentenceSuggestionResponse)
+@router.post(r"/sentence_suggestion/", response_model=SentenceSuggestionResponse)
 async def sentence_suggestion_post_handler(item: SentenceSuggestionRequest,):
 
     return sentence_suggestion._sentence_suggestion(
@@ -102,13 +104,13 @@ async def sentence_suggestion_post_handler(item: SentenceSuggestionRequest,):
     )
 
 
-@router.options(r"/sentence_suggestion/?", status_code=204, include_in_schema=False)
+@router.options(r"/sentence_suggestion/", status_code=204, include_in_schema=False)
 async def sentence_suggestion_options():
     return {}  # pragma: no cover
 
 
 @router.post(
-    r"/intent_sentence_suggestion/?", response_model=IntentSentenceSuggestionResponse
+    r"/intent_sentence_suggestion/", response_model=IntentSentenceSuggestionResponse
 )
 async def intent_sentence_suggestion_post_handler(
     item: IntentSentenceSuggestionRequest,
@@ -127,13 +129,13 @@ async def intent_sentence_suggestion_post_handler(
 
 
 @router.options(
-    r"/intent_sentence_suggestion/?", status_code=204, include_in_schema=False
+    r"/intent_sentence_suggestion/", status_code=204, include_in_schema=False
 )
 async def intent_sentence_suggestion_options():
     return {}  # pragma: no cover
 
 
-@router.post(r"/word_suggestion/?", response_model=WordSuggestionResponse)
+@router.post(r"/word_suggestion/", response_model=WordSuggestionResponse)
 async def word_suggestion_post_handler(item: WordSuggestionRequest,):
 
     return word_suggestion._word_suggestion(
@@ -141,12 +143,12 @@ async def word_suggestion_post_handler(item: WordSuggestionRequest,):
     )
 
 
-@router.options(r"/word_suggestion/?", status_code=204, include_in_schema=False)
+@router.options(r"/word_suggestion/", status_code=204, include_in_schema=False)
 async def word_suggestion_options():
     return {}  # pragma: no cover
 
 
-@router.post(r"/words_distribution/?", response_model=WordsDistributionResponse)
+@router.post(r"/words_distribution/", response_model=WordsDistributionResponse)
 async def words_distribution_post_handler(
     item: WordsDistributionRequest,
     request: Request = Depends(AuthorizationRequired()),
@@ -157,12 +159,12 @@ async def words_distribution_post_handler(
     )
 
 
-@router.options(r"/words_distribution/?", status_code=204, include_in_schema=False)
+@router.options(r"/words_distribution/", status_code=204, include_in_schema=False)
 async def words_distribution_options():
     return {}  # pragma: no cover
 
 
-@router.post(r"/train/?", response_model=TrainResponse)
+@router.post(r"/train/", response_model=TrainResponse)
 async def train_handler(
     item: TrainRequest,
     request: Request = Depends(AuthorizationRequired()),
@@ -174,13 +176,12 @@ async def train_handler(
     return result
 
 
-@router.options(r"/train/?", status_code=204, include_in_schema=False)
+@router.options(r"/train/", status_code=204, include_in_schema=False)
 async def train_options():
     return {}  # pragma: no cover
 
 
-# @router.get(r"/info/?", response_model=InfoResponse)
-@router.get(r"/info/?")
+@router.get(r"/info/")
 async def info_handler(
     request: Request = Depends(AuthorizationRequired()),
     Authorization: str = Header(..., description="Bearer your_key"),
@@ -192,12 +193,12 @@ async def info_handler(
     return info
 
 
-@router.options(r"/info/?", status_code=204, include_in_schema=False)
+@router.options(r"/info/", status_code=204, include_in_schema=False)
 async def info_options():
     return {}  # pragma: no cover
 
 
-@router.post(r"/evaluate/?", response_model=EvaluateResponse)
+@router.post(r"/evaluate/", response_model=EvaluateResponse)
 async def evaluate_handler(
     item: EvaluateRequest,
     request: Request = Depends(AuthorizationRequired()),
@@ -216,26 +217,33 @@ async def evaluate_handler(
     return result
 
 
-@router.options(r"/evaluate/?", status_code=204, include_in_schema=False)
+@router.options(r"/evaluate/", status_code=204, include_in_schema=False)
 async def evaluate_options():
     return {}  # pragma: no cover
 
 
-@router.get(r"/task-queue/?", response_model=TaskQueueResponse)
+@router.get(r"/task-queue/", response_model=TaskQueueResponse)
 async def task_queue_handler(id_task: str, from_queue: str):
 
     return task_queue.task_queue_handler(id_task, from_queue)
 
 
 if settings.BOTHUB_NLP_API_ENABLE_QA_ROUTE:
-    @router.post(r"/question-answering/?", response_model=QuestionAnsweringResponse)
+    @router.post(r"/question-answering/", response_model=QuestionAnsweringResponse)
     async def question_answering_handler(
         item: QuestionAnsweringRequest,
-        # authorization: str = Header(..., description="Bearer your_key"),
+        request: Request = Depends(AuthorizationRequired()),
+        authorization: str = Header(..., description="Bearer your_key"),
+        user_agent: str = Header(None),
     ):
         try:
             result = question_answering.qa_handler(
-                item.context, item.question, item.language
+                authorization,
+                item.knowledge_base_id,
+                item.question,
+                item.language,
+                user_agent=user_agent,
+                from_backend=item.from_backend,
             )
         except QuestionAnsweringException as err:
             raise HTTPException(status_code=400, detail=err.__str__())
