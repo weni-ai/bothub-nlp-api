@@ -48,6 +48,16 @@ Use ```make``` commands to ```init_development_env```.
 | BOTHUB_NLP_SENTRY | `str` | `None` | Sentry Client URL |
 | SUPPORTED_LANGUAGES | `str` | `en|pt` | Set supported languages. Separate languages using `|` |
 
+### QA tasks
+
+| Variable | Type | Default | Description |
+|--|--|--|--|
+
+| BOTHUB_NLP_API_ENABLE_QA_ROUTE | `bool` | `False` | Enable QA api route |
+| BOTHUB_NLP_API_QA_TEXT_LIMIT | `int` | `25000` | Limit of characters allowed in QA text |
+| BOTHUB_NLP_API_QA_QUESTION_LIMIT | `int` | `500` | Limit of characters allowed in QA question |
+
+
 ### Training
 
 | Variable | Type | Default | Description |
