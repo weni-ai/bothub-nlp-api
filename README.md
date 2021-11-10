@@ -61,7 +61,7 @@ Use ```make``` commands to ```init_development_env```.
 
 | Variable | Type | Default | Description |
 |--|--|--|--|
-| BOTHUB_SERVICE_TRAIN | `str` | `celery` | 'celery' to train on celery worker or 'ai-platform' to use GCP service |
+| BOTHUB_SERVICE_TRAIN | `str` | `celery` | `celery` to train on celery worker or `ai-platform` to use GCP service |
 | BOTHUB_GOOGLE_PROJECT_ID | `int` | `None` | GCP project id |
 | BOTHUB_GOOGLE_CREDENTIALS_REFRESH_TOKEN | `str` | `None` | GCP credentials |
 | BOTHUB_GOOGLE_CREDENTIALS_TOKEN_URI | `str` | `None` | GCP credentials |
