@@ -77,7 +77,7 @@ Needed variables to connect to celery running on workers
 
 | Variable | Type | Default | Description |
 |--|--|--|--|
-| BOTHUB_NLP_CELERY_BROKER_URL | `str` | `redis://localhost:6379/0	` | `Celery Broker URL, check usage instructions in Celery Docs` |
+| BOTHUB_NLP_CELERY_BROKER_URL | `str` | `redis://localhost:6379/0` | Celery Broker URL, check usage instructions in [Celery Docs](http://docs.celeryproject.org/en/latest/index.html) |
 | BOTHUB_NLP_CELERY_BACKEND_URL | `str` | `BOTHUB_NLP_CELERY_BROKER_URL` value | Celery Backend URL, check usage instructions in [Celery Docs](http://docs.celeryproject.org/en/latest/index.html) |
 
 ### Celery queue
