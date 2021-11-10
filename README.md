@@ -70,7 +70,7 @@ Use ```make``` commands to ```init_development_env```.
 | BOTHUB_GOOGLE_AI_PLATFORM_REGISTRY | `str` | `us.gcr.io/bothub/bothub-nlp-ai-platform` | Google Container Registry (GCR) project url |
 | BOTHUB_GOOGLE_AI_PLATFORM_IMAGE_VERSION | `str` | `1.0.0` | String to match built image version in google GCR |
 | BOTHUB_GOOGLE_AI_PLATFORM_PACKAGE_URI | `list` | `["gs://poc-training-ai-platform/bothub-nlp-ai-platform/bothub-nlp-ai-platform-0.1.tar.gz"]` |  |
-| BOTHUB_GOOGLE_AI_PLATFORM_JOB_TIMEOUT | `int` | `None` | Time limit a job can run before sending a cancel signal |
+| BOTHUB_GOOGLE_AI_PLATFORM_JOB_TIMEOUT | `int` | `None` | Time limit (seconds) a job can run before sending a cancel signal to GCP |
 
 ### Celery connection
 Needed variables to connect to celery running on workers
