@@ -136,12 +136,15 @@ def send_job_train_ai_platform(
     type_model,
     operation="train",
 ):
-    if type_model == "BERT" and language not in celery_settings.BERT_LANGUAGES:
+    if (
+        type_model == "BERT" and
+        (language == "xx" or language not in celery_settings.AVAILABLE_BERT_MODELS)
+    ):
         image_sufix = "-xx-BERT"
     elif type_model is not None:
         image_sufix = f"-{language}-{type_model}"
     else:
-        image_sufix = "-xx-SPACY"
+        image_sufix = "-xx-NONE"
 
     args = [
         "--operation",
@@ -235,14 +238,14 @@ def get_language_model(update):
     model = ALGORITHM_TO_LANGUAGE_MODEL[update.get("algorithm")]
     language = update.get("language")
 
-    if model == "SPACY" and language not in celery_settings.SPACY_LANGUAGES:
+    if model == "SPACY" and language not in celery_settings.AVAILABLE_SPACY_MODELS:
         model = None
 
     # Send parse to SPACY worker to use name_entities (only if BERT not in use)
     if (
         (update.get("use_name_entities"))
         and (model is None)
-        and (language in celery_settings.SPACY_LANGUAGES)
+        and (language in celery_settings.AVAILABLE_SPACY_MODELS)
     ):
         model = "SPACY"
 
