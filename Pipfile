@@ -9,7 +9,7 @@ lint = "flake8"
 [packages]
 uvicorn = "~=0.11.8"
 bothub_backend = {ref = "1.0.23",git = "https://github.com/Ilhasoft/bothub-backend"}
-bothub_nlp_celery = {ref = "0.1.37",git = "https://github.com/Ilhasoft/bothub-nlp-celery"}
+bothub_nlp_celery = {ref = "0.1.38",git = "https://github.com/Ilhasoft/bothub-nlp-celery"}
 requests = "~=2.20.1"
 google-api-python-client = "~=1.9.1"
 fastapi = "~=0.65.2"
