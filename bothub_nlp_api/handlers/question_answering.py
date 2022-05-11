@@ -51,7 +51,7 @@ def qa_handler(
     except TimeLimitExceeded:
         raise CeleryTimeoutException()
 
-    answer = result["answers"][0]
+    answer = result["answers"][0] if len(result["answers"]) > 0 else ""
 
     log = threading.Thread(
         target=backend().send_log_qa_nlp_parse,
