@@ -51,14 +51,21 @@ def qa_handler(
     except TimeLimitExceeded:
         raise CeleryTimeoutException()
 
-    answer = result["answers"][0] if len(result["answers"]) > 0 else ""
+    if len(result["answers"]) > 0:
+        answer_object = result["answers"][0]
+
+        answer = answer_object["text"]
+        confidence = float(answer_object["confidence"])
+    else:
+        answer = ""
+        confidence = .0
 
     log = threading.Thread(
         target=backend().send_log_qa_nlp_parse,
         kwargs={
             "data": {
-                "answer": answer["text"],
-                "confidence": float(answer["confidence"]),
+                "answer": answer,
+                "confidence": confidence,
                 "question": question,
                 "user_agent": user_agent,
                 "nlp_log": json.dumps(result),
