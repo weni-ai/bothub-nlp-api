@@ -1,5 +1,6 @@
 import threading
 import json
+import requests
 
 from bothub_nlp_celery.app import celery_app
 from bothub_nlp_celery.tasks import TASK_NLU_QUESTION_ANSWERING
@@ -10,10 +11,11 @@ from bothub_nlp_api.exceptions.question_answering_exceptions import (
     EmptyInputException,
     EmptyBaseException,
 )
+from bothub_nlp_api.utils import language_to_qa_model
 from bothub_nlp_api.utils import backend, repository_authorization_validation, language_validation
 from bothub_nlp_api.exceptions.celery_exceptions import CeleryTimeoutException
 from celery.exceptions import TimeLimitExceeded
-from bothub_nlp_api.settings import BOTHUB_NLP_API_QA_TEXT_LIMIT, BOTHUB_NLP_API_QA_QUESTION_LIMIT
+from bothub_nlp_api.settings import BOTHUB_NLP_API_QA_TEXT_LIMIT, BOTHUB_NLP_API_QA_QUESTION_LIMIT, BOTHUB_TORCHSERVE_URL
 
 
 def qa_handler(
@@ -40,16 +42,7 @@ def qa_handler(
     elif len(text) > BOTHUB_NLP_API_QA_TEXT_LIMIT:
         raise LargeContextException(len(text), limit=BOTHUB_NLP_API_QA_TEXT_LIMIT)
 
-    try:
-        answer_task = celery_app.send_task(
-            TASK_NLU_QUESTION_ANSWERING,
-            args=[text, question, language],
-            queue=queue_name(language, ACTION_QUESTION_ANSWERING, "QA"),
-        )
-        answer_task.wait()
-        result = answer_task.result
-    except TimeLimitExceeded:
-        raise CeleryTimeoutException()
+    result = request_torchserve(text, question, language)
 
     if len(result["answers"]) > 0:
         answer_object = result["answers"][0]
@@ -79,3 +72,13 @@ def qa_handler(
     log.start()
 
     return result
+
+def request_torchserve(text, question, language):
+    model = language_to_qa_model.get(language, "multilang")
+    url = f"{BOTHUB_TORCHSERVE_URL}/predictions/{model}"
+
+    payload = json.dumps(dict(question=question, context=text))
+    headers = {"Content-type": "application/json"}
+
+    response = requests.request("POST", url, headers=headers, data=payload)
+    return response.json()
