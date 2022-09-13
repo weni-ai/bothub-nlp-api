@@ -250,3 +250,9 @@ def get_language_model(update):
         model = "SPACY"
 
     return model
+
+language_to_qa_model = {
+    'en': 'en',
+    'pt_br': 'pt_br',
+    'pt': 'pt_br',
+}

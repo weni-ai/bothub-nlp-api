@@ -21,6 +21,7 @@ env = environ.Env(
     BOTHUB_NLP_SENTRY=(str, None),
     SUPPORTED_LANGUAGES=(cast_supported_languages, "en|pt"),
     BOTHUB_ENGINE_URL=(str, "https://api.bothub.it"),
+    BOTHUB_TORCHSERVE_URL=(str, "https://torchserve.weni.ai"),
     BOTHUB_GOOGLE_PROJECT_ID=(str, None),
     BOTHUB_GOOGLE_CREDENTIALS_REFRESH_TOKEN=(str, None),
     BOTHUB_GOOGLE_CREDENTIALS_TOKEN_URI=(str, None),
@@ -67,7 +68,7 @@ SUPPORTED_LANGUAGES = env.get_value(
 )
 
 BOTHUB_ENGINE_URL = env.str("BOTHUB_ENGINE_URL")
-
+BOTHUB_TORCHSERVE_URL = env.str("BOTHUB_TORCHSERVE_URL")
 
 BOTHUB_SERVICE_TRAIN = env.str("BOTHUB_SERVICE_TRAIN", default="celery")
 
