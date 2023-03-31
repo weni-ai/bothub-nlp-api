@@ -2,9 +2,6 @@ import threading
 import json
 import requests
 
-from bothub_nlp_celery.app import celery_app
-from bothub_nlp_celery.tasks import TASK_NLU_QUESTION_ANSWERING
-from bothub_nlp_celery.actions import ACTION_QUESTION_ANSWERING, queue_name
 from bothub_nlp_api.exceptions.question_answering_exceptions import (
     LargeQuestionException,
     LargeContextException,
@@ -13,7 +10,6 @@ from bothub_nlp_api.exceptions.question_answering_exceptions import (
 )
 from bothub_nlp_api.utils import backend, repository_authorization_validation, language_validation, language_to_qa_model
 from bothub_nlp_api.exceptions.celery_exceptions import CeleryTimeoutException
-from celery.exceptions import TimeLimitExceeded
 from bothub_nlp_api.settings import BOTHUB_NLP_API_QA_TEXT_LIMIT, BOTHUB_NLP_API_QA_QUESTION_LIMIT, BOTHUB_TORCHSERVE_URL
 
 
