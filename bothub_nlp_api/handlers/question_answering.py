@@ -87,7 +87,7 @@ def request_chatgpt(text, question, language):
 
     if choices:
         generated_text = choices[0]['message']['content']
-        answers = [dict(text=generated_text, confidence=1.0)]
+        answers = [dict(text=generated_text, confidence=1.0)] if generated_text != "😕" else []
     
     return dict(answers=answers, id="0")
 
