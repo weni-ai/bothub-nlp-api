@@ -8,8 +8,6 @@ lint = "flake8"
 
 [packages]
 uvicorn = "~=0.11.8"
-bothub_backend = {ref = "1.0.23",git = "https://github.com/Ilhasoft/bothub-backend"}
-bothub_nlp_celery = {ref = "0.1.38",git = "https://github.com/Ilhasoft/bothub-nlp-celery"}
 requests = "~=2.20.1"
 google-api-python-client = "~=1.9.1"
 fastapi = "~=0.65.2"
@@ -18,6 +16,9 @@ django-environ = "~=0.4.5"
 email-validator = "~=1.1.1"
 redis = "~=3.5.3"
 python-multipart = "~=0.0.5"
+bothub-backend = {editable = true, git = "https://github.com/weni-ai/bothub-backend"}
+bothub-nlp-celery = {editable = true, ref = "feature/remove-spacy", git = "https://github.com/weni-ai/bothub-nlp-celery.git"}
+openai = "*"
 
 [dev-packages]
 gunicorn = "~=19.9.0"
@@ -26,4 +27,4 @@ black = "==19.3b0"
 coverage = "*"
 
 [requires]
-python_version = "3.6"
+python_version = "3.10"
