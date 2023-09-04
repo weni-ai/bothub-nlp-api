@@ -120,29 +120,29 @@ def _parse(
     if "intent_ranking" not in answer or answer.get("intent_ranking") is None:
         answer.update({"intent_ranking": []})
 
-    # log = threading.Thread(
-    #     target=backend().send_log_nlp_parse,
-    #     kwargs={
-    #         "data": {
-    #             "text": text,
-    #             "from_backend": from_backend,
-    #             "user_agent": user_agent,
-    #             "user": str(repository_authorization),
-    #             "repository_version_language": int(
-    #                 repository.get("repository_version")
-    #             ),
-    #             "nlp_log": json.dumps(answer),
-    #             "log_intent": [
-    #                 {
-    #                     "intent": result["name"],
-    #                     "is_default": result["name"] == answer["intent"]["name"],
-    #                     "confidence": result["confidence"],
-    #                 }
-    #                 for result in answer.get("intent_ranking", [])
-    #             ],
-    #         }
-    #     },
-    # )
-    # log.start()
+    log = threading.Thread(
+        target=backend().send_log_nlp_parse,
+        kwargs={
+            "data": {
+                "text": text,
+                "from_backend": from_backend,
+                "user_agent": user_agent,
+                "user": str(repository_authorization),
+                "repository_version_language": int(
+                    repository.get("repository_version")
+                ),
+                "nlp_log": json.dumps(answer),
+                "log_intent": [
+                    {
+                        "intent": result["name"],
+                        "is_default": result["name"] == answer["intent"]["name"],
+                        "confidence": result["confidence"],
+                    }
+                    for result in answer.get("intent_ranking", [])
+                ],
+            }
+        },
+    )
+    log.start()
 
     return answer
