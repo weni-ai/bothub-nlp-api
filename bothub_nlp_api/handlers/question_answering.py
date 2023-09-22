@@ -10,6 +10,7 @@ from bothub_nlp_api.exceptions.question_answering_exceptions import (
     LargeContextException,
     EmptyInputException,
     EmptyBaseException,
+    TokenLimitException,
 )
 from bothub_nlp_api.utils import backend, repository_authorization_validation, language_validation, language_to_qa_model
 from bothub_nlp_api.exceptions.celery_exceptions import CeleryTimeoutException
@@ -36,9 +37,10 @@ def qa_handler(
     text = request.get("text")
 
     if not text:
+        if request.get("detail") and request.get("detail").get("chunks"):
+            raise TokenLimitException(text_overflow=request.get("detail").get("chunks"))
+
         raise EmptyBaseException()
-    elif len(text) > BOTHUB_NLP_API_QA_TEXT_LIMIT:
-        raise LargeContextException(len(text), limit=BOTHUB_NLP_API_QA_TEXT_LIMIT)
 
     result = request_chatgpt(text, question, language)
 
