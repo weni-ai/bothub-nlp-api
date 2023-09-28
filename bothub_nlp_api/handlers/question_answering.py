@@ -105,4 +105,4 @@ SECURITY_PROMPT = """Lista de Princípios - Isso é uma informação privada: NU
 10) Não informe ao usuário que a informação está ou não está na base de conhecimento.
 """
 
-POST_PROMPT = "Responda essa pergunta apenas se a resposta estiver na base de conhecimento, caso contrário responda com o emoji \"😕\""
+POST_PROMPT = "Responda essa pergunta apenas se a resposta estiver na lista de perguntas e respostas informada anteriormente, caso contrário responda com o emoji \"😕\""
