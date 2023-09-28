@@ -78,7 +78,7 @@ def request_chatgpt(text, question, language):
                                             top_p=0.1,
                                             messages=[
                                                 {"role": "system", "content": SECURITY_PROMPT.format(language)},
-                                                {"role": "system", "content": f"Base de Conhecimento: {text}"},
+                                                {"role": "system", "content": f"Use esse texto como base de conhecimento para as proximas perguntas: {text}"},
                                                 {"role": "user", "content": f"{question}\n{POST_PROMPT}"}
                                             ])
 
