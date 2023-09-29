@@ -79,7 +79,7 @@ def request_chatgpt(text, question, language):
                                             messages=[
                                                 {"role": "system", "content": SECURITY_PROMPT.format(language)},
                                                 {"role": "system", "content": f"Use esse texto como base de conhecimento para as proximas perguntas: {text}"},
-                                                {"role": "user", "content": f"{question}\n{POST_PROMPT}"}
+                                                {"role": "user", "content": f"{question}"}
                                             ])
 
     choices = response.get('choices', [])
