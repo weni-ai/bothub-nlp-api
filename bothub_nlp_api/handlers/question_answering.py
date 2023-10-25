@@ -37,6 +37,10 @@ def qa_handler(
     text = request.get("text")
 
     if not text:
+
+        print(f"[+] Text: {text}")
+        print(f"[+] Request: {request}")
+
         if request.get("detail") and request.get("detail").get("chunks"):
             raise TokenLimitException(text_overflow=request.get("detail").get("chunks"))
 
