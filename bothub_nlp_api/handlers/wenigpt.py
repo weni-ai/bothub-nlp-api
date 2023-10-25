@@ -28,12 +28,12 @@ def wenigpt_handler(
     if not question or not isinstance(question, str):
         raise EmptyInputException()
 
-    request = backend().request_backend_knowledge_bases(user_base_authorization, knowledge_base_id)
+    request = backend().request_backend_knowledge_bases(user_base_authorization, knowledge_base_id, language)
     text = request.get("text")
     if not text:
         raise EmptyBaseException()
 
-    result = request_wenigpt(text, question, language)
+    result = request_wenigpt(text, question)
 
     text_answer = result["output"].get("text")
     answer = text_answer[0] if text_answer else ""
