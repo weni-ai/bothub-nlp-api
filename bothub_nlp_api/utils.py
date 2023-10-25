@@ -83,6 +83,13 @@ def language_validation(language):
     return
 
 
+def wenigpt_language_validation(language: str):
+    valid_languages = ['pt', 'pt_br']
+    if language and language.lower() in valid_languages:
+        return
+    raise ValidationError(f"Language '{language}' not supported by now.")
+
+
 def get_train_job_status(job_name):
     jobId = f"projects/{settings.BOTHUB_GOOGLE_PROJECT_ID}/jobs/{job_name}"
 

@@ -18,6 +18,7 @@ from bothub_nlp_api.handlers import (
     words_distribution,
     train,
     question_answering,
+    wenigpt
 )
 
 from bothub_nlp_api.models import (
@@ -236,18 +237,34 @@ if settings.BOTHUB_NLP_API_ENABLE_QA_ROUTE:
         authorization: str = Header(..., description="Bearer your_key"),
         user_agent: str = Header(None),
     ):
-        try:
-            result = question_answering.qa_handler(
-                authorization,
-                item.knowledge_base_id,
-                item.question,
-                item.language,
-                user_agent=user_agent,
-                from_backend=item.from_backend,
-            )
-        except QuestionAnsweringException as err:
-            raise HTTPException(status_code=400, detail=err.__str__())
-        if result.get("status") and result.get("error"):
-            raise HTTPException(status_code=400, detail=result)
+        weni_gpt_languages = ['pt', 'pt_br']
+        if item.language in weni_gpt_languages:
+            try:
+                result = wenigpt.wenigpt_handler(
+                    authorization,
+                    item.knowledge_base_id,
+                    item.question,
+                    item.language,
+                    user_agent=user_agent,
+                    from_backend=item.from_backend,
+                )
+            except QuestionAnsweringException as err:
+                raise HTTPException(status_code=400, detail=err.__str__())
+            if result.get("status") and result.get("error"):
+                raise HTTPException(status_code=400, detail=result)
+        else:
+            try:
+                result = question_answering.qa_handler(
+                    authorization,
+                    item.knowledge_base_id,
+                    item.question,
+                    item.language,
+                    user_agent=user_agent,
+                    from_backend=item.from_backend,
+                )
+            except QuestionAnsweringException as err:
+                raise HTTPException(status_code=400, detail=err.__str__())
+            if result.get("status") and result.get("error"):
+                raise HTTPException(status_code=400, detail=result)
 
         return result
