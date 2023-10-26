@@ -94,7 +94,7 @@ def request_wenigpt(context, question):
     text_answers = response_json["output"].get("text")
 
     if text_answers:
-        text_answers = [{"text": answer} for answer in text_answers]
+        text_answers = [{"text": answer.strip()} for answer in text_answers]
     else:
         text_answers = []
 
