@@ -249,6 +249,8 @@ if settings.BOTHUB_NLP_API_ENABLE_QA_ROUTE:
                     user_agent=user_agent,
                     from_backend=item.from_backend,
                 )
+            except TokenLimitException as err:
+                raise HTTPException(status_code=400, detail=err.__dict__)
             except QuestionAnsweringException as err:
                 raise HTTPException(status_code=400, detail=err.__str__())
             if result.get("status") and result.get("error"):
