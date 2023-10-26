@@ -4,7 +4,7 @@ from bothub_nlp_api import settings
 from bothub_nlp_api.api_router import CustomAPIRouter
 
 from bothub_nlp_api.exceptions.question_answering_exceptions import (
-    QuestionAnsweringException,
+    QuestionAnsweringException, TokenLimitException
 )
 
 from bothub_nlp_api.handlers import (
@@ -237,6 +237,7 @@ if settings.BOTHUB_NLP_API_ENABLE_QA_ROUTE:
         authorization: str = Header(..., description="Bearer your_key"),
         user_agent: str = Header(None),
     ):
+
         weni_gpt_languages = ['pt', 'pt_br']
         if item.language in weni_gpt_languages:
             try:
@@ -262,6 +263,8 @@ if settings.BOTHUB_NLP_API_ENABLE_QA_ROUTE:
                     user_agent=user_agent,
                     from_backend=item.from_backend,
                 )
+            except TokenLimitException as err:
+                raise HTTPException(status_code=400, detail=err.__dict__)
             except QuestionAnsweringException as err:
                 raise HTTPException(status_code=400, detail=err.__str__())
             if result.get("status") and result.get("error"):

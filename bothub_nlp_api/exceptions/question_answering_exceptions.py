@@ -8,6 +8,17 @@ class EmptyInputException(QuestionAnsweringException):
         super().__init__(self.message)
 
 
+class TokenLimitException(Exception):
+    def __init__(self, text_overflow, message="Your text exceeds the limit of allowed tokens, please edit and try again") -> None:
+        self.message = message
+        self.text_overflow = text_overflow
+        self.response = {
+            "message": self.message,
+            "text_overflow": self.text_overflow,
+        }
+        super().__init__(self.response)
+
+
 class EmptyBaseException(QuestionAnsweringException):
     def __init__(self, message="Base text is inaccessible or nonexistent"):
         self.message = message
