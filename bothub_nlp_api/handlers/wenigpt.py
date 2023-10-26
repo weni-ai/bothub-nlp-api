@@ -33,10 +33,8 @@ def wenigpt_handler(
     if not text:
         raise EmptyBaseException()
 
-    result = request_wenigpt(text, question)
-
-    text_answer = result["output"].get("text")
-    answer = text_answer[0] if text_answer else ""
+    response_gpt = request_wenigpt(text, question)
+    answer = response_gpt["answers"]
 
     log = threading.Thread(
         target=backend().send_log_qa_nlp_parse,
@@ -46,7 +44,7 @@ def wenigpt_handler(
                 "confidence": 1.0,
                 "question": question,
                 "user_agent": user_agent,
-                "nlp_log": json.dumps(result),
+                "nlp_log": json.dumps(response_gpt),
                 "user": str(user_base_authorization),
                 "knowledge_base": int(knowledge_base_id),
                 "language": language,
@@ -56,7 +54,7 @@ def wenigpt_handler(
     )
     log.start()
 
-    return result
+    return response_gpt
 
 
 def request_wenigpt(context, question):
@@ -68,7 +66,7 @@ def request_wenigpt(context, question):
 
     headers = {
         "Content-Type": "application/json",
-        "Authorization": f"bearer {token}",
+        "Authorization": f"Bearer {token}",
         "Cookie": cookie
     }
     data = {
@@ -91,4 +89,13 @@ def request_wenigpt(context, question):
         response = requests.request("POST", url, headers=headers, data=json.dumps(data))
     except Exception as e:
         response = {"error": str(e)}
-    return response.json()
+
+    response_json = response.json()
+    text_answers = response_json["output"].get("text")
+
+    if text_answers:
+        text_answers = [{"text": answer} for answer in text_answers]
+    else:
+        text_answers = []
+
+    return {"answers": text_answers, "id": "0"}
