@@ -16,7 +16,7 @@ from bothub_nlp_api import settings
 
 def backend():
     return bothub_backend.get_backend(
-        "bothub_backend.bothub.BothubBackend", bothub_nlp_api.settings.BOTHUB_ENGINE_URL
+        "bothub_backend.bothub.BothubBackend", settings.BOTHUB_ENGINE_URL
     )
 
 
