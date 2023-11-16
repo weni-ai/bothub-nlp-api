@@ -1,6 +1,7 @@
 import threading
 import json
 import openai
+import requests
 
 from bothub_nlp_celery.app import celery_app
 from bothub_nlp_celery.tasks import TASK_NLU_QUESTION_ANSWERING
@@ -12,7 +13,7 @@ from bothub_nlp_api.exceptions.question_answering_exceptions import (
     EmptyBaseException,
     TokenLimitException,
 )
-from bothub_nlp_api.utils import backend, repository_authorization_validation, language_validation, language_to_qa_model
+from bothub_nlp_api.utils import backend, repository_authorization_validation, language_validation, language_to_qa_model, request_wenigpt
 from bothub_nlp_api.exceptions.celery_exceptions import CeleryTimeoutException
 from bothub_nlp_api.settings import (
     BOTHUB_NLP_API_QA_TEXT_LIMIT,
@@ -46,13 +47,16 @@ def qa_handler(
 
         raise EmptyBaseException()
 
-    result = request_chatgpt(text, question, language)
-
+    if language in ["pt", "pt_br"]:
+        result = request_wenigpt(text, question)
+    else:
+        result = request_chatgpt(text, question, language)
+    
     if len(result["answers"]) > 0:
         answer_object = result["answers"][0]
 
         answer = answer_object["text"]
-        confidence = float(answer_object["confidence"])
+        confidence = float(answer_object.get("confidence", 1))
     else:
         answer = ""
         confidence = .0
