@@ -85,7 +85,7 @@ def language_validation(language):
 
 
 def wenigpt_language_validation(language: str):
-    valid_languages = ['pt', 'pt_br']
+    valid_languages = settings.WENIGPT_SUPPORTED_LANGUAGES.split("|")
     if language and language.lower() in valid_languages:
         return
     raise ValidationError(f"Language '{language}' not supported by now.")

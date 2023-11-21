@@ -13,12 +13,20 @@ from bothub_nlp_api.exceptions.question_answering_exceptions import (
     EmptyBaseException,
     TokenLimitException,
 )
-from bothub_nlp_api.utils import backend, repository_authorization_validation, language_validation, language_to_qa_model, request_wenigpt
+from bothub_nlp_api.utils import (
+    backend,
+    repository_authorization_validation,
+    language_validation,
+    language_to_qa_model,
+    request_wenigpt,
+    wenigpt_language_validation,
+)
 from bothub_nlp_api.exceptions.celery_exceptions import CeleryTimeoutException
 from bothub_nlp_api.settings import (
     BOTHUB_NLP_API_QA_TEXT_LIMIT,
     BOTHUB_NLP_API_QA_QUESTION_LIMIT,
     OPENAI_API_KEY,
+    WENIGPT_SUPPORTED_LANGUAGES,
 )
 
 
@@ -30,7 +38,13 @@ def qa_handler(
     from_backend=False,
     user_agent=None,
 ):
-    language_validation(language)
+    weni_gpt_langs = WENIGPT_SUPPORTED_LANGUAGES.split("|")
+
+    if language in weni_gpt_langs:
+        wenigpt_language_validation(language)
+    else:
+        language_validation(language)
+
     user_base_authorization = repository_authorization_validation(authorization)
 
     if not question or type(question) != str:
@@ -47,7 +61,7 @@ def qa_handler(
 
         raise EmptyBaseException()
 
-    if language in ["pt", "pt_br"]:
+    if language in weni_gpt_langs:
         result = request_wenigpt(text, question)
     else:
         result = request_chatgpt(text, question, language)
