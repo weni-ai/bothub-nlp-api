@@ -17,8 +17,7 @@ from bothub_nlp_api.handlers import (
     word_suggestion,
     words_distribution,
     train,
-    question_answering,
-    wenigpt
+    question_answering
 )
 
 from bothub_nlp_api.models import (
