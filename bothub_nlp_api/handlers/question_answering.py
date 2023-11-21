@@ -51,7 +51,7 @@ def qa_handler(
         result = request_wenigpt(text, question)
     else:
         result = request_chatgpt(text, question, language)
-    
+
     if len(result["answers"]) > 0:
         answer_object = result["answers"][0]
 
@@ -84,8 +84,8 @@ def qa_handler(
 
 def request_chatgpt(text, question, language):
     openai.api_key = OPENAI_API_KEY
-    response = openai.ChatCompletion.create(model="gpt-3.5-turbo", 
-                                            temperature=0.1, 
+    response = openai.ChatCompletion.create(model="gpt-3.5-turbo",
+                                            temperature=0.1,
                                             top_p=0.1,
                                             messages=[
                                                 {"role": "system", "content": SECURITY_PROMPT.format(language)},
