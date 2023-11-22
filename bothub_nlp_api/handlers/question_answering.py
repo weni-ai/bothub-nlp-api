@@ -1,6 +1,7 @@
 import threading
 import json
 import openai
+import requests
 
 from bothub_nlp_celery.app import celery_app
 from bothub_nlp_celery.tasks import TASK_NLU_QUESTION_ANSWERING
@@ -12,12 +13,20 @@ from bothub_nlp_api.exceptions.question_answering_exceptions import (
     EmptyBaseException,
     TokenLimitException,
 )
-from bothub_nlp_api.utils import backend, repository_authorization_validation, language_validation, language_to_qa_model
+from bothub_nlp_api.utils import (
+    backend,
+    repository_authorization_validation,
+    language_validation,
+    language_to_qa_model,
+    request_wenigpt,
+    wenigpt_language_validation,
+)
 from bothub_nlp_api.exceptions.celery_exceptions import CeleryTimeoutException
 from bothub_nlp_api.settings import (
     BOTHUB_NLP_API_QA_TEXT_LIMIT,
     BOTHUB_NLP_API_QA_QUESTION_LIMIT,
     OPENAI_API_KEY,
+    WENIGPT_SUPPORTED_LANGUAGES,
 )
 
 
@@ -29,7 +38,13 @@ def qa_handler(
     from_backend=False,
     user_agent=None,
 ):
-    language_validation(language)
+    weni_gpt_langs = WENIGPT_SUPPORTED_LANGUAGES.split("|")
+
+    if language in weni_gpt_langs:
+        wenigpt_language_validation(language)
+    else:
+        language_validation(language)
+
     user_base_authorization = repository_authorization_validation(authorization)
 
     if not question or type(question) != str:
@@ -46,13 +61,16 @@ def qa_handler(
 
         raise EmptyBaseException()
 
-    result = request_chatgpt(text, question, language)
+    if language in weni_gpt_langs:
+        result = request_wenigpt(text, question)
+    else:
+        result = request_chatgpt(text, question, language)
 
     if len(result["answers"]) > 0:
         answer_object = result["answers"][0]
 
         answer = answer_object["text"]
-        confidence = float(answer_object["confidence"])
+        confidence = float(answer_object.get("confidence", 1))
     else:
         answer = ""
         confidence = .0
@@ -80,8 +98,8 @@ def qa_handler(
 
 def request_chatgpt(text, question, language):
     openai.api_key = OPENAI_API_KEY
-    response = openai.ChatCompletion.create(model="gpt-3.5-turbo", 
-                                            temperature=0.1, 
+    response = openai.ChatCompletion.create(model="gpt-3.5-turbo",
+                                            temperature=0.1,
                                             top_p=0.1,
                                             messages=[
                                                 {"role": "system", "content": SECURITY_PROMPT.format(language)},

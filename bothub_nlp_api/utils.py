@@ -2,9 +2,10 @@ import time
 import threading
 import bothub_backend
 import google.oauth2.credentials
-import bothub_nlp_api.settings
 import bothub_nlp_celery.settings as celery_settings
+import json
 import logging
+import requests
 
 from fastapi import HTTPException, Header
 from googleapiclient import discovery
@@ -15,7 +16,7 @@ from bothub_nlp_api import settings
 
 def backend():
     return bothub_backend.get_backend(
-        "bothub_backend.bothub.BothubBackend", bothub_nlp_api.settings.BOTHUB_ENGINE_URL
+        "bothub_backend.bothub.BothubBackend", settings.BOTHUB_ENGINE_URL
     )
 
 
@@ -84,7 +85,7 @@ def language_validation(language):
 
 
 def wenigpt_language_validation(language: str):
-    valid_languages = ['pt', 'pt_br']
+    valid_languages = settings.WENIGPT_SUPPORTED_LANGUAGES.split("|")
     if language and language.lower() in valid_languages:
         return
     raise ValidationError(f"Language '{language}' not supported by now.")
@@ -263,3 +264,47 @@ language_to_qa_model = {
     'pt_br': 'pt_br',
     'pt': 'pt_br',
 }
+
+
+def request_wenigpt(context, question):
+
+    url = settings.WENIGPT_API_URL
+    token = settings.WENIGPT_API_TOKEN
+    cookie = settings.WENIGPT_COOKIE
+    base_prompt = f"Responda à pergunta com a maior sinceridade possível usando o e, se a resposta não estiver contida no CONTEXTO abaixo, diga '\''Desculpe, não possuo essa informação'\''.\n\nCONTEXTO: {context}- \n\nPergunta: {question}\n\nResposta:"
+
+    headers = {
+        "Content-Type": "application/json",
+        "Authorization": f"Bearer {token}",
+        "Cookie": cookie
+    }
+    data = {
+        "input": {
+            "prompt": base_prompt,
+            "sampling_params": {
+                "max_new_tokens": 1000,
+                "top_p": 0.1,
+                "temperature": 0.1,
+                "do_sample": False,
+                "stop_sequences": [
+                    "Pergunta:",
+                    "Resposta:"
+                ]
+            }
+        }
+    }
+
+    try:
+        response = requests.request("POST", url, headers=headers, data=json.dumps(data))
+    except Exception as e:
+        response = {"error": str(e)}
+
+    response_json = response.json()
+    text_answers = response_json["output"].get("text")
+
+    if text_answers:
+        text_answers = [{"text": answer.strip()} for answer in text_answers]
+    else:
+        text_answers = []
+
+    return {"answers": text_answers, "id": "0"}

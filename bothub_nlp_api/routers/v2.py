@@ -17,8 +17,7 @@ from bothub_nlp_api.handlers import (
     word_suggestion,
     words_distribution,
     train,
-    question_answering,
-    wenigpt
+    question_answering
 )
 
 from bothub_nlp_api.models import (
@@ -238,38 +237,20 @@ if settings.BOTHUB_NLP_API_ENABLE_QA_ROUTE:
         user_agent: str = Header(None),
     ):
 
-        weni_gpt_languages = ['pt', 'pt_br']
-        if item.language in weni_gpt_languages:
-            try:
-                result = wenigpt.wenigpt_handler(
-                    authorization,
-                    item.knowledge_base_id,
-                    item.question,
-                    item.language,
-                    user_agent=user_agent,
-                    from_backend=item.from_backend,
-                )
-            except TokenLimitException as err:
-                raise HTTPException(status_code=400, detail=err.__dict__)
-            except QuestionAnsweringException as err:
-                raise HTTPException(status_code=400, detail=err.__str__())
-            if result.get("status") and result.get("error"):
-                raise HTTPException(status_code=400, detail=result)
-        else:
-            try:
-                result = question_answering.qa_handler(
-                    authorization,
-                    item.knowledge_base_id,
-                    item.question,
-                    item.language,
-                    user_agent=user_agent,
-                    from_backend=item.from_backend,
-                )
-            except TokenLimitException as err:
-                raise HTTPException(status_code=400, detail=err.__dict__)
-            except QuestionAnsweringException as err:
-                raise HTTPException(status_code=400, detail=err.__str__())
-            if result.get("status") and result.get("error"):
-                raise HTTPException(status_code=400, detail=result)
+        try:
+            result = question_answering.qa_handler(
+                authorization,
+                item.knowledge_base_id,
+                item.question,
+                item.language,
+                user_agent=user_agent,
+                from_backend=item.from_backend,
+            )
+        except TokenLimitException as err:
+            raise HTTPException(status_code=400, detail=err.__dict__)
+        except QuestionAnsweringException as err:
+            raise HTTPException(status_code=400, detail=err.__str__())
+        if result.get("status") and result.get("error"):
+            raise HTTPException(status_code=400, detail=result)
 
         return result
