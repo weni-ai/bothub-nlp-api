@@ -164,7 +164,7 @@ def send_job_train_ai_platform(
         "--repository-authorization",
         repository_authorization,
         "--base_url",
-        bothub_nlp_api.settings.BOTHUB_ENGINE_URL,
+        settings.BOTHUB_ENGINE_URL,
         "--AIPLATFORM_LANGUAGE_QUEUE",
         language,
     ]
