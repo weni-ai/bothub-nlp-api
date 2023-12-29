@@ -296,6 +296,7 @@ def request_wenigpt(context, question):
 
     try:
         response = requests.request("POST", url, headers=headers, data=json.dumps(data))
+        print(f"[ WENIGPT REQUEST] - {response.text}")
         response_json = response.json()
         text_answers = response_json["output"].get("text")
     except Exception as e:
