@@ -271,8 +271,7 @@ def request_wenigpt(context, question):
     url = settings.WENIGPT_API_URL
     token = settings.WENIGPT_API_TOKEN
     cookie = settings.WENIGPT_COOKIE
-    base_prompt = f"Responda à pergunta com a maior sinceridade possível usando o e, se a resposta não estiver contida no CONTEXTO abaixo, diga '\''Desculpe, não possuo essa informação'\''.\n\nCONTEXTO: {context}- \n\nPergunta: {question}\n\nResposta:"
-
+    base_prompt = f"{settings.WENIGPT_PROMPT_INTRODUCTION}{settings.WENIGPT_PROMPT_TEXT}{context}{settings.WENIGPT_PROMPT_QUESTION}{question}{settings.WENIGPT_PROMPT_REINFORCEMENT_INSTRUCTION}{settings.WENIGPT_PROMPT_ANSWER}"
     headers = {
         "Content-Type": "application/json",
         "Authorization": f"Bearer {token}",
@@ -282,14 +281,13 @@ def request_wenigpt(context, question):
         "input": {
             "prompt": base_prompt,
             "sampling_params": {
-                "max_new_tokens": 1000,
-                "top_p": 0.1,
-                "temperature": 0.1,
+                "max_new_tokens": settings.WENIGPT_MAX_NEW_TOKENS,
+                "max_length": settings.WENIGPT_MAX_LENGHT,
+                "top_p": settings.WENIGPT_TOP_P,
+                "top_k": settings.WENIGPT_TOP_K,
+                "temperature": settings.WENIGPT_TEMPERATURE,
                 "do_sample": False,
-                "stop_sequences": [
-                    "Pergunta:",
-                    "Resposta:"
-                ]
+                "stop": settings.WENIGPT_STOP,
             }
         }
     }

@@ -48,6 +48,17 @@ env = environ.Env(
     WENIGPT_API_TOKEN=(str, None),
     WENIGPT_COOKIE=(str, None),
     WENIGPT_SUPPORTED_LANGUAGES=(str, None),
+    WENIGPT_PROMPT_INTRODUCTION=(str, "Você é um médico tratando um paciente com amnésia. Para responder as perguntas do paciente, você irá ler um texto anteriormente para se contextualizar. Se você trouxer informações desconhecidas, fora do texto lido, poderá deixar o paciente confuso. Se o paciente fizer uma questão sobre informações não presentes no texto, você precisa responder 'Desculpe, não possuo essa informação', pois se tentar responder, pode trazer informações que não ajudarão o paciente recuperar sua memória.\n\n"),
+    WENIGPT_PROMPT_TEXT=(str, "TEXTO: "),
+    WENIGPT_PROMPT_QUESTION=(str, "\n\nPERGUNTA: "),
+    WENIGPT_PROMPT_REINFORCEMENT_INSTRUCTION=(str, "Lembre, se não estiver no texto ou não souber a resposta, responda especificamente 'Desculpe, não possuo essa informação'. Precisamos ajudar o paciente.\n\n"),
+    WENIGPT_PROMPT_ANSWER=(str, "RESPOSTA:"),
+    WENIGPT_MAX_NEW_TOKENS=(int, 1000),
+    WENIGPT_MAX_LENGHT=(int, 8192),
+    WENIGPT_TOP_P=(float, 0.1),
+    WENIGPT_TOP_K=(int, 10),
+    WENIGPT_TEMPERATURE=(float, 0.1),
+    WENIGPT_STOP=(str, "\n"),
 )
 
 ENVIRONMENT = env.str("ENVIRONMENT")
@@ -112,3 +123,18 @@ WENIGPT_API_URL = env.str("WENIGPT_API_URL")
 WENIGPT_API_TOKEN = env.str("WENIGPT_API_TOKEN")
 WENIGPT_COOKIE = env.str("WENIGPT_COOKIE")
 WENIGPT_SUPPORTED_LANGUAGES = env.str("WENIGPT_SUPPORTED_LANGUAGES")
+
+# wenigpt most dinamic prompt
+WENIGPT_PROMPT_INTRODUCTION = env.str("WENIGPT_PROMPT_INTRODUCTION")
+WENIGPT_PROMPT_TEXT = env.str("WENIGPT_PROMPT_TEXT")
+WENIGPT_PROMPT_QUESTION = env.str("WENIGPT_PROMPT_QUESTION")
+WENIGPT_PROMPT_REINFORCEMENT_INSTRUCTION = env.str("WENIGPT_PROMPT_REINFORCEMENT_INSTRUCTION")
+WENIGPT_PROMPT_ANSWER = env.str("WENIGPT_PROMPT_ANSWER")
+
+# wenigpt most dinamic sampling_params
+WENIGPT_MAX_NEW_TOKENS = env.int("WENIGPT_MAX_NEW_TOKENS")
+WENIGPT_MAX_LENGHT = env.int("WENIGPT_MAX_LENGHT")
+WENIGPT_TOP_P = env.float("WENIGPT_TOP_P")
+WENIGPT_TOP_K = env.int("WENIGPT_TOP_K")
+WENIGPT_TEMPERATURE = env.float("WENIGPT_TEMPERATURE")
+WENIGPT_STOP = env.str("WENIGPT_STOP")
