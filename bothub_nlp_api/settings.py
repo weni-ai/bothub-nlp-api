@@ -48,15 +48,15 @@ env = environ.Env(
     WENIGPT_API_TOKEN=(str, None),
     WENIGPT_COOKIE=(str, None),
     WENIGPT_SUPPORTED_LANGUAGES=(str, None),
-    WENIGPT_PROMPT_INTRODUCTION=(str, "Você é um médico tratando um paciente com amnésia. Para responder as perguntas do paciente, você irá ler um texto anteriormente para se contextualizar. Se você trouxer informações desconhecidas, fora do texto lido, poderá deixar o paciente confuso. Se o paciente fizer uma questão sobre informações não presentes no texto, você precisa responder 'Desculpe, não possuo essa informação', pois se tentar responder, pode trazer informações que não ajudarão o paciente recuperar sua memória.\\n\\n"),
+    WENIGPT_PROMPT_INTRODUCTION=(str, "Você é um médico tratando um paciente com amnésia. Para responder as perguntas do paciente, você irá ler um texto anteriormente para se contextualizar. Se você trouxer informações desconhecidas, fora do texto lido, poderá deixar o paciente confuso. Se o paciente fizer uma questão sobre informações não presentes no texto, você precisa responder 'Desculpe, não possuo essa informação', pois se tentar responder, pode trazer informações que não ajudarão o paciente recuperar sua memória.\n\n"),
     WENIGPT_PROMPT_TEXT=(str, "TEXTO: "),
-    WENIGPT_PROMPT_QUESTION=(str, "\\n\\nPERGUNTA: "),
-    WENIGPT_PROMPT_REINFORCEMENT_INSTRUCTION=(str, "Lembre, se não estiver no texto ou não souber a resposta, responda especificamente 'Desculpe, não possuo essa informação'. Precisamos ajudar o paciente.\\n\\n"),
+    WENIGPT_PROMPT_QUESTION=(str, "\n\nPERGUNTA: "),
+    WENIGPT_PROMPT_REINFORCEMENT_INSTRUCTION=(str, "Lembre, se não estiver no texto ou não souber a resposta, responda especificamente 'Desculpe, não possuo essa informação'. Precisamos ajudar o paciente.\n\n"),
     WENIGPT_PROMPT_ANSWER=(str, "RESPOSTA:"),
     WENIGPT_MAX_NEW_TOKENS=(int, 1000),
     WENIGPT_TOP_P=(float, 0.1),
     WENIGPT_TEMPERATURE=(float, 0.1),
-    WENIGPT_STOP_SEQUENCES=(list, ["PERGUNTA:", "RESPOSTA:"])
+    WENIGPT_STOP=(str, "\n")
 )
 
 ENVIRONMENT = env.str("ENVIRONMENT")
@@ -133,4 +133,4 @@ WENIGPT_PROMPT_ANSWER = env.str("WENIGPT_PROMPT_ANSWER")
 WENIGPT_MAX_NEW_TOKENS = env.int("WENIGPT_MAX_NEW_TOKENS")
 WENIGPT_TOP_P = env.float("WENIGPT_TOP_P")
 WENIGPT_TEMPERATURE = env.float("WENIGPT_TEMPERATURE")
-WENIGPT_STOP_SEQUENCES = env.list("WENIGPT_STOP_SEQUENCES")
+WENIGPT_STOP_SEQUENCES = env.str("WENIGPT_STOP")

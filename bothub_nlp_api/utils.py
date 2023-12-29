@@ -285,7 +285,7 @@ def request_wenigpt(context, question):
                 "top_p": settings.WENIGPT_TOP_P,
                 "temperature": settings.WENIGPT_TEMPERATURE,
                 "do_sample": False,
-                "stop_sequences": settings.WENIGPT_STOP_SEQUENCES
+                "stop": settings.WENIGPT_STOP
             }
         }
     }
