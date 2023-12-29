@@ -282,10 +282,12 @@ def request_wenigpt(context, question):
             "prompt": base_prompt,
             "sampling_params": {
                 "max_new_tokens": settings.WENIGPT_MAX_NEW_TOKENS,
+                "max_length": settings.WENIGPT_MAX_LENGHT,
                 "top_p": settings.WENIGPT_TOP_P,
+                "top_k": settings.WENIGPT_TOP_K,
                 "temperature": settings.WENIGPT_TEMPERATURE,
                 "do_sample": False,
-                "stop": settings.WENIGPT_STOP
+                "stop": settings.WENIGPT_STOP,
             }
         }
     }

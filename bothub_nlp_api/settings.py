@@ -54,9 +54,11 @@ env = environ.Env(
     WENIGPT_PROMPT_REINFORCEMENT_INSTRUCTION=(str, "Lembre, se não estiver no texto ou não souber a resposta, responda especificamente 'Desculpe, não possuo essa informação'. Precisamos ajudar o paciente.\n\n"),
     WENIGPT_PROMPT_ANSWER=(str, "RESPOSTA:"),
     WENIGPT_MAX_NEW_TOKENS=(int, 1000),
+    WENIGPT_MAX_LENGHT=(int, 8192),
     WENIGPT_TOP_P=(float, 0.1),
+    WENIGPT_TOP_K=(int, 10),
     WENIGPT_TEMPERATURE=(float, 0.1),
-    WENIGPT_STOP=(str, "\n")
+    WENIGPT_STOP=(str, "\n"),
 )
 
 ENVIRONMENT = env.str("ENVIRONMENT")
@@ -131,6 +133,8 @@ WENIGPT_PROMPT_ANSWER = env.str("WENIGPT_PROMPT_ANSWER")
 
 # wenigpt most dinamic sampling_params
 WENIGPT_MAX_NEW_TOKENS = env.int("WENIGPT_MAX_NEW_TOKENS")
+WENIGPT_MAX_LENGHT = env.int("WENIGPT_MAX_LENGHT")
 WENIGPT_TOP_P = env.float("WENIGPT_TOP_P")
+WENIGPT_TOP_K = env.int("WENIGPT_TOP_K")
 WENIGPT_TEMPERATURE = env.float("WENIGPT_TEMPERATURE")
-WENIGPT_STOP_SEQUENCES = env.str("WENIGPT_STOP")
+WENIGPT_STOP = env.str("WENIGPT_STOP")
