@@ -292,17 +292,25 @@ def request_wenigpt(context, question):
         }
     }
 
+    text_answers = None
+
     try:
         response = requests.request("POST", url, headers=headers, data=json.dumps(data))
+        print(f"[ WENIGPT REQUEST] - {response.text}")
+        response_json = response.json()
+        text_answers = response_json["output"].get("text")
     except Exception as e:
         response = {"error": str(e)}
+        print(f"[ WENIGPT REQUEST ] {response}")
 
-    response_json = response.json()
-    text_answers = response_json["output"].get("text")
-
+    answers = []
     if text_answers:
-        text_answers = [{"text": answer.strip()} for answer in text_answers]
-    else:
-        text_answers = []
-
-    return {"answers": text_answers, "id": "0"}
+        for answer in text_answers:
+            answer = answer.strip()
+            ans = ""
+            for ch in answer:
+                if ch == '\n':
+                    break
+                ans += ch
+            answers.append({"text": ans})
+    return {"answers": answers, "id": "0"}
