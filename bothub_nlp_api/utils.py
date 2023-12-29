@@ -312,5 +312,5 @@ def request_wenigpt(context, question):
                 if ch == '\n':
                     break
                 ans += ch
-            answer.append({"text": ans})
+            answers.append({"text": ans})
     return {"answers": answers, "id": "0"}
