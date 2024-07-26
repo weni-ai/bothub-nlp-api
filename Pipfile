@@ -17,7 +17,7 @@ email-validator = "~=1.1.1"
 redis = "~=3.5.3"
 python-multipart = "~=0.0.5"
 bothub-backend = {editable = true, git = "https://github.com/weni-ai/bothub-backend"}
-bothub-nlp-celery = {editable = true, ref = "feature/remove-spacy", git = "https://github.com/weni-ai/bothub-nlp-celery.git"}
+bothub-nlp-celery = {editable = true, git = "https://github.com/weni-ai/bothub-nlp-celery.git"}
 openai = "*"
 
 [dev-packages]
