@@ -37,9 +37,14 @@ def train_handler(authorization, repository_version=None, language=None):
         )
 
     for repository in ready_to_train_languages:
+        print("----------------------------------")
+        print("Enters in ready_to_train_languages")
+        print("Current service train: ", settings.BOTHUB_SERVICE_TRAIN)
+        print("----------------------------------")
 
         model = get_language_model(repository)
         if settings.BOTHUB_SERVICE_TRAIN == "celery":
+            print("Celery task")
             train_task = celery_app.send_task(
                 TASK_NLU_TRAIN_UPDATE,
                 args=[
@@ -53,6 +58,7 @@ def train_handler(authorization, repository_version=None, language=None):
                 {"task": train_task, "language": repository.get("language")}
             )
         elif settings.BOTHUB_SERVICE_TRAIN == "ai-platform":
+            print("AI Platform task")
             job_id = f'bothub_{settings.ENVIRONMENT}_train_{str(repository.get("current_version_id"))}_{repository.get("language")}_{str(int(time.time()))}'
             send_job_train_ai_platform(
                 jobId=job_id,
