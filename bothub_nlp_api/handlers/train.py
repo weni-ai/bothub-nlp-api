@@ -18,6 +18,7 @@ TRAIN_STATUS_FAILED = "failed"
 
 
 def train_handler(authorization, repository_version=None, language=None):
+    print("----- Enter on train language ---------")
     repository_authorization = repository_authorization_validation(authorization)
 
     languages_report = {}
@@ -31,10 +32,12 @@ def train_handler(authorization, repository_version=None, language=None):
         ready_to_train_languages = (
             [language_status] if language_status.get("ready_for_train") else []
         )
+        print("Enter on language if")
     else:
         ready_to_train_languages = backend().request_all_readytotrain_languages(
             repository_authorization, repository_version
         )
+        print("Enter on language else")
 
     for repository in ready_to_train_languages:
         print("----------------------------------")
@@ -80,6 +83,7 @@ def train_handler(authorization, repository_version=None, language=None):
             "status": TRAIN_STATUS_PROCESSING
         }
 
+    print("After for loop")
     resp = {
         "SUPPORTED_LANGUAGES": list(settings.SUPPORTED_LANGUAGES.keys()),
         "languages_report": languages_report,
